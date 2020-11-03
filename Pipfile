@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest-django = "*"
+factory-boy = "*"
+
+[packages]
+django = "*"
+psycopg2-binary = "*"
+django-environ = "*"
+pillow = "*"
+
+[requires]
+python_version = "3.8"
