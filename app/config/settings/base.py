@@ -2,10 +2,11 @@ import os
 import environ
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ENV_FILE = os.path.join(os.path.dirname(BASE_DIR), '.env')
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(env_file=ENV_FILE)
 
 SITE_ID = 1
 
