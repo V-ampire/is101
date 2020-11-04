@@ -12,6 +12,7 @@ class Company(TimeStamptedModel):
     logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/")
     tagline = models.CharField("Слоган компании", max_length=264)
     is_current = models.BooleanField("Текущая настройка", default=True)
+    
 
     def __str__(self):
         return self.title
