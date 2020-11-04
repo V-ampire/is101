@@ -7,8 +7,7 @@ After=network.target
 User=django
 Group=www-data
 WorkingDirectory=/home/django/projects/is101/app
-ExecStart=source /home/django/projects/is101/.env \
-          /home/django/projects/is101/venv/bin/gunicorn \
+ExecStart=/home/django/projects/is101/venv/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
