@@ -24,8 +24,8 @@ class BusinessEntity(TimeStamptedModel):
         return self.title
 
     class Meta:
-        verbose_name = 'Информация об организациях'
-        verbose_name_plural = 'Информация о организациях
+        verbose_name = 'Юридические лица'
+        verbose_name_plural = 'Юридические лица'
         ordering = ('is_active', 'title', '-created')
 
 
@@ -38,7 +38,6 @@ class Company(TimeStamptedModel):
     logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/")
     tagline = models.CharField("Слоган компании", max_length=264)
     is_current = models.BooleanField("Текущая настройка", default=True)
-    
 
     def __str__(self):
         return self.title
@@ -52,6 +51,7 @@ class Branch(TimeStamptedModel):
     """
     Модель филиала компании.
     """
+    company = models.ForeignKey("company.Company", on_delete=models.CASCADE, related_name="branches")
     city = models.CharField("Город", max_length=64, default="Комсомольск-на-Амуре") # FIXME батарейка для городов
     address = models.CharField("Адрес, без города", max_length=264)
     phone = models.CharField("Номер телефона", max_length=12) # FIXME список телефонов
@@ -89,6 +89,7 @@ class Employee(TimeStamptedModel):
         (ARCHIVED, "В архиве")
     )
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    fio = models.CharField("ФИО", max_length=264)
     branch = models.ForeignKey("company.Branch", on_delete=models.SET_NULL, null=True, 
                                     related_name='employees')
     position = models.ForeignKey("company.Position", on_delete=models.SET_NULL, null=True)
@@ -98,20 +99,8 @@ class Employee(TimeStamptedModel):
                                     validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'pdf', 'zip'])])
     status = models.CharField("Статус", max_length=16, choices=STATUS_CHOISES, default=ACTIVE)
 
-    def disable_user(self):
-        """
-        Отключить учетку работника.
-        """
-        self.user.is_active = False
-        self.user.save()
-
-    def save(self, *args, **kwargs):
-        if self.status == self.ARCHIVED:
-            self.disable_user()
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"{self.position.title}: {self.user.first_name} {self.user.last_name}"
+        return f"{self.position.title}: {self.fio}"
 
     class Meta:
         verbose_name = 'Работники'
