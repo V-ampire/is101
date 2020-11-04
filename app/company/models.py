@@ -107,6 +107,7 @@ class Employee(TimeStamptedModel):
     def save(self, *args, **kwargs):
         if self.status == self.ARCHIVED:
             self.disable_user()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.position.title}: {self.user.first_name} {self.user.last_name}"
