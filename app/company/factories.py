@@ -17,12 +17,6 @@ class BusinessEntityFactory(factory.django.DjangoModelFactory):
         model = models.BusinessEntity
 
     title = factory.Faker('company')
-    inn = factory.Faker('pystr', max_chars=12)
-    inn = factory.Faker('pystr', max_chars=15)
-    city = factory.Faker('city')
-    address = factory.Faker('address')
-    email = factory.Faker('company_email')
-    phone = factory.Faker('phone_number')
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -32,8 +26,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Company
 
-    entity = factory.SubFactory(BusinessEntityFactory)
     title = factory.Faker('company')
+    inn = factory.Faker('pystr', max_chars=12)
+    ogrn = factory.Faker('pystr', max_chars=15)
+    city = factory.Faker('city')
+    address = factory.Faker('address')
+    email = factory.Faker('company_email')
+    phone = factory.Faker('phone_number')
     logo = factory.django.ImageField(filename=fake.file_path())
     tagline = factory.Faker('catch_phrase')
 

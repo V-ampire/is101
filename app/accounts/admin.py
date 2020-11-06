@@ -7,14 +7,14 @@ from accounts import models
 
 class UserAccountAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('username', 'role', 'password')}),
         (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('is_active', 'is_superuser', 'groups', 'user_permissions'),
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
-    list_display = ('username', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    list_display = ('username', 'role')
+    list_filter = ('role', 'is_superuser', 'is_active', 'groups')
     search_fields = ('username',)
     ordering = ('username',)
     filter_horizontal = ('groups', 'user_permissions',)

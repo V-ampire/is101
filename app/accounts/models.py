@@ -9,26 +9,41 @@ class UserAccountManager(BaseUserManager):
     """
     Менеджер для модели учетной записи пользователя.
     """
-    def create_user(self, username, password=None, **extra_fields):
+    def create_user(self, username, role, password, **extra_fields):
         """
         Создать и сохранить новую учетную запись.
         """
-        extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        user = self.model(username=username, **extra_fields)
+        user = self.model(username=username, role=role, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password=None):
+    def create_superuser(self, username, password):
         """
         Создать и сохранить учетку суперпользоватля.
         """
-        user = self.create_user(username, password)
-        user.is_staff = True
+        role = UserAccount.ADMIN
+        user = self.create_user(username, role, password)
         user.is_superuser = True
         user.save(using=self._db)
         return user
+
+
+class CompanyManager(UserAccountManager):
+    """
+    Менеджер возвращающий только учетки юр. лиц.
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(role=UserAccount.COMPANY)
+
+
+class EmployeeManager(UserAccountManager):
+    """
+    Менеджер возвращающий только учетки работников.
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(role=UserAccount.EMPLOYEE)
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
@@ -37,6 +52,16 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     Содержит только поля username и password.
     """
     username_validator = UnicodeUsernameValidator()
+
+    ADMIN = 'admin'
+    COMPANY = 'company'
+    EMPLOYEE = 'employee'
+
+    ROLE_CHOICES = (
+        (ADMIN, 'Администратор'),
+        (COMPANY, 'Юр. лицо'),
+        (EMPLOYEE, 'Работник')
+    )
 
     username = models.CharField(
         _('username'),
@@ -48,11 +73,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    is_staff = models.BooleanField(
-        _('staff status'),
-        default=False,
-        help_text=_('Designates whether the user can log into this admin site.'),
-    )
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -61,12 +81,19 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
+    role = models.CharField("Тип учетки", max_length=16, choices=ROLE_CHOICES, default=EMPLOYEE)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
     objects = UserAccountManager()
+    company_objects = CompanyManager()
+    employee_objects = EmployerManager()
+
+    @property
+    def is_staff(self):
+        return self.role == self.ADMIN
 
     def get_full_name(self):
         return self.username

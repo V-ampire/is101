@@ -1,16 +1,39 @@
-from django.contrib.auth import get_user_model
-
-from accounts import models
+from accounts.models import UserAccount
 
 import factory
 
 
-class UserAccountModelFactory(factory.django.DjangoModelFactory):
+class AdminUserAccountModelFactory(factory.django.DjangoModelFactory):
     """
-    Фабрика для модели учетной записи (пользователя).
+    Фабрика для модели учетной записи администратора.
     """
     class Meta:
-        model = models.UserAccount
+        model = UserAccount
 
     username = factory.Faker('user_name')
-    pasword = factory.Faker('password')
+    password = factory.Faker('password')
+    role = UserAccount.ADMIN
+
+
+class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
+    """
+    Фабрика для модели учетной записи юр. лица.
+    """
+    class Meta:
+        model = UserAccount
+
+    username = factory.Faker('user_name')
+    password = factory.Faker('password')
+    role = UserAccount.COMPANY
+
+
+class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
+    """
+    Фабрика для модели учетной записи юр. лица.
+    """
+    class Meta:
+        model = UserAccount
+
+    username = factory.Faker('user_name')
+    password = factory.Faker('password')
+    role = UserAccount.EMPLOYEE
