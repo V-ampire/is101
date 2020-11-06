@@ -12,7 +12,7 @@ import datetime
 class MyLoginView(LoginView):
     """LoginView с ограничение попыток входа"""
 
-    template_block = 'my_auth/block.html'
+    template_block = 'accounts/block.html'
 
     def render_block_template(self, unblock_time):
         return render(self.request, self.template_block, {'unblock_time': unblock_time})
