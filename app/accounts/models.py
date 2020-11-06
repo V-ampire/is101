@@ -89,7 +89,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     objects = UserAccountManager()
     company_objects = CompanyManager()
-    employee_objects = EmployerManager()
+    employee_objects = EmployeeManager()
 
     @property
     def is_staff(self):

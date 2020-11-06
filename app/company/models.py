@@ -23,7 +23,7 @@ class StatusModel(models.Model):
         ('-status', )
 
 
-class Company(TimeStamptedModel, IsActiveModel):
+class Company(TimeStamptedModel, StatusModel):
     """
     Информация о компании.
     """
@@ -46,7 +46,7 @@ class Company(TimeStamptedModel, IsActiveModel):
         ordering = ('title', '-created')
 
 
-class Branch(TimeStamptedModel, IsActiveModel):
+class Branch(TimeStamptedModel, StatusModel):
     """
     Модель филиала компании.
     """
@@ -63,7 +63,7 @@ class Branch(TimeStamptedModel, IsActiveModel):
         verbose_name_plural = 'Филиалы'
 
 
-class Position(TimeStamptedModel, IsActiveModel):
+class Position(TimeStamptedModel, StatusModel):
     """
     Модель должности.
     """
@@ -77,7 +77,7 @@ class Position(TimeStamptedModel, IsActiveModel):
         verbose_name_plural = 'Должности'
 
 
-class Employee(TimeStamptedModel, IsActiveModel):
+class Employee(TimeStamptedModel, StatusModel):
     """
     Модель работника.
     """
