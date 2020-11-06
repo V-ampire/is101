@@ -3,9 +3,11 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from accounts import models
+from accounts.forms import UserAccountChangeForm
 
 
 class UserAccountAdmin(BaseUserAdmin):
+    form = UserAccountChangeForm
     fieldsets = (
         (None, {'fields': ('username', 'role', 'password')}),
         (_('Permissions'), {
