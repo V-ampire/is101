@@ -37,18 +37,18 @@ def test_create_superuser():
 def test_company_manager():
     admin_user = facories.AdminUserAccountModelFactory()
     company_user = facories.CompanyUserAccountModelFactory()
-    employer_user = facories.EmployerUserAccountModelFactory()
+    employer_user = facories.EmployeeUserAccountModelFactory()
     tested = UserAccount.company_objects.all()
     expected = UserAccount.objects.filter(role=UserAccount.COMPANY)
     assert set(tested) == set(expected)
 
 
 @pytest.mark.django_db
-def test_employer_manager():
+def test_employee_manager():
     admin_user = facories.AdminUserAccountModelFactory()
     company_user = facories.CompanyUserAccountModelFactory()
     employee_user = facories.EmployeeUserAccountModelFactory()
-    tested = UserAccount.employer_objects.all()
+    tested = UserAccount.employee_objects.all()
     expected = UserAccount.objects.filter(role=UserAccount.EMPLOYEE)
     assert set(tested) == set(expected)
 

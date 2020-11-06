@@ -1,8 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+
+import datetime
 
 
 class UserAccountManager(BaseUserManager):
@@ -106,3 +109,32 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Учетные записи'
 
 
+class IPAddress(models.Model):
+    """
+    IP адрес с возможностью блокировки по числу неудачных попыток входа.
+    """ 
+    ip = models.GenericIPAddressField("IP адрес", unique=True)
+    attempts = models.IntegerField("Неудачных попыток", default=0)
+    unblock_time = models.DateTimeField("Время разблокировки", blank=True, null=True)
+    is_blocked = models.BooleanField("Статус блокировки", default=False)
+
+    def block(self, minutes: int):
+        """Заблокировать IP на указанное количество минут"""
+        self.is_blocked = True
+        self.unblock_time = timezone.now() + datetime.timedelta(minutes=minutes)
+        self.save()
+
+    def unblock(self):
+        """
+        Разблокировать IP.
+        """
+        self.is_blocked = False
+        self.unblock_time = None
+        self.save()
+
+    def clean(self):
+        if self.is_blocked and not self.unblock_time:
+            raise ValidationError(_("You must set unblock time when blocking IP"))
+
+    def __str__(self):
+        return self.ip

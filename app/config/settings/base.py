@@ -95,3 +95,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'accounts.UserAccount'
+
+AUTH_ATTEMPTS = {
+    "15_MINUTES_BLOCK": (3, 6),
+    "24_HOURS_BLOCK": (9,),
+}
