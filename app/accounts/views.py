@@ -3,6 +3,8 @@ from django.views.generic import  TemplateView
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render
 
+from django.utils import timezone
+
 from accounts import utils
 from accounts.models import IPAddress
 
@@ -12,6 +14,7 @@ import datetime
 class MyLoginView(LoginView):
     """LoginView с ограничение попыток входа"""
 
+    template_name = 'accounts/login.html'
     template_block = 'accounts/block.html'
 
     def render_block_template(self, unblock_time):
@@ -32,13 +35,12 @@ class MyLoginView(LoginView):
             return self.form_invalid(form)
 
 
-# class BlockView(TemplateView):
-#     template_name = 'my_auth/block.html'
+class BlockView(TemplateView):
+    template_name = 'accounts/block.html'
 
-#     def get_context_data(self, **kwargs):
-#         context = super(BlockView, self).get_context_data(**kwargs)
-#         unblock_time = timezone.now() + datetime.timedelta(minutes=15)
-#         print(type(unblock_time))
-#         context['unblock_time'] = unblock_time
-#         return context
+    def get_context_data(self, **kwargs):
+        context = super(BlockView, self).get_context_data(**kwargs)
+        unblock_time = timezone.now() + datetime.timedelta(minutes=15)
+        context['unblock_time'] = unblock_time
+        return context
     
