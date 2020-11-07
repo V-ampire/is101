@@ -6,3 +6,4 @@ pillow==8.0.1
 psycopg2-binary==2.8.6
 pytz==2020.4
 sqlparse==0.4.1
+django-betterforms==1.2
