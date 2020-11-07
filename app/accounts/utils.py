@@ -55,13 +55,14 @@ def process_attempt(ip: str) -> IPAddress:
     attempts_15_minutes_block = settings.AUTH_ATTEMPTS['15_MINUTES_BLOCK']
     attempts_24_hours_block = settings.AUTH_ATTEMPTS['24_HOURS_BLOCK']
 
-    ip_adress, created = IPAddress.objects.get_or_create(ip=ip)
-    ip_adress.attempts += 1
-    if ip_adress.attempts in attempts_15_minutes_block:
-        ip_adress.block(minutes=15)
-    elif ip_adress.attempts in attempts_24_hours_block:
-        ip_adress.block(minutes=24*60)
-    elif ip_adress.attempts > max(attempts_24_hours_block):
-        ip_adress.attempts = 1
-        ip_adress.save()
-    return ip_adress
+    ip_address, created = IPAddress.objects.get_or_create(ip=ip)
+    ip_address.attempts += 1
+    ip_address.save()
+    if ip_address.attempts in attempts_15_minutes_block:
+        ip_address.block(minutes=15)
+    elif ip_address.attempts in attempts_24_hours_block:
+        ip_address.block(minutes=24*60)
+    elif ip_address.attempts > max(attempts_24_hours_block):
+        ip_address.attempts = 1
+        ip_address.save()
+    return ip_address

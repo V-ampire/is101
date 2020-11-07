@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'company',
+    'admins_dashboard',
 ]
 
 MIDDLEWARE = [

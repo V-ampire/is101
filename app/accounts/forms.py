@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserChangeForm, UsernameField
+from django.contrib.auth.forms import UserChangeForm, UsernameField, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -21,3 +21,9 @@ class UserAccountChangeForm(UserChangeForm):
                 params={'role': role}
             )
         
+
+class LoginForm(AuthenticationForm):
+    """
+    Форма для входа в систему
+    """
+    pass

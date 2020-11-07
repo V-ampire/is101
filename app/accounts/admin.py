@@ -23,3 +23,6 @@ class UserAccountAdmin(BaseUserAdmin):
 
 
 admin.site.register(models.UserAccount, UserAccountAdmin)
+
+
+admin.site.register(models.IPAddress)
