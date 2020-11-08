@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'accounts',
     'company',
     'admins_dashboard',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.api_root',
             ],
         },
     },
@@ -101,3 +103,7 @@ AUTH_ATTEMPTS = {
     "15_MINUTES_BLOCK": (3, 6),
     "24_HOURS_BLOCK": (9,),
 }
+
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+API_ROOT = env.str('API_ROOT')

@@ -44,6 +44,7 @@ class LoginView(BruteForceLoginView):
     LoginView для пользователей CRM.
     """
     form = forms.LoginForm
+    redirect_authenticated_user = True
 
     def get_redirect_url_for_admin(self):
         """
@@ -53,9 +54,7 @@ class LoginView(BruteForceLoginView):
 
     def get_redirect_url(self):
         if self.request.user.is_staff:
-            return self.get_redirect_url_for_admin()
-    
-    
+            return self.get_redirect_url_for_admin()    
 
 
 class BlockView(TemplateView):

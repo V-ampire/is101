@@ -10,3 +10,7 @@
 Тесты:
 - BruteForceView
 - LoginView
+
+
+Рефакторинг:
+- Заменить импорты UserAccount на get_user_model
