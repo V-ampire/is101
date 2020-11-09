@@ -1,6 +1,6 @@
 from company import models
 
-from accounts.facories import UserAccountModelFactory
+from accounts.factories import EmployeeUserAccountModelFactory
 
 import factory
 from faker import Faker
@@ -8,15 +8,6 @@ from faker import Faker
 
 fake = Faker()
 
-
-class BusinessEntityFactory(factory.django.DjangoModelFactory):
-    """
-    Фабрика для модели юридического лица.
-    """
-    class Meta:
-        model = models.BusinessEntity
-
-    title = factory.Faker('company')
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -54,6 +45,9 @@ class PositionFactory(factory.django.DjangoModelFactory):
     """
     Фабрика для модели должности.
     """
+    class Meta:
+        model = models.Position
+
     title = factory.Faker('job')
 
 
@@ -61,7 +55,10 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     """
     Фабрика для модели работника.
     """
-    user = factory.SubFactory(UserAccountModelFactory)
+    class Meta:
+        model = models.Employee
+        
+    user = factory.SubFactory(EmployeeUserAccountModelFactory)
     fio = factory.Faker('name')
     branch = factory.SubFactory(BranchFactory)
     position = factory.SubFactory(PositionFactory)

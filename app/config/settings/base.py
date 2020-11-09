@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'accounts',
     'company',
     'admins_dashboard',
-    'api'
+    'api',
+    'factory_generator'
 ]
 
 MIDDLEWARE = [
