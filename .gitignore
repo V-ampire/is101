@@ -136,4 +136,6 @@ venv.bak/
 .mypy_cache/
 
 .idea
+.idea/
 .vscode
+.vscode/
