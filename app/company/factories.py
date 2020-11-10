@@ -1,6 +1,6 @@
 from company import models
 
-from accounts.factories import EmployeeUserAccountModelFactory
+from accounts import factories as accounts_factories
 
 import factory
 from faker import Faker
@@ -17,6 +17,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Company
 
+    user = factory.SubFactory(accounts_factories.CompanyUserAccountModelFactory)
     title = factory.Faker('company')
     inn = factory.Faker('pystr', max_chars=12)
     ogrn = factory.Faker('pystr', max_chars=15)
@@ -58,7 +59,7 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Employee
         
-    user = factory.SubFactory(EmployeeUserAccountModelFactory)
+    user = factory.SubFactory(accounts_factories.EmployeeUserAccountModelFactory)
     fio = factory.Faker('name')
     branch = factory.SubFactory(BranchFactory)
     position = factory.SubFactory(PositionFactory)

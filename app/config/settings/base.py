@@ -108,3 +108,13 @@ AUTH_ATTEMPTS = {
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 API_ROOT = env.str('API_ROOT')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

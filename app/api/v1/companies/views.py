@@ -1,18 +1,24 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
+from api.v1 import mixins
 from api.v1.companies import serializers
 
 from company.models import Company
 
 
-class CompanyViewSet(viewsets.ModelViewSet):
+class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для юр. лиц.
     """
     queryset = Company.objects.all()
     serializer_class = serializers.CompanySerializer
     list_serializer_class = serializers.CompanyListSerializer
+
+    permission_action_classes = {
+         "list": [IsAdminUser]
+     }
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -26,5 +32,4 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
         serializer = serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
-        
         
