@@ -27,6 +27,12 @@ class Company(TimeStamptedModel, StatusModel):
     """
     Информация о компании.
     """
+    user = models.OneToOneField(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        null=True,
+        default=None
+    )
     title = models.CharField("Название компании", max_length=128, unique=True)
     logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/")
     tagline = models.CharField("Слоган компании", max_length=264)

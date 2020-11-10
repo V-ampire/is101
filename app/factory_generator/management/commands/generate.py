@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from factory_generator import utils
 
@@ -11,9 +12,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         config = utils.load_config()
-        for app in config.apps:
-            app_config = apps.get_app_config(app)
-            for factory in utils.get_app_factories(app_config.path):
-                factory.create_batch(config.quantity)
-                self.stdout.write(self.style.SUCCESS(f'Successfully created {config.quantity} \
-                objects of model {factory._meta.model}'))
+        with transaction.atomic():
+            for app in config.apps:
+                app_config = apps.get_app_config(app)
+                for factory in utils.get_app_factories(app_config.path):
+                    factory.create_batch(config.quantity)
+                    message = f'Successfully created {config.quantity} objects of model {factory._meta.model}'
+                    self.stdout.write(self.style.SUCCESS(message))

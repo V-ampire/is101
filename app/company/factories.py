@@ -24,7 +24,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     address = factory.Faker('address')
     email = factory.Faker('company_email')
     phone = factory.Faker('phone_number')
-    logo = factory.django.ImageField(filename=fake.file_path())
+    logo = factory.django.ImageField(filename=fake.file_name(extension='jpg'))
     tagline = factory.Faker('catch_phrase')
 
 
@@ -64,4 +64,4 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     position = factory.SubFactory(PositionFactory)
     date_of_birth = factory.Faker('date')
     pasport = factory.Faker('pystr')
-    pasport_scan = factory.django.FileField(filename=fake.file_name())
+    pasport_scan = factory.django.FileField(filename=fake.file_name(extension='pdf'))
