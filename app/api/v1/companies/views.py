@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from api.v1 import mixins
 from api.v1.companies import serializers
+from api.v1.companies.permissions import IsOwnerOrAdmin
 
 from company.models import Company
 
@@ -13,23 +14,37 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
     Вьюсет для юр. лиц.
     """
     queryset = Company.objects.all()
-    serializer_class = serializers.CompanySerializer
-    list_serializer_class = serializers.CompanyListSerializer
+    lookup_field = 'uuid'
 
     permission_action_classes = {
-         "list": [IsAdminUser]
+        "list": [IsAdminUser],
+        "retrieve": [IsOwnerOrAdmin],
+        "create": [IsAdminUser],
+        "update": [IsOwnerOrAdmin],
+        "partial_update": [IsOwnerOrAdmin],
+        "destroy": [IsAdminUser],
      }
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer_class = self.list_serializer_class
-        context = self.get_serializer_context()
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            if self.request.user.is_staff:
+                return serializers.CompanySerializerForAdmin
+            return serializers.CompanySerializerForOwner
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = serializer_class(page, many=True, context=context)
-            return self.get_paginated_response(serializer.data)
+        if self.action == "list":
+            return serializers.CompanyListSerializer
 
-        serializer = serializer_class(queryset, many=True, context=context)
-        return Response(serializer.data)
+        if self.action == "create":
+            return serializers.CompanySerializerForAdmin
+
+        if self.action == "update":
+            if self.request.user.is_staff:
+                return serializers.CompanySerializerForAdmin
+            return serializers.CompanySerializerForOwner
         
+        if self.action == "partial_update":
+            if self.request.user.is_staff:
+                return serializers.CompanySerializerForAdmin
+            return serializers.CompanySerializerForOwner
+        
+

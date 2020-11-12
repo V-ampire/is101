@@ -27,10 +27,13 @@ class ViewSetActionPermissionMixin:
         Refer to https://stackoverflow.com/a/35987077/1677041
         """
         try:
-            return [
+            p = [
                 permission()
                 for permission in self.permission_action_classes[self.action]
             ]
+            # if self.action == 'retrieve':
+            #     import pdb; pdb.set_trace()
+            return p
         except KeyError:
             if self.action:
                 action_func = getattr(self, self.action, {})

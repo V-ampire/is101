@@ -8,6 +8,8 @@ from core.models import TimeStamptedModel
 
 from company.utils import get_employee_pasport_scan_path
 
+import uuid
+
 
 class StatusModel(models.Model):
     """
@@ -36,6 +38,7 @@ class Company(TimeStamptedModel, StatusModel):
     """
     Информация о компании.
     """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="company")
     title = models.CharField("Название компании", max_length=128, unique=True)
     logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/")
@@ -45,7 +48,7 @@ class Company(TimeStamptedModel, StatusModel):
     city = models.CharField("Город", max_length=64, default="Комсомольск-на-Амуре") # FIXME батарейка для городов
     address = models.CharField("Адрес, без города", max_length=264)
     email = models.EmailField("Имеил")
-    phone = models.CharField("Номер телефона", max_length=12)
+    phone = models.CharField("Номер телефона", max_length=32)
 
     def clean(self):
         is_user_company(self.user.pk)
@@ -63,10 +66,11 @@ class Branch(TimeStamptedModel, StatusModel):
     """
     Модель филиала компании.
     """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     company = models.ForeignKey("company.Company", on_delete=models.CASCADE, related_name="branches")
-    city = models.CharField("Город", max_length=64, default="Комсомольск-на-Амуре") # FIXME батарейка для городов
+    city = models.CharField("Город", max_length=264, default="Комсомольск-на-Амуре") # FIXME батарейка для городов
     address = models.CharField("Адрес, без города", max_length=264)
-    phone = models.CharField("Номер телефона", max_length=12) # FIXME список телефонов
+    phone = models.CharField("Номер телефона", max_length=32) # FIXME список телефонов
 
     def __str__(self):
         return f"{self.city}, {self.address}"
@@ -80,7 +84,8 @@ class Position(TimeStamptedModel, StatusModel):
     """
     Модель должности.
     """
-    title = models.CharField("Название должности", max_length=64, unique=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    title = models.CharField("Название должности", max_length=264, unique=True)
 
     def __str__(self):
         return self.title
@@ -94,6 +99,7 @@ class Employee(TimeStamptedModel, StatusModel):
     """
     Модель работника.
     """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="employee")
     fio = models.CharField("ФИО", max_length=264)
     branch = models.ForeignKey("company.Branch", on_delete=models.SET_NULL, null=True, 
@@ -107,8 +113,8 @@ class Employee(TimeStamptedModel, StatusModel):
     def clean(self):
         is_user_employee(self.user.pk)
 
-    def __str__(self):
-        return f"{self.position.title}: {self.fio}"
+    # def __str__(self):
+    #     return f"{self.position.title}: {self.fio}"
 
     class Meta:
         verbose_name = 'Работники'

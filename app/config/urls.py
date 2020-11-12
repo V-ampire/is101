@@ -23,6 +23,7 @@ urlpatterns = [
     path('adminka/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('admins_dashboard/', include('admins_dashboard.urls')),
+    path('api/v1/', include('api.v1.urls')),
 ]
 
 if settings.DEBUG:
