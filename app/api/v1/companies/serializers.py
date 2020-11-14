@@ -40,7 +40,6 @@ class CompanySerializerForAdmin(serializers.ModelSerializer):
     class Meta:
         model = models.Company
         fields = (
-            'id',
             'user',
             'title',
             'logo',

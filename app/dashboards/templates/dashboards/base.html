@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="api_root" content="{{ api_root }}">
+
+    {% block css %}
+    {% endblock css %}
+    <style>
+        html, body {height: 100%;}
+        .flex-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+    </style>
+    <title>{% block title %}{% endblock title %}</title>
+  </head>
+  <body>
+    <div class="flex-wrapper">
+      <div class="main">
+        <div class="content">
+          {% block content %}
+          {% endblock content %}            
+        </div>
+      </div>
+      <footer></footer>
+    </div>
+</html>
