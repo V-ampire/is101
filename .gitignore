@@ -11,8 +11,8 @@ __pycache__/*
 # Деплоймент
 /deployment/*
 # Медиа и статик
-/media/*
-/static/*
+media/
+app/static/*
 *.sh
 *.pem
 # node_modules
