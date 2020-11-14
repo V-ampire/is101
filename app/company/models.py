@@ -6,8 +6,6 @@ from accounts.validators import is_user_company, is_user_employee
 
 from core.models import TimeStamptedModel
 
-from company.utils import get_employee_pasport_scan_path
-
 import uuid
 
 
@@ -93,6 +91,13 @@ class Position(TimeStamptedModel, StatusModel):
     class Meta:
         verbose_name = 'Должности'
         verbose_name_plural = 'Должности'
+
+
+def get_employee_pasport_scan_path(instance, filename) -> str:
+    """
+    Возвращает путь к директории в которую сохраняются сканы паспортов.
+    """
+    return f"employees_pasports/{instance.fio}"
 
 
 class Employee(TimeStamptedModel, StatusModel):

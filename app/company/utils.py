@@ -1,5 +1,16 @@
-def get_employee_pasport_scan_path(instance, filename) -> str:
+from django.contrib.auth import get_user_model
+from django.db import transaction
+
+from company.models import Company
+
+
+def delete_company(company_pk):
     """
-    Возвращает путь к директории в которую сохраняются сканы паспортов.
+    Удаление юрлица.
+    Вместе с юрлицом удаляется его учетная запись.
     """
-    return f"employees_pasports/{instance.fio}"
+    with transaction.atomic():
+        company = Company.objects.get(pk=company_pk)
+        user = get_user_model().company_objects.get(pk=company.user.pk)
+        company.delete()
+        user.delete()
