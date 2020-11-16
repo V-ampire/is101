@@ -7,8 +7,22 @@
 {% endblock title %}
 
 
+{% block css %}
+    <link rel="stylesheet" href="{% static 'dashboards/admin/dist/css/chunk-vendors.css' %}">
+{% endblock css %}
+
+
 {% block content %}
-    
+    <div id="app"></div>
 {% endblock content %}
     
+
+
+{% block scripts %}
+    <script>
+        const api_root = 'localhost';
+    </script>
+    <script src="{% static 'dashboards/admin/dist/js/chunk-vendors.js' %}"></script>
+    <script src="{% static 'dashboards/admin/dist/js/app.js' %}"></script>
+{% endblock scripts %}
     

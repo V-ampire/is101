@@ -50,7 +50,7 @@ class LoginView(BruteForceLoginView):
         """
         Возвращает URL для админов.
         """
-        return reverse_lazy('admins_dashboard:main')
+        return reverse_lazy('dashboards:admin')
 
     def get_redirect_url(self):
         if self.request.user.is_staff:

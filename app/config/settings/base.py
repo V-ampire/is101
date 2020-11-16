@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'company',
-    'admins_dashboard',
+    'dashboards',
     'api',
     'factory_generator'
 ]
