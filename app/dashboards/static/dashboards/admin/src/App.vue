@@ -1,15 +1,11 @@
 <template>
-  <v-app>
-    <v-main>
-      <router-link
-        to='/dashboards/about'
-        tag='span'
-        style='cursor: pointer'>
-        About
-      </router-link>
-      <router-view></router-view>
-    </v-main>
-  </v-app>
+<v-app>
+  <v-main>
+    <v-container>
+      Hello World
+    </v-container>
+  </v-main>
+</v-app>
 </template>
 
 <script>

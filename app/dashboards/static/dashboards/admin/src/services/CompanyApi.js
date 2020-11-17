@@ -3,7 +3,7 @@ import axios from 'axios'
 
 export default {
 
-    fetchCompanyList() {
+    fetchAll() {
         return axios.get('/companies')
             .then(response => {
                 return response.data

@@ -1,24 +1,16 @@
-# admin
+# Панель администратора
 
-## Project setup
-```
-npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## API компаний:
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### Методы:
 
-### Lints and fixes files
-```
-npm run lint
-```
+`fetchAll()` - загрузить все компании
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+`archivate(company_uuid)` - устаноить статус "В архиве"
+
+1. Отправить запрос
+2. Получить ответ результатом выполнения, uuid объекта.
+3. Сравнить uuid отправленного и полученного.
+4. Изменить статус объекта в отображении
+5. Отсортирвать список

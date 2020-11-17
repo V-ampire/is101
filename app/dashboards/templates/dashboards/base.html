@@ -1,32 +1,37 @@
+{% load static %}
+
 <!doctype html>
 <html lang="ru">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="api_root" content="{{ api_root }}">
 
     {% block css %}
     {% endblock css %}
-    <style>
-        html, body {height: 100%;}
-        .flex-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-        }
-        .w-100vw {
-          width: 1vw;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'dashboards/base/css/base.css' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;600;900&display=swap" rel="stylesheet">
     <title>{% block title %}{% endblock title %}</title>
   </head>
   <body>
     <div class="flex-wrapper">
       <div class="main">
-        <header class="w-100vw">
-          <div class="brand">101</div>
+        <header class="header">
+          <div class="toolbar">
+            <div class="brand">
+              "101" - CRM
+            </div>
+            <div class="auth">
+              {% if user.is_authenticated %}
+                <div class="user">
+                  <span class="username">{{ user.username }}</span> 
+                  / 
+                  <a href="{% url 'accounts:logout' %}">Выйти</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
         </header>
         <div class="content">
           {% block content %}

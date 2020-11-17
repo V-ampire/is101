@@ -114,7 +114,13 @@ class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = models.Company
-        fields = ('url', 'city', 'title', 'status')
+        fields = (
+            'uuid',
+            'url', 
+            'city', 
+            'title', 
+            'status'
+        )
         extra_kwargs = {
             'url': {'view_name': 'api_v1:company-detail', 'lookup_field': 'uuid'},
         }
