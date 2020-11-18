@@ -1,33 +1,43 @@
 <template>
     <v-container>
-        <v-list
-            v-for="company in companies"
-            :key="company.uuid">
-            <company-item
-                uuid=company.uuid,
-                url=company.url,
-                city=company.city,
-                title=company.title,
-                status=company.status
-            ></company-item>
-        </v-list>
+        <v-data-table
+            :headers="headers"
+            :items="companies"
+        ></v-data-table>
     </v-container>
 </template>
 
 
 <script>
-import CompanyListItem from './CompanyListItem'
 import companyApi from '@/services/CompanyApi'
 
 export default {
     data() {
         return {
+            headers: [
+                {
+                    text: 'Название юр. лица',
+                    value: 'title',
+                },
+                {
+                    text: 'Город',
+                    value: 'city'
+                },
+                {
+                    text: 'Адрес',
+                    value: 'address'
+                },
+                {
+                    text: 'Статус',
+                    value: 'status'
+                }
+            ],
             companies: []
         }
     },
-    components: {
-        'company-item': CompanyListItem
-    },
+    computed: {
+        companyLink: function()
+    }
     mounted() {
         companyApi.fetchAll()
             .then(companies => {

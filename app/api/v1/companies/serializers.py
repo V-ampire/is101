@@ -117,8 +117,9 @@ class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'uuid',
             'url', 
-            'city', 
-            'title', 
+            'city',
+            'address',
+            'title',
             'status'
         )
         extra_kwargs = {
