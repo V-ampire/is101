@@ -33,6 +33,9 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
 
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    def get_queryset(self):
+        return self.queryset.order_by('-status')
+
     def get_serializer_class(self):
         if self.action == "retrieve":
             if self.request.user.is_staff:

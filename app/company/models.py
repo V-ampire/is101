@@ -22,7 +22,7 @@ class StatusModel(models.Model):
     status = models.PositiveSmallIntegerField("Статус", choices=STATUS_CHOISES, default=ACTIVE)
     class Meta:
         abstract = True
-        ('-status', )
+        ('status', )
 
     def archive(self):
         """
