@@ -56,6 +56,7 @@
 
 <script>
 import AddCompanyDialog from '@/components/AddCompanyDialog'
+import api from '@/services/companies/ApiClient'
 
 export default {
     data() {
@@ -79,7 +80,7 @@ export default {
         'add-dialog': AddCompanyDialog
     },
     mounted() {
-        companyApi.fetchAll()
+        api.fetchAll()
             .then(companies => {
                 this.companies = companies
             })

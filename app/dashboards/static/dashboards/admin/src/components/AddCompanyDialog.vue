@@ -18,12 +18,10 @@
             <v-card-actions>
                 <v-btn
                     color="primary"
-                    text
                     @click="dialog=false"
                 >Добавить</v-btn>
                 <v-btn
                     color="primary"
-                    text
                     @click="dialog=false"
                 >Отмена</v-btn>
             </v-card-actions>
