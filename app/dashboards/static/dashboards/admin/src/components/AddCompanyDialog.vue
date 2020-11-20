@@ -15,6 +15,18 @@
             <v-card-text>
                 <company-form></company-form>
             </v-card-text>
+            <v-card-actions>
+                <v-btn
+                    color="primary"
+                    text
+                    @click="dialog=false"
+                >Добавить</v-btn>
+                <v-btn
+                    color="primary"
+                    text
+                    @click="dialog=false"
+                >Отмена</v-btn>
+            </v-card-actions>
         </v-card>
     </v-dialog>
 </template>

@@ -39,7 +39,8 @@ class Company(TimeStamptedModel, StatusModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="company")
     title = models.CharField("Название компании", max_length=128, unique=True)
-    logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/")
+    logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/",
+                                validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png'])])
     tagline = models.CharField("Слоган компании", max_length=264)
     inn = models.CharField("ИНН", max_length=12, unique=True)
     ogrn = models.CharField("ОГРН\ОГРНИП", max_length=15, unique=True)
