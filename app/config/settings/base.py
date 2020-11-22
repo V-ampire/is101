@@ -58,7 +58,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.api_root',
             ],
         },
     },
@@ -109,7 +108,6 @@ AUTH_ATTEMPTS = {
 
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-API_ROOT = env.str('API_ROOT')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -120,3 +118,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'

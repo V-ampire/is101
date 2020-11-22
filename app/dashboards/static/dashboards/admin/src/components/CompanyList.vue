@@ -55,7 +55,7 @@
 
 
 <script>
-import AddCompanyDialog from '@/components/AddCompanyDialog'
+import CreateCompanyDialog from '@/components/CreateCompanyDialog'
 import api from '@/services/companies/ApiClient'
 
 export default {
@@ -77,7 +77,7 @@ export default {
         }
     },
     components: {
-        'add-dialog': AddCompanyDialog
+        'add-dialog': CreateCompanyDialog
     },
     mounted() {
         api.fetchAll()
