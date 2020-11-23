@@ -82,41 +82,54 @@
 
 <script>
 	import validators from '@/validators';
+	import formDataMixin from '@/components/mixins/formDataMixin';
 
 	export default {
+		mixins: [formDataMixin],
 		data () {
 			return {
-				title: '',
-				logo: '',
-				tagline: '',
-				inn: '',
-				ogrn: '',
-				city: '',
-				address: '',
-				email: '',
-				phone: '',
+				fields: {
+					title: {
+						value: '',
+						error: ''
+					},
+					logo: {
+						value: '',
+						error: ''
+					},
+					tagline: {
+						value: '',
+						error: ''
+					},
+					inn: {
+						value: '',
+						error: ''
+					},
+					ogrn: {
+						value: '',
+						error: ''
+					},
+					city: {
+						value: '',
+						error: ''
+					},
+					address: {
+						value: '',
+						error: ''
+					},
+					email: {
+						value: '',
+						error: ''
+					},
+					phone: {
+						value: '',
+						error: ''
+					},
+				},
 				rules: {
 					required: validators.required('Обязательное поле.'),
 					emailMatch: validators.emailMatch('Не валидный имеил.')
 				}
-			}
-		},
-		methods: {
-			getFormData: function() {
-				return {
-					title: this.title,
-					logo: this.logo,
-					tagline: this.tagline,
-					inn: this.inn,
-					ogrn: this.ogrn,
-					city: this.city,
-					address: this.address,
-					email: this.email,
-					phone: this.phone,
-				}
-			},
-			validate() {
-				return this.$refs.form.validate();
 			}
 		},
 	}

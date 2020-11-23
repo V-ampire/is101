@@ -12,17 +12,10 @@ export default {
 		});
 	},
 
-	create(data) {
-		const formData = new FormData()
-		for (let key in data) {
-			formData.append(key, data[key])
-		}
+	create(formData) {
 		const headers = {
 			'Content-Type': 'multipart/form-data'
 		};
-		// const data = companyData;
-		// data[user.username] = userData.username;
-		// data[user.password] = userData.password;
 		return http.post(endpoint, formData, {
 			headers: headers,
 		})

@@ -63,7 +63,7 @@ import api from '@/services/companies/ApiClient'
                 return this.$refs.createUserForm.getFormData()
             },
             companyData: function() {
-                return this.$refs.createCompanyForm.getFormData()
+                return this.$refs.createCompanyForm.getAsFormData()
             }
         },
         components: {
