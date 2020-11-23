@@ -5,7 +5,8 @@
                 <v-col cols="12">Создать учетную запись для юр. лица</v-col>
                 <v-col cols="12">
                     <v-text-field
-                        v-model="username"
+                        v-model="fields.username.value"
+                        :error-messages="fields.username.error"
                         :rules="[rules.required, rules.min]"
                         label="Логин"
                         counter
@@ -14,7 +15,8 @@
                 </v-col>
                 <v-col cols="12">
                     <v-text-field
-                        v-model="password"
+                        v-model="fields.password.value"
+                        :error-messages="fields.password.error"
                         :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                         :rules="[rules.required, rules.min, rules.passwordMatch]"
                         :type="showPassword ? 'text' : 'password'"
@@ -43,12 +45,22 @@
 <script>
 import passwordGen from 'password-generator'
 import validators from '@/validators';
+import formDataMixin from '@/components/mixins/formDataMixin';
 
 export default {
+    mixins: [formDataMixin],
     data () {
         return {
-            username: '',
-            password: '',
+            fields: {
+                username: {
+                    value: '',
+                    error: ''
+                },
+                password: {
+                    value: '',
+                    error: ''
+                }
+            },
             showPassword: false,
             rules: {
                 required: validators.required('Обязательное поле.'),
@@ -61,12 +73,6 @@ export default {
         }   
     },
     methods: {
-        getFormData: function() {
-            return {
-                username: this.username,
-                password: this.password
-            }
-        },
         generatePassword: function() {
             const pattern = /(?=.*[0-9])(?=.*[a-zA-Z!@#$%^&*])/;
             let password = passwordGen(
@@ -81,12 +87,9 @@ export default {
                     /[\d\W\w\p]/
                 );
             }
-            this.password = password
+            this.fields.password.value = password;
             this.showPassword = true;
         },
-        validate() {
-            return this.$refs.form.validate();
-        }
     },
 }
 </script>

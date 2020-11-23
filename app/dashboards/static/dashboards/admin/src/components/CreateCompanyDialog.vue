@@ -60,7 +60,7 @@ import api from '@/services/companies/ApiClient'
         }),
         computed: {
             userData: function() {
-                return this.$refs.createUserForm.getFormData()
+                return this.$refs.createUserForm.getAsObject()
             },
             companyData: function() {
                 return this.$refs.createCompanyForm.getAsFormData()
@@ -75,8 +75,8 @@ import api from '@/services/companies/ApiClient'
                 if (this._validateForms()) {
                     this.loading = true;
                     const data = this.companyData;
-                    data['user.username'] = this.userData.username;
-                    data['user.password'] = this.userData.password;
+                    data.append('user.username', this.userData.username);
+                    data.append('user.password', this.userData.password);
                     api.create(data).then(res => {
                         console.log(res.data);
                         console.log(res)
