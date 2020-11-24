@@ -63,6 +63,9 @@ class CompanySerializerForAdmin(serializers.ModelSerializer):
             )
         return user_data
 
+    def validate_title(self, value):
+        raise serializers.ValidationError("Такой заголовок не пойдет!")
+
     def create(self, validated_data):
         """
         1. Создать учетную запись

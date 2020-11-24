@@ -77,11 +77,15 @@ import api from '@/services/companies/ApiClient'
                     const data = this.companyData;
                     data.append('user.username', this.userData.username);
                     data.append('user.password', this.userData.password);
-                    api.create(data).then(res => {
-                        console.log(res.data);
-                        console.log(res)
-                        this.loading = false;
-                    });
+                    api.create(data)
+                        .then(res => {
+                            this.loading = false;
+                            console.log(res);
+                        })
+                        .catch(err => {
+                            console.log(err.response);
+                            this.loading = false;
+                        });
                 }
             },
             closeDialog: function() {
