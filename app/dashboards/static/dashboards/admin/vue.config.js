@@ -8,5 +8,8 @@ module.exports = {
     config.plugins.delete('html')
     config.plugins.delete('preload')
     config.plugins.delete('prefetch')
+  },
+  configureWebpack: {
+    devtool: 'source-map'
   }
 }

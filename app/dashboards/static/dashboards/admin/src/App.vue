@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import CompanyList from '@/components/CompanyList'
+import CompanyList from '@/components/companies/CompanyList'
 
 export default {
   name: 'App',

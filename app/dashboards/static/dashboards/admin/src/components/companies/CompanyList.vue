@@ -15,7 +15,7 @@
                     </v-col>
                     <v-col cols="4">
                         <v-card-actions>
-                            <add-dialog></add-dialog>
+                            <create-dialog v-on:companyCreated="processCreate"></create-dialog>
                         </v-card-actions>
                     </v-col>
                 </v-row>
@@ -55,7 +55,7 @@
 
 
 <script>
-import CreateCompanyDialog from '@/components/CreateCompanyDialog'
+import CreateCompanyDialog from '@/components/companies/CreateCompanyDialog'
 import api from '@/services/companies/ApiClient'
 
 export default {
@@ -77,18 +77,21 @@ export default {
         }
     },
     components: {
-        'add-dialog': CreateCompanyDialog
+        'create-dialog': CreateCompanyDialog
     },
     mounted() {
-        api.fetchAll()
-            .then(companies => {
-                this.companies = companies
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        this.getCompanies();
     },
     methods: {
+        getCompanies: function() {
+            api.fetchAll()
+                .then(companies => {
+                    this.companies = companies
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
         editCompany: function(company_uuid) {
             console.log(company_uuid);
             this.companies.unshift({
@@ -105,6 +108,16 @@ export default {
         getRowClasses: function(item) {
             if (item.status == this.statuses.archive) {
                 return 'archive'
+            }
+        },
+        refreshTable: function() {
+            this.getCompanies();
+        },
+        processCreate: function(response) {
+            if (response.status == 'success') {
+                this.refreshTable();
+            } else {
+                console.log(response.data);
             }
         }
     }

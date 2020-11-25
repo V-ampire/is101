@@ -33,30 +33,27 @@
                     bottom
                     color="deep-purple accent-4"
                 ></v-progress-linear>
-                <v-alert v-show="created.status=='success'" type="success">
-                    {{ created.message }}
-                </v-alert>
-                <v-alert v-show="created.status=='error'" type="error">
-                    {{ created.message }}
-                </v-alert>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
 <script>
-import CompanyForm from '@/components/CompanyForm'
-import UserForm from '@/components/CreateUserForm'
+    /*
+Диалог для создания нового юрлица.
+Генерирует событие:
+created - в случает успешного создания юрлица, возвращает данные созданного объекта,
+в случае возникновения ошибки, возвращает информацию об ошибке
+*/
+import CompanyForm from '@/components/companies/CompanyForm'
+import UserForm from '@/components/users/CreateUserForm'
 import api from '@/services/companies/ApiClient'
 
     export default {
         data: () => ({
             dialog: false,
             loading: false,
-            created: {
-                status: '',
-                message: ''
-            }
+            createdEvent: 'companyCreated'
         }),
         computed: {
             userData: function() {
@@ -72,30 +69,42 @@ import api from '@/services/companies/ApiClient'
         },
         methods: {
             createCompany: function() {
-                if (this._validateForms()) {
+                // Проверит валидность форм
+                // Отправить запрос на создание юрлица
+                // Вызвать нужное событие
+                if (this.validateForms()) {
                     this.loading = true;
                     const data = this.companyData;
                     data.append('user.username', this.userData.username);
                     data.append('user.password', this.userData.password);
                     api.create(data)
-                        .then(res => {
+                        .then(response => {
                             this.loading = false;
-                            console.log(res);
+                            this.$emit(this.createdEvent, {status: 'created', data: response.data});
                         })
-                        .catch(err => {
-                            console.log(err.response);
+                        .catch(error => {
                             this.loading = false;
-                        });
+                            if (error.response) {
+                                this.$emit(this.createdEvent, {status: 'error', data: error.response.data});
+                            } else if (error.request) {
+                                // The request was made but no response was received
+                                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                                // http.ClientRequest in node.js
+                                this.$emit(this.createdEvent, {status: 'error', data: 'Упс! Возникла ошибка, возможно, нет соединения с интернетом...'});
+                                console.log(error.request);
+                            } else {
+                                // Something happened in setting up the request that triggered an Error
+                                this.$emit(this.events.failCreated, {status: 'error', data: 'Упс! Возникла какая то ошибка, повторите попытку чуть позже...'});
+                                console.log('Error', error.message);
+                            }
+
+                    })
                 }
             },
             closeDialog: function() {
-                this.created = {
-                    status: '',
-                    message: ''
-                };
                 this.dialog = false;
             },
-            _validateForms() {
+            validateForms: function() {
                 return this.$refs.createUserForm.validate() && this.$refs.createCompanyForm.validate()
             }
         },
