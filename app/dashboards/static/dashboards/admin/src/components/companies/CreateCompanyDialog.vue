@@ -34,6 +34,14 @@
                     color="deep-purple accent-4"
                 ></v-progress-linear>
             </v-card-actions>
+            <div class="status-alert">
+                <v-alert v-show="alerts.success.show" type="success">
+                    {{ alerts.success.message }}
+                </v-alert>
+                <v-alert v-show="alerts.error.show" type="error">
+                    {{ alerts.error.message }}
+                </v-alert>
+            </div>
         </v-card>
     </v-dialog>
 </template>
@@ -42,8 +50,7 @@
     /*
 Диалог для создания нового юрлица.
 Генерирует событие:
-created - в случает успешного создания юрлица, возвращает данные созданного объекта,
-в случае возникновения ошибки, возвращает информацию об ошибке
+companyCreated - в случает успешного создания юрлица, возвращает статус запроса created/error
 */
 import CompanyForm from '@/components/companies/CompanyForm'
 import UserForm from '@/components/users/CreateUserForm'
@@ -53,7 +60,19 @@ import api from '@/services/companies/ApiClient'
         data: () => ({
             dialog: false,
             loading: false,
-            createdEvent: 'companyCreated'
+            createdEvent: 'companyCreated',
+            succesStatus: 'created',
+            errorStatus: 'error',
+            alerts: {
+                success: {
+                    show: false,
+                    message: ''
+                },
+                error: {
+                    show: false,
+                    message: ''
+                }
+            }
         }),
         computed: {
             userData: function() {
@@ -71,7 +90,7 @@ import api from '@/services/companies/ApiClient'
             createCompany: function() {
                 // Проверит валидность форм
                 // Отправить запрос на создание юрлица
-                // Вызвать нужное событие
+                // Вызвать метод обработки результата
                 if (this.validateForms()) {
                     this.loading = true;
                     const data = this.companyData;
@@ -80,25 +99,26 @@ import api from '@/services/companies/ApiClient'
                     api.create(data)
                         .then(response => {
                             this.loading = false;
-                            this.$emit(this.createdEvent, {status: 'created', data: response.data});
+                            this.onCreated(response.data);
                         })
                         .catch(error => {
                             this.loading = false;
-                            if (error.response) {
-                                this.$emit(this.createdEvent, {status: 'error', data: error.response.data});
-                            } else if (error.request) {
-                                // The request was made but no response was received
-                                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                                // http.ClientRequest in node.js
-                                this.$emit(this.createdEvent, {status: 'error', data: 'Упс! Возникла ошибка, возможно, нет соединения с интернетом...'});
-                                console.log(error.request);
-                            } else {
-                                // Something happened in setting up the request that triggered an Error
-                                this.$emit(this.events.failCreated, {status: 'error', data: 'Упс! Возникла какая то ошибка, повторите попытку чуть позже...'});
-                                console.log('Error', error.message);
-                            }
+                            // if (error.response) {
+                            //     this.$emit(this.createdEvent, this.errorStatus);
+                            // } else if (error.request) {
+                            //     // The request was made but no response was received
+                            //     // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                            //     // http.ClientRequest in node.js
 
-                    })
+                            //     this.$emit(this.createdEvent, {status: 'error', data: 'Упс! Возникла ошибка, возможно, нет соединения с интернетом...'});
+                            //     console.log(error.request);
+                            // } else {
+                            //     // Something happened in setting up the request that triggered an Error
+                            //     this.$emit(this.events.failCreated, {status: 'error', data: 'Упс! Возникла какая то ошибка, повторите попытку чуть позже...'});
+                            //     console.log('Error', error.message);
+                            this.onError(error);
+                        }
+                    )
                 }
             },
             closeDialog: function() {
@@ -106,6 +126,39 @@ import api from '@/services/companies/ApiClient'
             },
             validateForms: function() {
                 return this.$refs.createUserForm.validate() && this.$refs.createCompanyForm.validate()
+            },
+            onCreated: function(company) {
+                // При успешном добавлении вызвать событие ос статусом создания
+                // Вывести информацию о новом объекте
+                this.$emit(this.createdEvent, this.succesStatus);
+                this.alerts.success.show = true;
+                this.alerts.success.message = `Юр.лицо <a href="${company.url}">${company.title}</a> добавлено.`;
+            },
+            onError: function(error) {
+                // При ошибке вызвать событие со статусом ошибки
+                // Вывести информацию об ошибке
+                // Обработать ошибку
+                this.$emit(this.createdEvent, this.errorStatus);
+                if (error.response) {
+                    const errorData = error.response.data;
+                    if (error.response.status == 400) {
+                        for (let field in errorData) {
+                            if (field == 'user') {
+                                for (let message in errorData[field]) {
+                                    this.$refs.createUserForm.setErrorMessage('username', message);
+                                }
+                            }
+                            console.log(this.$refs.createCompanyForm.fields);
+                            if (this.$refs.createCompanyForm.fields.includes(field)) {
+                                for (let message in errorData[field]) {
+                                    this.$refs.createUserForm.setErrorMessage('username', message);
+                                }
+                            }
+                        }
+                        this.alerts.error.show = true;
+                        this.alerts.error.message = 'Ошибка! Проверьте правильность заполнение полей форм!';
+                    }
+                }
             }
         },
     }

@@ -31,7 +31,7 @@ class CompanyUserAccountSerializer(serializers.ModelSerializer):
         return user
 
 
-class CompanySerializerForAdmin(serializers.ModelSerializer):
+class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
     """
     Сериалайзер для юр. лица для админов.
     """
@@ -50,13 +50,18 @@ class CompanySerializerForAdmin(serializers.ModelSerializer):
             'address',
             'email',
             'phone',
+            'url'
         )
+        extra_kwargs = {
+            'url': {'view_name': 'api_v1:company-detail', 'lookup_field': 'uuid'},
+        }
 
     def validate_user(self, user_data):
         """
         Если вызывается обновление учетной записи, то выдаем ошибку
         т.к. чтобы обновить пароль необходимо использовать действие сброса пароля.
         """
+        raise serializers.ValidationError("Опачки! Придумай другое имя")
         if self.instance and user_data.get('password', None):
             raise serializers.ValidationError(
                 "Для изменения пароля используйте функцию сброса пароля"

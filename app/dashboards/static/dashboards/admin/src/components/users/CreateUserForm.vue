@@ -6,7 +6,7 @@
                 <v-col cols="12">
                     <v-text-field
                         v-model="fields.username.value"
-                        :error-messages="fields.username.error"
+                        :error-messages="fields.username.errors"
                         :rules="[rules.required, rules.min]"
                         label="Логин"
                         counter
@@ -16,7 +16,7 @@
                 <v-col cols="12">
                     <v-text-field
                         v-model="fields.password.value"
-                        :error-messages="fields.password.error"
+                        :error-messages="fields.password.errors"
                         :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                         :rules="[rules.required, rules.min, rules.passwordMatch]"
                         :type="showPassword ? 'text' : 'password'"
@@ -54,11 +54,11 @@ export default {
             fields: {
                 username: {
                     value: '',
-                    error: ''
+                    errors: []
                 },
                 password: {
                     value: '',
-                    error: ''
+                    errors: []
                 }
             },
             showPassword: false,

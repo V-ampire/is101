@@ -2,10 +2,10 @@ import axios from 'axios';
 import config from '@/config'
 
 
-const instance = axios.create({
+const http = axios.create({
 	baseURL: `http://${config.apiRoot}`
 });
-instance.defaults.xsrfCookieName = 'csrftoken';
-instance.defaults.xsrfHeaderName = 'X-CSRFToken'
+http.defaults.xsrfCookieName = 'csrftoken';
+http.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-export default instance;
+export default http;

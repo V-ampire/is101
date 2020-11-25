@@ -24,7 +24,6 @@ export default {
             }
             return formData
         },
-
         getAsObject: function() {
             const formData = {};
             for (let field in this.fields) {
@@ -32,13 +31,16 @@ export default {
             }
             return formData
         },
-
         setErrorMessage: function(fieldName, errorMessage) {
-            this.fields[fieldName].error = errorMessage;
+            this.fields[fieldName].errors.push(errorMessage);
         },
-
-        validate() {
+        validate: function() {
             return this.$refs.form.validate();
-        }
+        },
+        computed: {
+            fields: function() {
+                return Object.keys(Object.assign({}, ...this.fields))
+            }
+        },
     },
 }

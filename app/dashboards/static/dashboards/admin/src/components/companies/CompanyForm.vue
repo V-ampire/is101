@@ -6,7 +6,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.title.value"
-						:error-messages="fields.title.error"
+						:error-messages="fields.title.errors"
 						:rules="[rules.required]"
 						label="Название компании"
 						counter
@@ -15,7 +15,7 @@
 				<v-col cols="12">
 					<v-file-input
 						v-model="fields.logo.value"
-						:error-messages="fields.logo.error"
+						:error-messages="fields.logo.errors"
 						accept=".jpeg, .jpg, .png"
 						label="Логотип компании"
 					></v-file-input>
@@ -23,7 +23,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.tagline.value"
-						:error-messages="fields.tagline.error"
+						:error-messages="fields.tagline.errors"
 						:rules="[rules.required]"
 						label="Слоган"
 						counter
@@ -32,7 +32,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.inn.value"
-						:error-messages="fields.inn.error"
+						:error-messages="fields.inn.errors"
 						:rules="[rules.required]"
 						label="ИНН"
 						counter
@@ -41,7 +41,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.ogrn.value"
-						:error-messages="fields.ogrn.error"
+						:error-messages="fields.ogrn.errors"
 						:rules="[rules.required]"
 						label="ОГРН"
 						counter
@@ -50,7 +50,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.city.value"
-						:error-messages="fields.city.error"
+						:error-messages="fields.city.errors"
 						:rules="[rules.required]"
 						label="Город"
 						counter
@@ -59,7 +59,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.address.value"
-						:error-messages="fields.address.error"
+						:error-messages="fields.address.errors"
 						:rules="[rules.required]"
 						label="Адрес"
 						counter
@@ -68,7 +68,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.email.value"
-						:error-messages="fields.email.error"
+						:error-messages="fields.email.errors"
 						:rules="[rules.required, rules.emailMatch]"
 						label="Имеил"
 						counter
@@ -77,7 +77,7 @@
 				<v-col cols="12">
 					<v-text-field
 						v-model="fields.phone.value"
-						:error-messages="fields.phone.error"
+						:error-messages="fields.phone.errors"
 						:rules="[rules.required]"
 						label="Телефон"
 						counter
@@ -100,39 +100,39 @@
 				fields: {
 					title: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					logo: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					tagline: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					inn: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					ogrn: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					city: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					address: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					email: {
 						value: '',
-						error: ''
+						errors: []
 					},
 					phone: {
 						value: '',
-						error: ''
+						errors: []
 					},
 				},
 				rules: {
