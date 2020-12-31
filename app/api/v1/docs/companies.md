@@ -16,7 +16,7 @@
 `/companies/{uuid}/branches/{uuid}/activate/`
 
 
-<a name="companies-list">
+<a name="companies-list"></a>
 ## /companies/
 
 Методы:
@@ -102,7 +102,7 @@
 ```
 
 
-<a name="companies-detail">
+<a name="companies-detail"></a>
 ## /companies/{uuid}/
 
 Методы:
@@ -200,7 +200,7 @@
 При удалении юрлица будет одновременно удалена учетная запись.
 
 
-<a name="companies-archivate">
+<a name="companies-archivate"></a>
 ## /companies/{uuiu}/archivate/
 
 Меняет статус объекта на `company.Company.ARCHIVED`
@@ -212,7 +212,7 @@
 Ответ {'status': 'ok}
 
 
-<a name="companies-activate">
+<a name="companies-activate"></a>
 ## /companies/{uuiu}/activate/
 
 Меняет статус объекта на `company.Company.ACTIVE`
