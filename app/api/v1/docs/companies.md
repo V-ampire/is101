@@ -2,9 +2,13 @@
 
 
 [/companies/](#companies-list)
-[`/companies/{uuid}/`](#companies-detail)
-[`/companies/{uuid}/archivate/`](#companies-archivate)
-[`/companies/{uuid}/activate/`](#companies-activate)
+
+[/companies/{uuid}/](#companies-detail)
+
+[/companies/{uuid}/archivate/](#companies-archivate)
+
+[/companies/{uuid}/activate/](#companies-activate)
+
 
 `/companies/{uuid}/branches/`
 `/companies/{uuid}/branches/{uuid}`
@@ -13,7 +17,7 @@
 
 
 <a name="companies-list">
-`/companies/`
+## /companies/
 
 Методы:
 
@@ -99,7 +103,7 @@
 
 
 <a name="companies-detail">
-`/companies/{uuid}/`
+## /companies/{uuid}/
 
 Методы:
 
@@ -197,7 +201,7 @@
 
 
 <a name="companies-archivate">
-`/companies/{uuiu}/archivate/`
+## /companies/{uuiu}/archivate/
 
 Меняет статус объекта на `company.Company.ARCHIVED`
 
@@ -209,7 +213,7 @@
 
 
 <a name="companies-activate">
-`/companies/{uuiu}/activate/`
+## /companies/{uuiu}/activate/
 
 Меняет статус объекта на `company.Company.ACTIVE`
 
