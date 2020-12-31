@@ -1,0 +1,25 @@
+{% extends 'dashboards/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    101CRM - панель админинстратора
+{% endblock title %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'dashboards/dist/admin/css/chunk-vendors.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboards/dist/admin/css/admin.css' %}">
+{% endblock css %}
+
+
+{% block content %}
+    <div id="app"></div>
+{% endblock content %}
+
+
+{% block scripts %}
+  <script src="{% static 'dashboards/dist/admin/js/chunk-vendors.js' %}"></script>
+  <script src="{% static 'dashboards/dist/admin/js/admin.js' %}"></script>
+{% endblock scripts %}
+    

@@ -1,0 +1,16 @@
+{% extends 'accounts/base.html' %}
+
+
+{% block title %}
+    Доступ временно заблокирован
+{% endblock title %}
+
+
+{% block content %}
+    <div class="jumbotron jumbotron-fluid h-100 m-0 p-0">
+        <div class="container">
+            <h1 class="display-4">Доступ временно заблокирован!</h1>
+            <p class="lead">Мы заметили подозрительную активность с вашего IP адреса, в целях безопасности ваш IP был заблокирован до {{ unblock_time }}</p>
+        </div>
+    </div>
+{% endblock content %}
