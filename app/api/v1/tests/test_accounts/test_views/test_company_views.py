@@ -13,18 +13,14 @@ import pytest
 fake = Faker()
 
 
-list_url_name = 'api_v1:accounts_companies-list'
-detail_url_name = 'api_v1:accounts_companies-detail'
-password_url_name = 'api_v1:accounts_companies-change-password'
-deactivate_url_name = 'api_v1:accounts_companies-deactivate'
+list_url_name = 'api_v1:account-companies-list'
+detail_url_name = 'api_v1:account-companies-detail'
+password_url_name = 'api_v1:account-companies-change-password'
+deactivate_url_name = 'api_v1:account-companies-deactivate'
 
 success_status = status.HTTP_200_OK
 denied_status = status.HTTP_403_FORBIDDEN
 unauth_status = status.HTTP_401_UNAUTHORIZED
-
-
-# Тесты на действия
-# Тесты на невалидные данные
 
 
 

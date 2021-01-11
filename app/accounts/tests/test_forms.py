@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from accounts import forms
-from accounts.models import UserAccount
+from accounts.models import Roles, UserAccount
 
 from faker import Faker
 import pytest
@@ -11,7 +11,7 @@ fake = Faker()
 
 @pytest.mark.django_db
 def test_clean_is_superuser_for_company_role():
-    tested_role = UserAccount.COMPANY
+    tested_role = Roles.COMPANY
     tested_data = {
         'username': fake.user_name(),
         'is_superuser': True,
@@ -24,7 +24,7 @@ def test_clean_is_superuser_for_company_role():
 
 @pytest.mark.django_db
 def test_clean_is_superuser_for_employee_role():
-    tested_role = UserAccount.EMPLOYEE
+    tested_role = Roles.EMPLOYEE
     tested_data = {
         'username': fake.user_name(),
         'is_superuser': True,
@@ -37,7 +37,7 @@ def test_clean_is_superuser_for_employee_role():
 
 @pytest.mark.django_db
 def test_clean_is_superuser_for_admin_role():
-    tested_role = UserAccount.ADMIN
+    tested_role = Roles.ADMIN
     tested_data = {
         'username': fake.user_name(),
         'is_superuser': True,

@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserChangeForm, UsernameField, Authenticat
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import UserAccount
+from accounts.models import UserAccount, Roles
 
 class UserAccountChangeForm(UserChangeForm):
 
@@ -15,7 +15,7 @@ class UserAccountChangeForm(UserChangeForm):
         cleaned_data = super().clean()
         role = cleaned_data['role']
         is_superuser = cleaned_data['is_superuser']
-        if is_superuser and role != UserAccount.ADMIN:
+        if is_superuser and role != Roles.ADMIN:
             raise ValidationError(
                 _('User with role %(role)s can not be a superuser'), 
                 params={'role': role}

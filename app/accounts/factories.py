@@ -1,6 +1,6 @@
 from django.utils import timezone
 
-from accounts.models import UserAccount, IPAddress
+from accounts.models import UserAccount, IPAddress, Roles
 
 import factory
 
@@ -39,7 +39,7 @@ class AdminUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
-    role = UserAccount.ADMIN
+    role = Roles.ADMIN
 
 
 class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
@@ -51,7 +51,7 @@ class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
-    role = UserAccount.COMPANY
+    role = Roles.COMPANY
 
 
 class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
@@ -63,4 +63,4 @@ class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
-    role = UserAccount.EMPLOYEE
+    role = Roles.EMPLOYEE

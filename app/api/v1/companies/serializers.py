@@ -49,7 +49,7 @@ class CompanyDetailSerializerForAdmin(serializers.HyperlinkedModelSerializer):
     Содержит учетную запись.
     """
     user = ReadOnlyCompanyUserAccountSerializer()
-    # branches = BranchListSerializer(many=True)
+    branches = BranchListSerializer(many=True)
     
     class Meta:
         model = models.Company
@@ -78,7 +78,7 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
     """
     Сериалайзер для юр. лица для тех кому разрешен доступ.
     """
-    # branches = BranchListSerializer(many=True)
+    branches = BranchListSerializer(many=True)
 
     class Meta:
         model = models.Company

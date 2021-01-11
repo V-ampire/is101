@@ -119,13 +119,17 @@ def get_employee_pasport_scan_path(instance, filename) -> str:
 class Employee(TimeStamptedModel, StatusModel):
     """
     Модель работника.
+    DEFAULT_POSTITION - значение, которое будет использовано 
+    если работнику не назначана должность.
     """
+    DEFAULT_POSTITION = 'Должность не задана'
+
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="employee")
     fio = models.CharField("ФИО", max_length=264)
     branch = models.ForeignKey("company.Branch", on_delete=models.SET_NULL, null=True, 
                                     related_name='employees')
-    position = models.ForeignKey("company.Position", on_delete=models.SET_NULL, null=True)
+    employee_position = models.ForeignKey("company.Position", on_delete=models.SET_NULL, null=True)
     date_of_birth = models.DateField("Дата рождения")
     pasport = models.CharField("Паспортные данные", max_length=264)
     pasport_scan = models.FileField(
@@ -133,6 +137,13 @@ class Employee(TimeStamptedModel, StatusModel):
         upload_to=get_employee_pasport_scan_path, 
         validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'pdf', 'zip'])]
     )
+
+    @property
+    def position(self):
+        p = self.employee_position
+        if not p or p.status == Position.ARCHIVED:
+            return self.DEFAULT_POSTITION
+        return self.employee_position
 
     @property
     def permitted_users(self):
@@ -147,4 +158,4 @@ class Employee(TimeStamptedModel, StatusModel):
     class Meta:
         verbose_name = 'Работники'
         verbose_name_plural = 'Работники'
-        ordering = ('branch', 'position')
+        ordering = ('branch',)

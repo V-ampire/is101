@@ -9,4 +9,4 @@ class PositionSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Position
-        fields = ('uuid', 'title')
+        fields = ('uuid', 'title', 'status')

@@ -1,15 +1,8 @@
 from django.urls import reverse
 
-from rest_framework import status
+from company import factories as company_factories
 
-from accounts.factories import CompanyUserAccountModelFactory
-
-from company.factories import PositionFactory
-from company.models import Position
-
-from api.v1.positions.serializers import PositionSerializer
-
-from factory_generator import generate_to_dict
+from faker import Faker
 import pytest
 
 
@@ -26,7 +19,7 @@ class TestAccess():
     obj_factory_class = PositionFactory
     user_factory_class = CompanyUserAccountModelFactory
     app_name = 'api_v1'
-    url_basename = 'position'
+    url_basename = 'company-branches'
 
     def get_action_url(self, action, *args, **kwargs):
         url = f'{self.app_name}:{self.url_basename}-{action}'
@@ -73,7 +66,7 @@ class TestAccess():
 
         delete_response = api_client.delete(self.get_action_url('detail', uuid=self.obj.uuid))
 
-        assert list_response.status_code == success_status
+        assert list_response.status_code == denied_status
         assert detail_response.status_code == denied_status
         assert create_response.status_code == denied_status
         assert patch_response.status_code == denied_status
@@ -122,52 +115,3 @@ class TestAccess():
         assert delete_response.status_code == unauth_status
         assert archivate_response.status_code == unauth_status
         assert activate_response.status_code == unauth_status
-
-
-@pytest.mark.django_db
-class TestListPositions():
-
-    serializer_class = PositionSerializer
-    app_name = 'api_v1'
-    url_basename = 'position'
-
-    def get_action_url(self, action, *args, **kwargs):
-        url = f'{self.app_name}:{self.url_basename}-{action}'
-        return reverse(url, args=args, kwargs=kwargs) 
-
-    def test_list_positions_for_admins(self, api_client, admin_user):
-        """
-        Тест на получение списка админами.
-        """
-        active_positions = [PositionFactory(status=Position.ACTIVE) for i in range(3)]
-        archive_positions = [PositionFactory(status=Position.ARCHIVED) for i in range(3)]       
-        api_client.force_authenticate(user=admin_user)
-        response = api_client.get(self.get_action_url('list'))
-        expected_data = self.serializer_class(
-            Position.objects.all(),
-            many=True,
-            context={'request': response.wsgi_request}
-        ).data
-        import pdb; pdb.set_trace()
-        assert expected_data == response.json()
-
-
-    def test_get_position_list_by_company(self, api_client, company_user):
-        """
-        Тест на получение списка юрлицом.
-        Юрлицо имеет доступ только к списку активных должностей.
-        """
-        active_positions = [PositionFactory(status=Position.ACTIVE) for i in range(3)]
-        archive_positions = [PositionFactory(status=Position.ARCHIVED) for i in range(3)]
-        url = reverse('api_v1:position-list')
-        api_client.force_authenticate(user=company_user)
-        response = api_client.get(self.get_action_url('list'))
-
-        expected_data = PositionSerializer(
-            Position.objects.filter(status=Position.ACTIVE), 
-            many=True, 
-            context={'request': response.wsgi_request}
-        ).data
-        import pdb; pdb.set_trace()
-        assert expected_data == response.json()
-

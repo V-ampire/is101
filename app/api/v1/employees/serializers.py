@@ -27,8 +27,12 @@ class EmployeeListSerizlizer(serializers.HyperlinkedModelSerializer):
     """
     Сериалайзер для списка сотрудников.
     """
-    branch = serializers.StringRelatedField()
+    branch = serializers.StringRelatedField(read_only=True)
     position = serializers.StringRelatedField()
+
+    parent_lookup_kwargs = {
+		'branch_uuid': 'branch__uuid',
+	}
 
     class Meta:
         model = Employee

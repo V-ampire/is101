@@ -82,7 +82,7 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(accounts_factories.EmployeeUserAccountModelFactory)
     fio = factory.Faker('name')
     branch = factory.SubFactory(BranchFactory)
-    position = factory.SubFactory(PositionFactory)
+    employee_position = factory.SubFactory(PositionFactory)
     date_of_birth = factory.Faker('date')
     pasport = factory.Faker('pystr')
     pasport_scan = factory.django.FileField(filename=fake.file_name(extension='pdf'))

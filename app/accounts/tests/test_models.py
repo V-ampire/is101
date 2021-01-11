@@ -1,4 +1,4 @@
-from accounts.models import UserAccount
+from accounts.models import UserAccount, Roles
 from accounts import factories 
 
 import pytest
@@ -12,13 +12,13 @@ fake = Faker()
 @pytest.mark.django_db
 def test_is_staff():
     admin_user = UserAccount.objects.create_user(
-        fake.user_name(), UserAccount.ADMIN, fake.password()
+        fake.user_name(), Roles.ADMIN, fake.password()
     )
     company_user = UserAccount.objects.create_user(
-        fake.user_name(), UserAccount.COMPANY, fake.password()
+        fake.user_name(), Roles.COMPANY, fake.password()
     )
     employee_user = UserAccount.objects.create_user(
-        fake.user_name(), UserAccount.EMPLOYEE, fake.password()
+        fake.user_name(), Roles.EMPLOYEE, fake.password()
     )
     assert admin_user.is_staff == True
     assert company_user.is_staff == False
@@ -30,7 +30,7 @@ def test_create_superuser():
     superuser = UserAccount.objects.create_superuser(fake.user_name(), fake.password())
     assert superuser.is_superuser
     assert superuser.is_staff
-    assert superuser.role == UserAccount.ADMIN
+    assert superuser.role == Roles.ADMIN
 
 
 @pytest.mark.django_db
@@ -39,7 +39,7 @@ def test_company_manager():
     company_user = factories.CompanyUserAccountModelFactory()
     employer_user = factories.EmployeeUserAccountModelFactory()
     tested = UserAccount.company_objects.all()
-    expected = UserAccount.objects.filter(role=UserAccount.COMPANY)
+    expected = UserAccount.objects.filter(role=Roles.COMPANY)
     assert set(tested) == set(expected)
 
 
@@ -49,6 +49,6 @@ def test_employee_manager():
     company_user = factories.CompanyUserAccountModelFactory()
     employee_user = factories.EmployeeUserAccountModelFactory()
     tested = UserAccount.employee_objects.all()
-    expected = UserAccount.objects.filter(role=UserAccount.EMPLOYEE)
+    expected = UserAccount.objects.filter(role=Roles.EMPLOYEE)
     assert set(tested) == set(expected)
 

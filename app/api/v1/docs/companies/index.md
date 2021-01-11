@@ -10,6 +10,7 @@
 [/companies/{uuid}/activate/](#companies-activate)
 
 
+
 `/companies/{uuid}/branches/`
 `/companies/{uuid}/branches/{uuid}`
 `/companies/{uuid}/branches/{uuid}/archivate/`

@@ -9,6 +9,13 @@ import datetime
 import uuid
 
 
+class Roles(models.TextChoices):
+
+    ADMIN = 'admin', 'Администратор'
+    COMPANY = 'company', 'Юр. лицо'
+    EMPLOYEE = 'employee', 'Работник'
+
+
 class UserAccountManager(BaseUserManager):
     """
     Менеджер для модели учетной записи пользователя.
@@ -27,7 +34,7 @@ class UserAccountManager(BaseUserManager):
         """
         Создать и сохранить учетку суперпользоватля.
         """
-        role = UserAccount.ADMIN
+        role = Roles.ADMIN
         user = self.create_user(username, role, password)
         user.is_superuser = True
         user.save(using=self._db)
@@ -39,13 +46,13 @@ class CompanyManager(UserAccountManager):
     Менеджер возвращающий только учетки юр. лиц.
     """
     def get_queryset(self):
-        return super().get_queryset().filter(role=UserAccount.COMPANY)
+        return super().get_queryset().filter(role=Roles.COMPANY)
 
     def create_account(self, username, password, **extra_fields):
         """
         Создать учетную запись для компании.
         """
-        role = UserAccount.COMPANY
+        role = Roles.COMPANY
         return self.create_user(username, role, password, **extra_fields)
 
 
@@ -54,13 +61,13 @@ class EmployeeManager(UserAccountManager):
     Менеджер возвращающий только учетки работников.
     """
     def get_queryset(self):
-        return super().get_queryset().filter(role=UserAccount.EMPLOYEE)
+        return super().get_queryset().filter(role=Roles.EMPLOYEE)
 
     def create_account(self, username, password, **extra_fields):
         """
         Создать учетную запись для работника.
         """
-        role = UserAccount.EMPLOYEE
+        role = Roles.EMPLOYEE
         return self.create_user(username, role, password, **extra_fields)
 
 
@@ -70,16 +77,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     Содержит только поля username и password.
     """
     username_validator = UnicodeUsernameValidator()
-
-    ADMIN = 'admin'
-    COMPANY = 'company'
-    EMPLOYEE = 'employee'
-
-    ROLE_CHOICES = (
-        (ADMIN, 'Администратор'),
-        (COMPANY, 'Юр. лицо'),
-        (EMPLOYEE, 'Работник')
-    )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     username = models.CharField(
@@ -100,7 +97,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    role = models.CharField("Тип учетки", max_length=16, choices=ROLE_CHOICES, default=EMPLOYEE)
+    role = models.CharField("Тип учетки", max_length=16, choices=Roles.choices, default=Roles.EMPLOYEE)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     USERNAME_FIELD = 'username'
@@ -112,7 +109,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_staff(self):
-        return self.role == self.ADMIN
+        return self.role == Roles.ADMIN
 
     def get_full_name(self):
         return self.username

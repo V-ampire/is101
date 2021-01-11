@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test.client import encode_multipart
 
 from rest_framework import status
 from rest_framework.serializers import ValidationError
@@ -115,7 +113,7 @@ class TestAccess():
         assert archivate_response.status_code == denied_status
         assert activate_response.status_code == denied_status
     
-    def test_access_for_anonymous(self, api_client, employee_user):
+    def test_access_for_anonymous(self, api_client):
 
         list_response = api_client.get(get_action_url('list'))
         detail_response = api_client.get(get_action_url('detail', uuid=self.company.uuid))
@@ -162,6 +160,7 @@ class TestAccess():
             assert activate_response.status_code == denied_status
 
 
+@pytest.mark.django_db
 class TestListCompanies():
     """
     Тест для метода CompanyViewSet.list()

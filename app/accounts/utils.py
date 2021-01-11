@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils.http import is_safe_url, urlunquote
 from django.utils import timezone
 
-from accounts.models import IPAddress
+from accounts.models import IPAddress, Roles, UserAccount
 
 
 def get_next_url(request):
@@ -78,3 +78,21 @@ def change_password(user_pk, new_password):
     user = get_user_model().objects.get(pk=user_pk)
     user.set_password(new_password)
     user.save()
+
+
+def is_admin_user_account(user):
+    if isinstance(user, UserAccount):
+        return user.role == Roles.ADMIN
+    return False
+
+
+def is_company_user_account(user):
+    if isinstance(user, UserAccount):
+        return user.role == Roles.COMPANY
+    return False
+
+
+def is_employee_user_account(user):
+    if isinstance(user, UserAccount):
+        return user.role == Roles.EMPLOYEE
+    return False

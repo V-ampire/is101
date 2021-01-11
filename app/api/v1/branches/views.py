@@ -16,6 +16,8 @@ class BranchesViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     permission_classes = [IsPermittedOrAdmin]
 
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
     def get_queryset(self):
         return self.queryset.filter(company__uuid=self.kwargs['company_uuid'])
 

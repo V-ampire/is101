@@ -8,6 +8,7 @@ pytest-django = "*"
 factory-boy = "*"
 ipython = "*"
 pytest-mock = "*"
+django-factory-boy-generator = "*"
 
 [packages]
 django = "*"

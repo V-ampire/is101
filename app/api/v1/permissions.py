@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import permissions
 
-from accounts.models import UserAccount
+from accounts.utils import is_company_user_account
 
 
 class IsPermittedOrAdmin(permissions.BasePermission):
@@ -24,4 +26,4 @@ class IsCompanyOrAdmin(permissions.BasePermission):
         """
         Доступ только у юрлиц и админов.
         """
-        return request.user.role == UserAccount.COMPANY or request.user.is_staff
+        return is_company_user_account(request.user) or request.user.is_staff
