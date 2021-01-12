@@ -23,3 +23,4 @@ urls = [
     path('', include(branches_router.urls)),
     path('', include(employees_router.urls)),
 ]
+

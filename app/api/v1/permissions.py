@@ -4,6 +4,11 @@ from rest_framework import permissions
 
 from accounts.utils import is_company_user_account
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 class IsPermittedOrAdmin(permissions.BasePermission):
 
@@ -16,7 +21,7 @@ class IsPermittedOrAdmin(permissions.BasePermission):
         try:
             return request.user in obj.permitted_users or request.user.is_staff
         except AttributeError:
-            # Отсутствует аттрибут allow_users
+            logger.warning(f'Отсутствует аттрибут permitted_users у {obj}')
             return False
 
 

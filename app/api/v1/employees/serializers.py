@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
+
 
 from company.models import Employee
 
@@ -7,6 +9,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для модели работника.
     """
+    company = serializers.ReadOnlyField()
     branch = serializers.StringRelatedField()
     position = serializers.StringRelatedField()
 
@@ -15,6 +18,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = (
             'uuid',
             'fio',
+            'company',
             'branch',
             'position',
             'date_of_birth',
@@ -23,14 +27,14 @@ class EmployeeSerializer(serializers.ModelSerializer):
         )
 
 
-class EmployeeListSerizlizer(serializers.HyperlinkedModelSerializer):
+class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
     """
     Сериалайзер для списка сотрудников.
     """
-    branch = serializers.StringRelatedField(read_only=True)
     position = serializers.StringRelatedField()
 
     parent_lookup_kwargs = {
+        'company_uuid': 'branch__company__uuid',
 		'branch_uuid': 'branch__uuid',
 	}
 
@@ -40,9 +44,8 @@ class EmployeeListSerizlizer(serializers.HyperlinkedModelSerializer):
             'uuid',
             'url',
             'fio',
-            'branch',
             'position'
         )
         extra_kwargs = {
-            'url': {'view_name': 'api_v1:employee-detail', 'lookup_field': 'uuid'},
+            'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},
         }

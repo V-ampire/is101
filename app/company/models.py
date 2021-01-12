@@ -138,6 +138,9 @@ class Employee(TimeStamptedModel, StatusModel):
         validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'pdf', 'zip'])]
     )
 
+    def company(self):
+        return self.branch.company.title
+
     @property
     def position(self):
         p = self.employee_position
@@ -147,7 +150,7 @@ class Employee(TimeStamptedModel, StatusModel):
 
     @property
     def permitted_users(self):
-        return self.branch.allow_users
+        return self.branch.permitted_users
 
     def clean(self):
         is_user_employee(self.user.pk)

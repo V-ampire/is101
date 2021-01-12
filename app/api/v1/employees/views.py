@@ -16,7 +16,12 @@ class EmployeeViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     permission_classes = [IsPermittedOrAdmin]
 
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
     def get_serializer_class(self):
         if self.action == 'list':
             return serializers.EmployeeListSerizlizer
         return serializers.EmployeeSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(branch__uuid=self.kwargs['branch_uuid'])
