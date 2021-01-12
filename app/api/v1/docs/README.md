@@ -3,13 +3,20 @@
 ## Аккаунты
 
 `/accounts/companies/`
+
 `/accounts/companies/{uuid}/`
+
 `/accounts/companies/{uuid}/change-password/`
+
 `/accounts/companies/{uuid}/deactivate/`
 
+
 `/accounts/employees/`
+
 `/accounts/employees/{uuid}/`
+
 `/accounts/employees/{uuid}/change-password/`
+
 `/accounts/employees/{uuid}/deactivate/`
 
 
@@ -23,9 +30,13 @@
 
 ## Юрлица
 
+
 `/companies/`
+
 `/companies/{uuid}/`
+
 `/companies/{uuid}/archivate/`
+
 `/companies/{uuid}/activate/`
 
 
