@@ -3,9 +3,9 @@ from django.contrib.auth import get_user_model, password_validation
 from rest_framework import serializers
 
 
-class CompanyUserAccountSerializer(serializers.ModelSerializer):
+class UserAccountSerializer(serializers.ModelSerializer):
     """
-    Сериалайзер для учетной записи юр. лица.
+    Сериалайзер для учетной записи.
     """
     password = serializers.CharField(write_only=True)
 
@@ -14,9 +14,7 @@ class CompanyUserAccountSerializer(serializers.ModelSerializer):
         fields = ('username', 'uuid', 'password')
 
     def create(self, validated_data):
-        username = validated_data['username']
-        password = validated_data['password']
-        return get_user_model().company_objects.create_account(username, password)
+        raise NotImplementedError('Define wchich user role to use for creating.')
 
     def validate_password(self, password_value):
         """
@@ -30,7 +28,27 @@ class CompanyUserAccountSerializer(serializers.ModelSerializer):
         return password_value
 
 
-class ReadOnlyCompanyUserAccountSerializer(serializers.ModelSerializer):
+class CompanyUserAccountSerializer(UserAccountSerializer):
+    """
+    Сериалайзер для учетной записи юр. лица.
+    """
+    def create(self, validated_data):
+        username = validated_data['username']
+        password = validated_data['password']
+        return get_user_model().company_objects.create_account(username, password)
+
+
+class EmployeeUserAccountSerializer(UserAccountSerializer):
+    """
+    Сериалайзер для учетной записи работника.
+    """
+    def create(self, validated_data):
+        username = validated_data['username']
+        password = validated_data['password']
+        return get_user_model().employee_objects.create_account(username, password)
+
+
+class ReadOnlyUserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('username', 'uuid')

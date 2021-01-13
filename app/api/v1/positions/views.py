@@ -28,3 +28,4 @@ class PositionViewSet(mixins.ViewSetActionPermissionMixin, mixins.StatusViewSetM
         if not self.request.user.is_staff:
             return self.queryset.filter(status=Position.ACTIVE)
         return self.queryset
+        

@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from company import models, utils
 
-from api.v1.accounts.serizlizers import ReadOnlyCompanyUserAccountSerializer
+from api.v1.accounts.serizlizers import ReadOnlyUserAccountSerializer
 from api.v1.branches.serializers import BranchListSerializer
 from api.v1.companies import validators
 
@@ -48,7 +48,7 @@ class CompanyDetailSerializerForAdmin(serializers.HyperlinkedModelSerializer):
     Сериалайзер для чтения юр. лица для админов.
     Содержит учетную запись.
     """
-    user = ReadOnlyCompanyUserAccountSerializer()
+    user = ReadOnlyUserAccountSerializer()
     branches = BranchListSerializer(many=True)
     
     class Meta:

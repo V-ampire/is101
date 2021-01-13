@@ -21,7 +21,8 @@ class BranchSerializer(serializers.ModelSerializer):
             'city',
             'address',
             'phone',
-            'employees'
+            'employees',
+            'status'
         )
 
 

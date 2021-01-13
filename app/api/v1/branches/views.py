@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
 
 from api.v1 import mixins
 from api.v1.permissions import IsPermittedOrAdmin
@@ -7,7 +8,7 @@ from api.v1.branches import serializers
 from company.models import Branch
 
 
-class BranchesViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
+class BranchesViewSet(mixins.ViewSetActionPermissionMixin, mixins.StatusViewSetMixin, viewsets.ModelViewSet):
     """
     Вьюсет для филиалов.
     """
@@ -15,6 +16,10 @@ class BranchesViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     lookup_field = 'uuid'
     permission_classes = [IsPermittedOrAdmin]
+
+    permission_action_classes = {
+        'destroy': [IsAdminUser],
+    }
 
     http_method_names = ['get', 'post', 'patch', 'delete']
 

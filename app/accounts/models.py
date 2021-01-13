@@ -7,6 +7,10 @@ from django.utils import timezone
 
 import datetime
 import uuid
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Roles(models.TextChoices):
@@ -110,6 +114,23 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.role == Roles.ADMIN
+
+    @property
+    def permitted_users(self):
+        if self.role == Roles.EMPLOYEE:
+            try:
+                employee = self.employee
+            except AttributeError:
+                logger.warning(f'Отсутствует информация работнике для учетной записи {self.get_full_name()}')
+                return []
+
+            try:
+                return self.employee.permitted_users
+            except AttributeError:
+                logger.warning(f'Отсутствует аттрибут permitted_users у {self.employee}')
+                       
+        return []
+    
 
     def get_full_name(self):
         return self.username

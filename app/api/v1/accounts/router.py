@@ -6,9 +6,10 @@ from api.v1.accounts import views
 
 root_router = SimpleRouter()
 root_router.register(
-    r'companies', 
-    views.CompanyAccountsViewSet, 
-    basename='account-companies'
+    r'companies', views.CompanyAccountsViewSet, basename='account-companies'
+)
+root_router.register(
+    r'employees', views.EmployeeAccountsViewSet, basename='account-employees'
 )
 
 urls = [
