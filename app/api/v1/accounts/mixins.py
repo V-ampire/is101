@@ -22,15 +22,21 @@ class ChangePasswordViewMixin():
         return Response({'status': 'ok'})
 
 
-class DeactivateViewMixin():
+class ActiveControlViewMixin():
     """
-    Миксин для вью с действием делающим учетную запись неактивной.
+    Миксин для вью с действием делающим учетную запись активной/неактивной.
     """
     @action(detail=True)
     def deactivate(self, request, uuid):
         user = get_object_or_404(get_user_model(), uuid=uuid)
         user.deactivate()
-        return Response({'status': 'ok'})
+        return Response({'status': 'User has been deactivated'})
+
+    @action(detail=True)
+    def activate(self, request, uuid):
+        user = get_object_or_404(get_user_model(), uuid=uuid)
+        user.activate()
+        return Response({'status': 'User has been activated'})
 
 
 

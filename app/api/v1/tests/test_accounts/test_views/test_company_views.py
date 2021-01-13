@@ -5,6 +5,8 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import status
 
 from accounts import factories as accounts_factories
+from api.v1.tests.base import BaseViewsetTest
+from api.v1.accounts.views import CompanyAccountsViewSet
 
 from faker import Faker
 import pytest
@@ -105,6 +107,20 @@ class TestAccess():
         assert detail_response.status_code == unauth_status
         assert password_response.status_code == unauth_status
         assert deactivate_response.status_code == unauth_status
+
+
+@pytest.mark.django_db
+class TestViewset(BaseViewsetTest):
+    viewset = CompanyAccountsViewSet
+    obj_factory_class = accounts_factories.CompanyUserAccountModelFactory
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+    save_requests = True
+
+    def test_create(self, admin_user):
+        api =self.get_client()
+        api.force_authenticate(user=admin_user)
+        api.post(self.get_action_url('detail', uuid=self.obj.uuid), data=self.post_data)
 
 
 @pytest.mark.django_db

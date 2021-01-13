@@ -10,20 +10,20 @@ from api.v1.accounts import mixins
 from accounts.models import UserAccount
 
 
-class CompanyAccountsViewSet(mixins.DeactivateViewMixin, mixins.ChangePasswordViewMixin,
+class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,
                         viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей юрлиц.
     Метод PUT отключен, т.к. изменение пароля происходит через отдельное действие.
     """
-    hhttp_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = [IsAdminUser]
     queryset = UserAccount.company_objects.all()
     serializer_class = serizlizers.CompanyUserAccountSerializer
     lookup_field = 'uuid'
 
 
-class EmployeeAccountsViewSet(mixins.DeactivateViewMixin, mixins.ChangePasswordViewMixin,
+class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,
                         viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей работников.

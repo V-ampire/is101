@@ -1,24 +1,5 @@
 # Документация по API
 
-## Аккаунты
-
-`/accounts/companies/`
-
-`/accounts/companies/{uuid}/`
-
-`/accounts/companies/{uuid}/change-password/`
-
-`/accounts/companies/{uuid}/deactivate/`
-
-
-`/accounts/employees/`
-
-`/accounts/employees/{uuid}/`
-
-`/accounts/employees/{uuid}/change-password/`
-
-`/accounts/employees/{uuid}/deactivate/`
-
 
 ## Должности
 
@@ -59,7 +40,7 @@
 
 ## accounts
 
-Ресурс для действий [аккаунтами](./accounts.md).
+Ресурс для действий [аккаунтами](../accounts/README.md).
 
 Назначение:
 - Создание/чтение/удаление учетных записей

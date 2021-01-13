@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.test import RequestFactory
 
 from accounts.views import BruteForceLoginView
@@ -34,8 +36,9 @@ class TestBruteForceView():
         }
         request = self.rf.post('/accounts/login', data=invalid_data)
         request.META['REMOTE_ADDR'] = tested_ip
+        view = method_decorator(csrf_exempt, name='dispatch')(BruteForceLoginView)
         for attempt in range(attempts_15_minutes_block[0]):
-            response = BruteForceLoginView.as_view()(request)
+            response = view.as_view()(request)
         result_ip = IPAddress.objects.get(ip=tested_ip)
 
 

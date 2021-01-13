@@ -131,7 +131,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
                        
         return []
     
-
     def get_full_name(self):
         return self.username
 
@@ -141,6 +140,24 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     def deactivate(self):
         self.is_active = False
         self.save()
+
+    def activate(self):
+        self.is_active = True
+        self.save()
+
+    def save(self, *args, **kwargs):
+        """
+        Учетную запись работника можно активировать 
+        только после добавления информации о работнике.
+        """
+        if self.role == Roles.EMPLOYEE and self.is_active:
+            try:
+                if self.employee:
+                    super().save(*args, **kwargs)
+            except AttributeError:
+                logger.error('Невозможно активировать учетную запись без профиля работника')
+                self.is_active = False
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Учетные записи'
