@@ -1,16 +1,20 @@
 from django.urls import reverse
+from django.conf import settings
 
 from rest_framework import status
 
-from accounts.factories import CompanyUserAccountModelFactory
+from accounts.factories import CompanyUserAccountModelFactory, AdminUserAccountModelFactory, EmployeeUserAccountModelFactory
 
 from company.factories import PositionFactory
 from company.models import Position
 
 from api.v1.positions.serializers import PositionSerializer
 
+from api.v1.tests.base import BaseViewsetTest, ActionConfig
+
 from factory_generator import generate_to_dict
 import pytest
+import os
 
 
 success_status = status.HTTP_200_OK
@@ -18,6 +22,21 @@ created_status = status.HTTP_201_CREATED
 denied_status = status.HTTP_403_FORBIDDEN
 unauth_status = status.HTTP_401_UNAUTHORIZED
 deleted_status = status.HTTP_204_NO_CONTENT
+
+admin_user = AdminUserAccountModelFactory()
+company_user = CompanyUserAccountModelFactory()
+employee_user = EmployeeUserAccountModelFactory()
+
+
+class TestViewSet(BaseViewsetTest):
+    actions_config = [
+        ActionConfig('detail', 'get', success_status, data=None, user=admin_user)
+    ]
+    obj_factory_class = PositionFactory
+    app_name = 'api_v1'
+    url_basename = 'position'
+    create_reports = True
+    reports_path = os.path.join(settings.BASE_DIR, 'api/v1/docs/positions')
 
 
 @pytest.mark.django_db

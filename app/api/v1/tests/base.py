@@ -2,137 +2,78 @@ from rest_framework.test import APIClient
 
 from django.urls import reverse
 
+from collections import namedtuple
 from factory_generator import generate_to_dict
 import json
 import os
 import pytest
 
 
-class DocClient():
-
-    def __init__(self, registry):
-        self.client = APIClient()
-        self.registry = registry
-
-    def get(self, path, data=None, follow=False, **extra):
-        self.registry['get']['request'] = {
-            'path': path, 
-            'data': data
-        }
-        response = self.client.get(path, data=None, follow=False, **extra)
-        self.registry['get']['response'] = {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }
-        return response
-
-    def post(self, path, data=None, format=None, content_type=None, follow=False, **extra):
-        self.registry['post'] = {}
-        self.registry['post'].update({'request': {
-            'path': path, 
-            'data': data,
-            'format': format,
-            'content_type': content_type,
-        }})
-        response = self.client.post(path, data=None, follow=False, **extra)
-        self.registry['post'].update({'response': {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }})
-        return response
-
-    def put(self, path, data=None, format=None, content_type=None, follow=False, **extra):
-        self.registry['put'] = {}
-        self.registry['put'].update({'request': {
-            'path': path, 
-            'data': data,
-            'format': format,
-            'content_type': content_type,
-        }})
-        response = self.client.put(path, data=None, follow=False, **extra)
-        self.registry['put'].update({'response': {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }})
-        return response
-
-    def patch(self, path, data=None, format=None, content_type=None, follow=False, **extra):
-        self.registry['patch']['request'] = {
-            'path': path, 
-            'data': data,
-            'format': format,
-            'content_type': content_type,
-        }
-        response = self.client.get(path, data=None, follow=False, **extra)
-        self.registry['patch']['response'] = {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }
-        return response
-
-    def delete(self, path, data=None, format=None, content_type=None, follow=False, **extra):
-        self.registry['delete']['request'] = {
-            'path': path, 
-            'data': data,
-            'format': format,
-            'content_type': content_type,
-        }
-        response = self.client.get(path, data=None, follow=False, **extra)
-        self.registry['delete']['response'] = {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }
-        return response
-
-    def options(self, path, data=None, format=None, content_type=None, follow=False, **extra):
-        self.registry['options']['request'] = {
-            'path': path, 
-            'data': data,
-            'format': format,
-            'content_type': content_type,
-        }
-        response = self.client.get(path, data=None, follow=False, **extra)
-        self.registry['options']['response'] = {
-            'status_code': response.status_code, 
-            'data': response.json()
-        }
-        return response
-
-    def __getattr__(self, attr):
-        if not attr in dir(self):
-            return getattr(self.client, attr)
-        return getattr(self, attr)
+ActionConfig = namedtuple('ActionConfig', [
+        'action',
+        'method',
+        'status_code',
+        'data',
+        'user'
+    ])
 
 
 class BaseViewsetTest():
     """
     Класс для тестирования вьюсетов.
     """
+    actions_config = None
     viewset = None
     obj_factory_class = None
     app_name = 'api_v1'
     url_basename = 'company-branches'
-    save_requests = False
-    requests_registry = {}      
+    create_reports = False
+    reports_path = None      
 
     def get_client(self):
-        if self.save_requests:
-            return DocClient(self.requests_registry)
-        return APIClient
+        return APIClient()
 
     def get_action_url(self, action, *args, **kwargs):
         url = f'{self.app_name}:{self.url_basename}-{action}'
         return reverse(url, args=args, kwargs=kwargs)
 
-    def setup_method(self, method):
-        self.client = self.get_client()
-        self.obj = self.obj_factory_class()
-        self.post_data = generate_to_dict(self.obj_factory_class)
-        self.patch_data = generate_to_dict(self.obj_factory_class)
+    def get_object(self):
+        return self.obj_factory_class()
 
-    def teardown_class(cls):
-        if cls.save_requests:
-            dir_path = os.path.dirname(os.path.abspath(__file__))
-            file_name = f'{cls.viewset.__name__}.json'
-            with open(os.path.join(dir_path, file_name), 'w') as fp:
-                json.dump(cls.requests_registry, fp, ensure_ascii=False, indent=4)
+    def test_viewset_actions(self):
+        for config in self.actions_config:
+            self._test_action(config)
+
+    def save_action_report(self, action, report):
+        file_name = f'{cls.viewset}-{action}.json'
+        with open(os.path.join(self.reports_path, file_name), 'w') as fp:
+            json.dump(report, fp, ensure_ascii=False, indent=4)
+
+    def _test_action(self, config):
+        client = self.get_client()
+        obj = self.get_object()
+        url = get_action_url(config.action, uuid=obj.uuid)
+        expected_status = config.status_code
+        try:
+            data_getter = getattr(self, f'get_{config.action}_data')
+            data = data_getter()
+        except AttributeError:
+            data = config.data
+        if config.user:
+            client.force_authenticate(user=config.user)
+        method = getattr(client, config.method)
+        response = method(url, data=data)
+        if self.create_reports:
+            report = {}
+            report['request'] = {
+                'url': url,
+                'data': data,
+                'user_role': user.role
+            }
+            report['response'] = {
+                'status_code': response.status_code,
+                'data': response.json()
+            }
+
+        assert response.status_code = expected_status
+        
