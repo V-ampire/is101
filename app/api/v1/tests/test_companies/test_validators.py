@@ -10,8 +10,9 @@ import pytest
 
 fake = Faker()
 
+
 @pytest.mark.django_db
-class TestValidateuserData():
+class TestValidateUserData():
 
     def test_validate_user_if_user_doesnt_exist(self):
         """

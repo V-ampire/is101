@@ -4,39 +4,43 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.v1.accounts.serizlizers import ChangePasswordSerializer
+from api.v1.accounts.serializers import ChangePasswordSerializer
+from api.v1.accounts.validators import validate_user_employee_to_activate
 
-from accounts.utils import change_password
+from accounts.utils import change_password, is_employee_user_account
+from accounts.models import Roles
 
 
 class ChangePasswordViewMixin():
     """
     Миксин для вью с действием смены пароля.
     """
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['patch'])
     def change_password(self, request, uuid):
-        user = get_object_or_404(get_user_model(), uuid=uuid)
+        user = self.get_object()
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         change_password(user.pk, serializer.validated_data['password1'])
-        return Response({'status': 'ok'})
+        return Response({'status': 'Пароль изменен.'})
 
 
 class ActiveControlViewMixin():
     """
     Миксин для вью с действием делающим учетную запись активной/неактивной.
     """
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def deactivate(self, request, uuid):
-        user = get_object_or_404(get_user_model(), uuid=uuid)
+        user = self.get_object()
         user.deactivate()
-        return Response({'status': 'User has been deactivated'})
+        return Response({'status': 'Пользователь в неактивном статусе.'})
 
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def activate(self, request, uuid):
-        user = get_object_or_404(get_user_model(), uuid=uuid)
+        user = self.get_object()
+        if is_employee_user_account(user):
+            validate_user_employee_to_activate(user)
         user.activate()
-        return Response({'status': 'User has been activated'})
+        return Response({'status': 'Пользователь в активном статусе.'})
 
 
 

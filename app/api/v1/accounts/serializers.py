@@ -11,7 +11,8 @@ class UserAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'uuid', 'password')
+        fields = ('username', 'uuid', 'password', 'is_active')
+        reda_only_fields = ('is_active',)
 
     def create(self, validated_data):
         raise NotImplementedError('Define wchich user role to use for creating.')
@@ -22,9 +23,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
         специальное действие.
         """
         if self.instance:
-            raise serializers.ValidationError(
-                "Для изменения пароля используйте функцию сброса пароля"
-            )
+            raise serializers.ValidationError("Для изменения пароля используйте функцию сброса пароля")
         return password_value
 
 

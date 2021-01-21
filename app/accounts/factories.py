@@ -57,6 +57,7 @@ class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
 class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
     """
     Фабрика для модели учетной записи юр. лица.
+    Учетная запись неактивна пока не заполнен профиль.
     """
     class Meta:
         model = UserAccount
@@ -64,3 +65,4 @@ class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
     username = factory.Faker('user_name')
     password = factory.Faker('password')
     role = Roles.EMPLOYEE
+    is_active = False

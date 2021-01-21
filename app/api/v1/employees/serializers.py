@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
-from api.v1.accounts.serizlizers import ReadOnlyUserAccountSerializer
+from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
 
 from api.v1.positions.serializers import PositionSerializer
 
@@ -34,6 +34,42 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'pasport_scan'
         )
 
+    def validate_user(self, user_uuid):
+        """
+        Возвращает объект accounts.UserAccount
+        """
+        user = validators.validate_user_data_for_create(uuid=user_uuid)
+        return user.uuid
+    
+    def create(self, validated_data):
+        user_uuid = validated_data.pop('user')
+        return utils.create_employee(user_uuid=user_uuid, **validated_data)
+
+
+class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
+    """
+    Сериалайзер для списка сотрудников.
+    """
+    position = serializers.StringRelatedField(read_only=True)
+
+    parent_lookup_kwargs = {
+        'company_uuid': 'branch__company__uuid',
+		'branch_uuid': 'branch__uuid',
+	}
+
+    class Meta:
+        model = Employee
+        fields = (
+            'uuid',
+            'url',
+            'fio',
+            'position'
+        )
+        extra_kwargs = {
+            'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},
+        }
+
+
 
 class ChangePositionSerializer(serializers.Serializer):
     uuid = serializers.UUIDField()
@@ -56,28 +92,3 @@ class ChangeBranchSerializer(serializers.Serializer):
         employee_uuid = validated_data['employee_uuid']
         validate_branch_for_transfer(branch_uuid, employee_uuid)
         return validated_data
-
-
-class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
-    """
-    Сериалайзер для списка сотрудников.
-    """
-    position = serializers.StringRelatedField()
-
-    parent_lookup_kwargs = {
-        'company_uuid': 'branch__company__uuid',
-		'branch_uuid': 'branch__uuid',
-	}
-
-    class Meta:
-        model = Employee
-        fields = (
-            'uuid',
-            'url',
-            'fio',
-            'position'
-        )
-        extra_kwargs = {
-            'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},
-        }
-

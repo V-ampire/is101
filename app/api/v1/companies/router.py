@@ -8,7 +8,7 @@ from api.v1.employees.views import EmployeeViewSet
 
 
 root_router = routers.SimpleRouter()
-root_router.register('', CompanyViewSet, basename='company')
+root_router.register('', CompanyViewSet, basename='companies')
 
 
 branches_router = routers.NestedSimpleRouter(root_router, r'', lookup='company')

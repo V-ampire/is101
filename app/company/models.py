@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 
-from accounts.validators import is_user_company, is_user_employee
+from accounts.utils import is_employee_user_account
 
 from core.models import TimeStamptedModel
 
@@ -127,7 +128,7 @@ class Employee(TimeStamptedModel, StatusModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="employee")
     fio = models.CharField("ФИО", max_length=264)
-    branch = models.ForeignKey("company.Branch", on_delete=models.SET_NULL, null=True, 
+    branch = models.ForeignKey("company.Branch", on_delete=models.CASCADE, null=True, 
                                     related_name='employees')
     employee_position = models.ForeignKey("company.Position", on_delete=models.SET_NULL, null=True)
     date_of_birth = models.DateField("Дата рождения")
@@ -153,7 +154,8 @@ class Employee(TimeStamptedModel, StatusModel):
         return self.branch.permitted_users
 
     def clean(self):
-        is_user_employee(self.user.pk)
+        if not is_employee_user_account(self.user):
+            raise ValidationError('Аккаунт не является аккаунтом работника.')
 
     # def __str__(self):
     #     return f"{self.position.title}: {self.fio}"

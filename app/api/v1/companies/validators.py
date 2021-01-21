@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 
+from accounts.models import Roles
+
 from rest_framework.serializers import ValidationError
 
 
@@ -13,7 +15,7 @@ def validate_user_data(**user_data):
     except get_user_model().DoesNotExist:
         raise ValidationError('Учетная запись не зарегистрирована')
     
-    if user.role != get_user_model().COMPANY:
+    if user.role != Roles.COMPANY:
         raise ValidationError(
             f'Учетная запись {user.username} не может быть использована для юрлица'
         )

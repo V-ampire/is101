@@ -3,6 +3,37 @@ from rest_framework.serializers import ValidationError
 from company.models import Branch, Employee, Position
 
 
+def validate_user_data(**user_data):
+    """
+    Проверяем существует ли такая учетная запись.
+    Проверяем что учетная запись имеет роль работника.
+    """
+    try:
+        user = get_user_model().objects.get(**user_data)
+    except get_user_model().DoesNotExist:
+        raise ValidationError('Учетная запись не зарегистрирована')
+    
+    if user.role != Roles.EMPLOYEE:
+        raise ValidationError(
+            f'Учетная запись {user.username} не может быть использована для работника'
+        )
+    return user
+
+
+def validate_user_data_for_create(**user_data):
+    """
+    Проверяем существует ли такая учетная запись.
+    Проверяем что учетная запись имеет роль работника.
+    Проверяем не привязан ли к учетной записи работник.
+    """
+    user = validate_user_data(**user_data)
+    if hasattr(user, 'employee'):
+        raise ValidationError(
+            f'На учетную запись {user.username} уже оформлен работник {user.employee.fio}'
+        )
+    return user
+
+
 def validate_branch_for_transfer(branch_uuid, employee_uuid):
     """
     Филиал не должен принадлежать другому юрлицу.

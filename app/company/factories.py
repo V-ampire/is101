@@ -86,3 +86,7 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     date_of_birth = factory.Faker('date')
     pasport = factory.Faker('pystr')
     pasport_scan = factory.django.FileField(filename=fake.file_name(extension='pdf'))
+
+    activate_user = factory.PostGeneration(
+        lambda obj, create, extracted, **kwargs: obj.user.activate()
+    )

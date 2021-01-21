@@ -15,7 +15,7 @@ class ViewSetActionPermissionMixin:
             permission_classes = [AllowAny]
             permission_action_classes = {
                 'list': [IsAuthenticated]
-                'create': [IsAdminUser]
+                'partial_update': [IsAdminUser]
                 'my_action': [MyCustomPermission]
             }
 
