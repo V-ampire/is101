@@ -3,6 +3,35 @@ from django.db import transaction
 
 from company.models import Company, Employee, Position, Branch
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
+def is_company_permitted_user(company_uuid, user_uuid):
+    """
+    Проверяет имеет ли учетная запись доступ к информации о юрлице.
+    """
+    try:
+        company = Company.objects.get(uuid=company_uuid)
+    except Company.DoesNotExist:
+        logger.warning(f"Проверка доступа для несуществующей компании company_uuid={company_uuid}")
+        return False
+    return company.user.uuid == user_uuid
+
+
+def is_employee_permitted_company_user(employee_uuid, user_uuid):
+    """
+    Проверяет имеет ли учетная запись юрлица доступ к информации о работнике.
+    """
+    try:
+        employee = Employee.objects.get(uuid=employee_uuid)
+    except Employee.DoesNotExist:
+        logger.warning(f"Проверка доступа для несуществующего работника employee_uuid={employee_uuid}")
+        return False
+    return employee.company.user.uuid == user_uuid
+
 
 def delete_company(company_uuid):
     """
