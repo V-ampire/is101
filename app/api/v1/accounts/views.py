@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework import viewsets
 
-from api.v1.permissions import IsPermittedOrAdmin, IsCompanyOrAdmin
+from api.v1.permissions import IsCompanyOrAdmin, IsPermittedCompanyToEmployeeUser
 from api.v1.accounts import serializers
 from api.v1.accounts import mixins
 
@@ -39,8 +39,8 @@ class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswo
 
     permission_action_classes = {
         'create': [IsCompanyOrAdmin],
-        'partial_update': [IsPermittedOrAdmin],
-        'activate': [IsPermittedOrAdmin],
-        'deactivate': [IsPermittedOrAdmin],
-        'change_password': [IsPermittedOrAdmin]
+        'partial_update': [IsPermittedCompanyToEmployeeUser],
+        'activate': [IsPermittedCompanyToEmployeeUser],
+        'deactivate': [IsPermittedCompanyToEmployeeUser],
+        'change_password': [IsPermittedCompanyToEmployeeUser]
     }

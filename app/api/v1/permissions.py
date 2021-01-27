@@ -4,7 +4,7 @@ from rest_framework import permissions
 
 from accounts.utils import is_company_user_account
 
-from company.utils import is_company_permitted_user, is_employee_permitted_company_user
+from company.utils import is_company_permitted_user, is_employee_permitted_user
 
 import logging
 
@@ -27,21 +27,12 @@ class CompanyResourcePermission(permissions.BasePermission):
 
 
 class IsPermittedCompanyToEmployeeUser(permissions.BasePermission):
-    pass
-
-
-class IsPermittedOrAdmin(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        """
-        Доступ только для тех учетных записей которым разрешен доступ или админов.
-        Список учетных записей, у которых есть доступ быть определен 
-        в аттрибуте allow_users
-        """
-        try:
-            return request.user in obj.permitted_users or request.user.is_staff
-        except AttributeError:
-            logger.warning(f'Отсутствует аттрибут permitted_users у {obj}')
-            return False
+    """
+    Регулирует доступ юрлица к учетной записи работника.
+    """
+    def has_object_permission(self, request, view, employee):
+        
+        return is_employee_permitted_user(employee.uuid, request.user.uuid)
 
 
 class IsCompanyOrAdmin(permissions.BasePermission):

@@ -68,8 +68,7 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},
         }
-
-
+        
 
 class ChangePositionSerializer(serializers.Serializer):
     uuid = serializers.UUIDField()

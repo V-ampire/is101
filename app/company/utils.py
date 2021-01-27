@@ -21,9 +21,9 @@ def is_company_permitted_user(company_uuid, user_uuid):
     return company.user.uuid == user_uuid
 
 
-def is_employee_permitted_company_user(employee_uuid, user_uuid):
+def is_employee_permitted_user(employee_uuid, user_uuid):
     """
-    Проверяет имеет ли учетная запись юрлица доступ к информации о работнике.
+    Проверяет имеет ли учетная запись доступ к информации о работнике.
     """
     try:
         employee = Employee.objects.get(uuid=employee_uuid)

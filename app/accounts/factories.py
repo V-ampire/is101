@@ -65,4 +65,3 @@ class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
     username = factory.Faker('user_name')
     password = factory.Faker('password')
     role = Roles.EMPLOYEE
-    is_active = False
