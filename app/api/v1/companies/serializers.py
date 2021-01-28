@@ -3,7 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from company import models, utils
+from companies import models, utils, validators
 
 from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
 from api.v1.branches.serializers import BranchListSerializer
@@ -36,15 +36,16 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         """
         Возвращает объект accounts.UserAccount
         """
-        user = validators.validate_user_data_for_create(uuid=user_uuid)
+        try:
+            user = get_user_model().company_objects.get(uuid=user_uuid)
+        except get_user_model().DoesNotExists:
+            raise serializers.ValidationError(f'Учетная запись юрлица с uuid={user_uuid} не существует.')
+        validators.validate_company_user(user)
         return user.uuid
     
     def create(self, validated_data):
         user_uuid = validated_data.pop('user')
         return utils.create_company(user_uuid=user_uuid, **validated_data)
-
-    def update(self, *args, **kwargs):
-        raise NotImplementedError('Сериалайзер доступен только для создания объектов.')
 
 
 class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
@@ -72,7 +73,7 @@ class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
             'url',
             'branches'
         )
-        read_only_fields = ('user',)
+        read_only_fields = ('user', 'branches')
         extra_kwargs = {
             'url': {'view_name': 'api_v1:companies-detail', 'lookup_field': 'uuid'},
         }
@@ -82,7 +83,7 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
     """
     Сериалайзер для юр. лица для тех кому разрешен доступ.
     """
-    branches = BranchListSerializer(many=True)
+    branches = BranchListSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Company
@@ -98,6 +99,7 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
             'phone',
             'branches'
         )
+
 
 class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
     """

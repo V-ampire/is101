@@ -1,9 +1,17 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.http import is_safe_url, urlunquote
 from django.utils import timezone
 
 from accounts.models import IPAddress, Roles, UserAccount
+
+from companies.utils
+
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_next_url(request):
@@ -96,3 +104,4 @@ def is_employee_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.EMPLOYEE
     return False
+    

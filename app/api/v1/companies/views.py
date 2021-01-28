@@ -5,10 +5,10 @@ from rest_framework.response import Response
 
 from api.v1 import mixins
 from api.v1.companies import serializers
-from api.v1.permissions import IsPermittedOrAdmin
+from api.v1 import permissions
 
-from company.models import Company
-from company import utils
+from companies.models import CompanyProfile
+from companies import utils
 
 
 class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet):
@@ -16,18 +16,18 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
     Вьюсет для юр. лиц.
     Метод PUT отключен т.к. запрещено обновлять учетную запись через данный вьюсет.
     """
-    model_class = Company
-    queryset = Company.objects.all()
+    model_class = CompanyProfile
+    queryset = CompanyProfile.objects.all()
     lookup_field = 'uuid'
 
     permission_action_classes = {
         "list": [IsAdminUser],
-        "retrieve": [IsPermittedOrAdmin],
+        "retrieve": [permissions.IsPermittedToCompanyProfile],
         "create": [IsAdminUser],
-        "partial_update": [IsPermittedOrAdmin],
+        "partial_update": [permissions.IsPermittedToCompanyProfile],
         "destroy": [IsAdminUser],
-        "archivate": [IsAdminUser],
-        "activate": [IsAdminUser],
+        "to_archive": [IsAdminUser],
+        "to_work": [IsAdminUser],
     }
 
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -56,20 +56,20 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
         utils.delete_company(instance.uuid)
 
     @action(detail=True, methods=['patch'])
-    def archivate(self, request, *args, **kwargs):
+    def to_archive(self, request, *args, **kwargs):
         """
-        Устанавливает юрлицу архиный статус и отключает учетку.
+        Выполняет действия по переводу юрлица в архив.
         """
+        force = request.data.get('force', False)
         company = self.get_object()
-        utils.archivate_company(company.uuid)
+        utils.company_to_archive(company.uuid, force=force)
         return Response({'status': 'Юрлицо переведено в архив. Учетная запись отключена.'})
 
     @action(detail=True, methods=['patch'])
-    def activate(self, request, *args, **kwargs):
+    def to_work(self, request, *args, **kwargs):
         """
-        Устанавливает объекту статус ACTIVE.
-        Метод GET.
+        Выполняет действия по переводу юрлица в работу.
         """
         company = self.get_object()
-        utils.activate_company(company.uuid)
-        return Response({'status': 'Юрлицо активно. Учетная запись активирована.'})
+        utils.company_to_work(company.uuid)
+        return Response({'status': 'Юрлицо в рабочем статусе. Учетная запись активирована.'})

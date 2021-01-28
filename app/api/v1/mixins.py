@@ -51,29 +51,3 @@ class ViewSetActionPermissionMixin:
                     permission_classes or self.permission_classes
                 )
             ]
-
-
-class StatusViewSetMixin:
-    """
-    Миксин определяющий действия по изменению статусов объекта,
-    определенных в company.models.StatusModel
-    """
-    @action(detail=True)
-    def archivate(self, request, *args, **kwargs):
-        """
-        Устанавливает объекту статус ARCHIVED.
-        Метод GET.
-        """
-        obj = self.get_object()
-        obj.archivate()
-        return Response({'status': 'ok'})
-
-    @action(detail=True)
-    def activate(self, request, *args, **kwargs):
-        """
-        Устанавливает объекту статус ACTIVE.
-        Метод GET.
-        """
-        obj = self.get_object()
-        obj.activate()
-        return Response({'status': 'ok'})

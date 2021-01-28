@@ -5,6 +5,7 @@ from rest_framework import viewsets
 
 from api.v1.accounts import serializers
 from api.v1.accounts import mixins
+from api.v1.permissions import IsPermittedToEmployeeUser
 
 from api.v1.mixins import ViewSetActionPermissionMixin
 
@@ -31,4 +32,7 @@ class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswo
     Метод DELETE отключен, т.к. учетная запись удаляется одновременно с профилем.
     """
     http_method_names = ['get', 'patch']
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsPermittedToEmployeeUser]
+    queryset = get_user_model().employee_objects.all()
+    serializer_class = serializers.EmployeeUserAccountSerializer
+    lookup_field = 'uuid'
