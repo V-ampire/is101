@@ -34,7 +34,7 @@ class CompanyUserAccountSerializer(UserAccountSerializer):
     def create(self, validated_data):
         username = validated_data['username']
         password = validated_data['password']
-        return get_user_model().company_objects.create_account(username, password)
+        return get_user_model().company_objects.create_user(username, password)
 
 
 class EmployeeUserAccountSerializer(UserAccountSerializer):
@@ -44,7 +44,7 @@ class EmployeeUserAccountSerializer(UserAccountSerializer):
     def create(self, validated_data):
         username = validated_data['username']
         password = validated_data['password']
-        return get_user_model().employee_objects.create_account(username, password)
+        return get_user_model().employee_objects.create_user(username, password)
 
 
 class ReadOnlyUserAccountSerializer(serializers.ModelSerializer):

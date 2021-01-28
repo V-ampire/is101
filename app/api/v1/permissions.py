@@ -4,7 +4,7 @@ from rest_framework import permissions
 
 from accounts.utils import is_company_user_account
 
-from company.utils import is_company_permitted_user, is_employee_permitted_user
+from companies.utils import is_company_permitted_user, is_employee_permitted_user
 
 import logging
 
@@ -26,10 +26,13 @@ class CompanyResourcePermission(permissions.BasePermission):
         return is_company_permitted_user(company_uuid, request.user.uuid)
 
 
-class IsPermittedCompanyToEmployeeUser(permissions.BasePermission):
+class IsPermittedToEmployeeUser(permissions.BasePermission):
     """
-    Регулирует доступ юрлица к учетной записи работника.
+    Регулирует доступ к учетной записи работника.
     """
+    def has_permission(self, request, view):
+        return request.user.is_staff
+
     def has_object_permission(self, request, view, employee):
         
         return is_employee_permitted_user(employee.uuid, request.user.uuid)

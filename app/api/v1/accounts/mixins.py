@@ -37,8 +37,6 @@ class ActiveControlViewMixin():
     @action(detail=True, methods=['patch'])
     def activate(self, request, uuid):
         user = self.get_object()
-        if is_employee_user_account(user):
-            validate_user_employee_to_activate(user)
         user.activate()
         return Response({'status': 'Пользователь в активном статусе.'})
 
