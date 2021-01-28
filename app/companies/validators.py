@@ -1,6 +1,8 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
 from accounts.utils import is_company_user, is_employee_user
+
+from core.models import Statuses
 
 
 def validate_company_user(user):
@@ -17,3 +19,58 @@ def validate_employee_user(user):
     """
     if not is_employee_user(user):
         raise ValidationError(f"Учетная запись не может быть использована для профиля работника")
+
+
+def validate_company_to_archive(company):
+    """
+    Валидация профлия юрлица перед переводом в архив.
+    Юрлицо не должно иметь работников в рабочем статусе.
+    """
+    try:
+        for branch in company.branches:
+            if branch.employees.filter(status=Statuses.WORKS).exists():
+                raise ValidationError(
+                    f'Невозможно перевести юрлицо {company.title} в архив пока в нем числятся работающие сотрудники.'
+                )
+    except ObjectDoesNotExist:
+        # Нет филиалов или работников в филиалах
+        pass
+
+
+def validate_branch_to_archive(branch):
+    """
+    Валидация филиала юрлица перед переводом в архив.
+    Филиал не должен иметь работников в рабочем статусе.
+    """
+    try:
+        if branch.employees.filter(status=Statuses.WORKS).exists():
+            raise ValidationError(
+                f'Невозможно перевести филиал {branch} в архив пока в нем числятся работающие сотрудники.'
+            )
+    except ObjectDoesNotExist:
+        # Нет работников в филиале
+        pass
+
+
+def validate_branch_to_work(branch):
+    """
+    Валидация филиала перед переводом в статус Работает.
+    Филиал не может быть переведен в рабочий статус если юрлицо в архиве.
+    """
+    if branch.company.status == Statuses.ARCHIVED:
+        raise ValidationError(
+            f'Невозможно перевести филиал {branch} в рабочий статус пока архивировано юрлицо {branch.company.title}.'
+        )
+
+
+def validate_employee_to_work(employee):
+    """
+    Валидация работника перед переводом в статс Работает.
+    работник не может быть переведен в рабочий статус если филиал или юрлицо в архиве.
+    """
+    if employee.branch.status == Statuses.ARCHIVED or employee.branch.company.status == Statuses.ARCHIVED:
+        raise ValidationError(
+            f'Невозможно перевести работника {employee.fio} в рабочий статус '
+            f'пока архивирован филиал {employee.branch} '
+            f'или юрлицо {employee.branch.company.title}.'
+        )
