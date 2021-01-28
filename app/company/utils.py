@@ -77,13 +77,14 @@ def create_company(user_uuid, **company_data):
     return Company.objects.create(user=user, **company_data)
 
 
-def create_employee(user_uuid, **employee_data):
+def create_employee(username, password, **employee_data):
     """
+    Создать учетку работника.
     Создать профиль работника.
-    Активировать учетку работника.
     """
-    user = get_user_model().employee_objects.get(uuid=user_uuid)
-    return Employee.objects.create(user=user, **employee_data)
+    with transaction.atomic():
+        user = get_user_model().employee_objects.create_account(username=username, password=password)
+        return Employee.objects.create(user=user, **employee_data)
 
 
 def change_employee_position(employee_uuid, new_position_uuid):

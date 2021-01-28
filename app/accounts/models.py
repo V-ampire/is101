@@ -52,12 +52,12 @@ class CompanyManager(UserAccountManager):
     def get_queryset(self):
         return super().get_queryset().filter(role=Roles.COMPANY)
 
-    def create_account(self, username, password, **extra_fields):
+    def create_user(self, username, password, **extra_fields):
         """
         Создать учетную запись для компании.
         """
         role = Roles.COMPANY
-        return self.create_user(username, role, password, **extra_fields)
+        return super().create_user(username, role, password, **extra_fields)
 
 
 class EmployeeManager(UserAccountManager):
@@ -67,12 +67,12 @@ class EmployeeManager(UserAccountManager):
     def get_queryset(self):
         return super().get_queryset().filter(role=Roles.EMPLOYEE)
 
-    def create_account(self, username, password, **extra_fields):
+    def create_user(self, username, password, **extra_fields):
         """
         Создать учетную запись для работника.
         """
         role = Roles.EMPLOYEE
-        return self.create_user(username, role, password, **extra_fields)
+        return super().create_user(username, role, password, **extra_fields)
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):

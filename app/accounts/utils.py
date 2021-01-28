@@ -80,19 +80,19 @@ def change_password(user_pk, new_password):
     user.save()
 
 
-def is_admin_user_account(user):
+def is_admin_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.ADMIN
     return False
 
 
-def is_company_user_account(user):
+def is_company_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.COMPANY
     return False
 
 
-def is_employee_user_account(user):
+def is_employee_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.EMPLOYEE
     return False
