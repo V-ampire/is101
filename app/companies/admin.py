@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from company import models
+from companies import models
 
 
 admin.site.register(models.CompanyProfile)

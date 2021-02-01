@@ -28,7 +28,7 @@ INSTALLED_APPS = [
 
     'core',
     'accounts',
-    'company',
+    'companies',
     'dashboards',
     'api',
     'factory_generator'

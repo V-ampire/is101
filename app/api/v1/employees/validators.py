@@ -1,6 +1,6 @@
 from rest_framework.serializers import ValidationError
 
-from company.models import Branch, Employee, Position
+from companies.models import Branch, EmployeeProfile, Position
 
 
 def validate_user_data(**user_data):

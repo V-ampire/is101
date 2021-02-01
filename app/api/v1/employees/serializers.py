@@ -8,7 +8,7 @@ from api.v1.positions.serializers import PositionSerializer
 
 from api.v1.employees.validators import validate_position_for_change, validate_branch_for_transfer
 
-from company.models import Employee, Position, Branch
+from companies.models import EmployeeProfile, Position, Branch
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     position = PositionSerializer(read_only=True)
 
     class Meta:
-        model = Employee
+        model = EmployeeProfile
         fields = (
             'user',
             'uuid',
@@ -58,7 +58,7 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
 	}
 
     class Meta:
-        model = Employee
+        model = EmployeeProfile
         fields = (
             'uuid',
             'url',

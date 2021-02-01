@@ -3,7 +3,7 @@ from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
 from api.v1.employees.serializers import EmployeeListSerizlizer
 
-from company.models import Branch
+from companies.models import Branch
 
 
 class BranchSerializer(serializers.ModelSerializer):

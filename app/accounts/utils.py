@@ -6,8 +6,6 @@ from django.utils import timezone
 
 from accounts.models import IPAddress, Roles, UserAccount
 
-from companies.utils
-
 import logging
 
 

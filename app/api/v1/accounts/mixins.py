@@ -5,9 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.v1.accounts.serializers import ChangePasswordSerializer
-from api.v1.accounts.validators import validate_user_employee_to_activate
 
-from accounts.utils import change_password, is_employee_user_account
+from accounts.utils import change_password, is_employee_user
 from accounts.models import Roles
 
 

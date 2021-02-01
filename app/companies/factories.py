@@ -1,4 +1,4 @@
-from company import models
+from companies import models
 
 from accounts import factories as accounts_factories
 
@@ -10,12 +10,12 @@ fake = Faker()
 
 
 
-class CompanyFactory(factory.django.DjangoModelFactory):
+class CompanyProfileFactory(factory.django.DjangoModelFactory):
     """
     Фабрика для модели компании.
     """
     class Meta:
-        model = models.Company
+        model = models.CompanyProfile
 
     user = factory.SubFactory(accounts_factories.CompanyUserAccountModelFactory)
     title = factory.Faker('company')
@@ -27,26 +27,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     phone = factory.Faker('phone_number')
     logo = factory.django.ImageField(filename=fake.file_name(extension='jpg'))
     tagline = factory.Faker('catch_phrase')
-
-
-class ArchivedCompanyFactory(factory.django.DjangoModelFactory):
-    """
-    Фабрика для модели компании со статусом Company.ARCHIVED.
-    """
-    class Meta:
-        model = models.Company
-
-    user = factory.SubFactory(accounts_factories.CompanyUserAccountModelFactory)
-    title = factory.Faker('company')
-    inn = factory.Faker('pystr', max_chars=12)
-    ogrn = factory.Faker('pystr', max_chars=15)
-    city = factory.Faker('city')
-    address = factory.Faker('address')
-    email = factory.Faker('company_email')
-    phone = factory.Faker('phone_number')
-    logo = factory.django.ImageField(filename=fake.file_name(extension='jpg'))
-    tagline = factory.Faker('catch_phrase')
-    status = models.Company.ARCHIVED
 
 
 class BranchFactory(factory.django.DjangoModelFactory):
@@ -56,7 +36,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Branch
 
-    company = factory.SubFactory(CompanyFactory)
+    company = factory.SubFactory(CompanyProfileFactory)
     city = factory.Faker('city')
     address = factory.Faker('address')
     phone = factory.Faker('phone_number')
@@ -72,12 +52,12 @@ class PositionFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('job')
 
 
-class EmployeeFactory(factory.django.DjangoModelFactory):
+class EmployeeProfileFactory(factory.django.DjangoModelFactory):
     """
     Фабрика для модели работника.
     """
     class Meta:
-        model = models.Employee
+        model = models.EmployeeProfile
         
     user = factory.SubFactory(accounts_factories.EmployeeUserAccountModelFactory)
     fio = factory.Faker('name')
@@ -86,7 +66,3 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     date_of_birth = factory.Faker('date')
     pasport = factory.Faker('pystr')
     pasport_scan = factory.django.FileField(filename=fake.file_name(extension='pdf'))
-
-    activate_user = factory.PostGeneration(
-        lambda obj, create, extracted, **kwargs: obj.user.activate()
-    )

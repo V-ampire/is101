@@ -12,7 +12,7 @@ class TimeStamptedModel(models.Model):
 
 
 class Statuses(models.IntegerChoices):
-    WORKS = 1, 'Рабтает'
+    WORKS = 1, 'Работает'
     ARCHIVED = 0, 'В архиве'
 
 
@@ -20,7 +20,7 @@ class StatusModel(models.Model):
     """
     Модель позволяющая не удалять, а перемещать записи в архив.
     """
-    status = models.IntegerField("Статус", choices=Statuses, default=Statuses.WORKS)
+    status = models.IntegerField("Статус", choices=Statuses.choices, default=Statuses.WORKS)
 
     class Meta:
         abstract = True

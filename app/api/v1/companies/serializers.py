@@ -7,7 +7,6 @@ from companies import models, utils, validators
 
 from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
 from api.v1.branches.serializers import BranchListSerializer
-from api.v1.companies import validators
 
 
 class CompanyCreateSerializer(serializers.ModelSerializer):
@@ -18,7 +17,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     user = serializers.UUIDField(format='hex_verbose')
 
     class Meta:
-        model = models.Company
+        model = models.CompanyProfile
         fields = (
             'user',
             'title',
@@ -57,7 +56,7 @@ class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
     branches = BranchListSerializer(many=True)
     
     class Meta:
-        model = models.Company
+        model = models.CompanyProfile
         fields = (
             'uuid',
             'user',
@@ -86,7 +85,7 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
     branches = BranchListSerializer(many=True, read_only=True)
 
     class Meta:
-        model = models.Company
+        model = models.CompanyProfile
         fields = (
             'title',
             'logo',
@@ -106,7 +105,7 @@ class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
     Сериалайзер для списка компаний.
     """
     class Meta:
-        model = models.Company
+        model = models.CompanyProfile
         fields = (
             'uuid',
             'url', 

@@ -24,7 +24,7 @@ class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswor
 
 
 class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,
-                        viewsets.ModelViewSet):
+                        ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей работников.
     Метод PUT отключен, т.к. изменение пароля происходит через отдельное действие.
@@ -36,3 +36,7 @@ class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswo
     queryset = get_user_model().employee_objects.all()
     serializer_class = serializers.EmployeeUserAccountSerializer
     lookup_field = 'uuid'
+
+    permission_action_classes = {
+        "list": [IsAdminUser],
+    }

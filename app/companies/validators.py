@@ -27,7 +27,7 @@ def validate_company_to_archive(company):
     Юрлицо не должно иметь работников в рабочем статусе.
     """
     try:
-        for branch in company.branches:
+        for branch in company.branches.all():
             if branch.employees.filter(status=Statuses.WORKS).exists():
                 raise ValidationError(
                     f'Невозможно перевести юрлицо {company.title} в архив пока в нем числятся работающие сотрудники.'

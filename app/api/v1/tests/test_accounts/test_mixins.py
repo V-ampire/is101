@@ -1,4 +1,6 @@
-from rest_framework.viewsets import ViewSet
+from django.contrib.auth import get_user_model
+
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from api.v1.accounts import mixins
@@ -14,8 +16,9 @@ fake = Faker()
 class TestChangePasswordMixin():
     
     def setup_method(self, method):
-        class PasswordViewSet(mixins.ChangePasswordViewMixin, ViewSet):
-            pass
+        class PasswordViewSet(mixins.ChangePasswordViewMixin, ModelViewSet):
+            queryset = get_user_model().objects.all()
+            lookup_field = 'uuid'
         self.view = PasswordViewSet.as_view({'patch': 'change_password'})
         self.factory = APIRequestFactory()
 
@@ -38,8 +41,9 @@ class TestChangePasswordMixin():
 class TestActiveControlMixin():
 
     def setup_method(self, method):
-        class ActiveControlViewSet(mixins.ActiveControlViewMixin, ViewSet):
-            pass
+        class ActiveControlViewSet(mixins.ActiveControlViewMixin, ModelViewSet):
+            queryset = get_user_model().objects.all()
+            lookup_field = 'uuid'
         self.activate_view = ActiveControlViewSet.as_view({'patch': 'activate'})
         self.deactivate_view = ActiveControlViewSet.as_view({'patch': 'deactivate'})
         self.factory = APIRequestFactory()

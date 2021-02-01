@@ -5,7 +5,7 @@ from django.db import models
 
 from companies import validators
 
-from core.models import TimeStamptedModel, StatusModel
+from core.models import TimeStamptedModel, StatusModel, Statuses
 
 import uuid
 
@@ -15,7 +15,7 @@ class CompanyProfile(TimeStamptedModel, StatusModel):
     Информация о компании.
     """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="company_profile")
     title = models.CharField("Название компании", max_length=128, unique=True)
     logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/",
                                 validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png'])])
@@ -88,7 +88,7 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     DEFAULT_POSTITION = 'Должность не задана'
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="employee_profile")
     fio = models.CharField("ФИО", max_length=264)
     branch = models.ForeignKey("companies.Branch", on_delete=models.CASCADE, null=True, 
                                     related_name='employees')
@@ -108,7 +108,7 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     @property
     def position(self):
         p = self.employee_position
-        if not p or p.status == Position.ARCHIVED:
+        if not p or p.status == Statuses.ARCHIVED:
             return self.DEFAULT_POSTITION
         return self.employee_position
 
