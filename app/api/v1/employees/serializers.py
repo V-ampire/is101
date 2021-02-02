@@ -6,9 +6,24 @@ from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
 
 from api.v1.positions.serializers import PositionSerializer
 
-from api.v1.employees.validators import validate_position_for_change, validate_branch_for_transfer
-
 from companies.models import EmployeeProfile, Position, Branch
+
+
+class EmployeeCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериалайзер для валидации данных для создания работника.
+    """
+    employee_position = PositionSerializer
+
+    class Meta:
+        model = EmployeeProfile
+        fields = (
+            'fio',
+            'employee_position',
+            'date_of_birth',
+            'pasport',
+            'pasport_scan'
+        )
 
 
 class EmployeeSerializer(serializers.ModelSerializer):

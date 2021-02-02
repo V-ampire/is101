@@ -33,7 +33,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
 
     def validate_user(self, user_uuid):
         """
-        Возвращает объект accounts.UserAccount
+        Возвращает uuid объекта accounts.UserAccount
         """
         try:
             user = get_user_model().company_objects.get(uuid=user_uuid)
@@ -87,6 +87,7 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
     class Meta:
         model = models.CompanyProfile
         fields = (
+            'uuid',
             'title',
             'logo',
             'tagline',

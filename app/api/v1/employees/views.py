@@ -5,21 +5,22 @@ from rest_framework.response import Response
 
 from api.v1 import mixins
 from api.v1.employees import serializers
+from api.v1.permissions import IsPermittedToEmployeeProfile
 
 from companies.models import EmployeeProfile
 from companies.utils import change_employee_position, transfer_employee_to_branch
 
 
-# class EmployeeViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
-#     """
-#     Вьюсет для филиалов.
-#     """
-#     model_class = Employee
-#     queryset = Employee.objects.all()
-#     lookup_field = 'uuid'
-#     permission_classes = [IsPermittedOrAdmin]
+class EmployeeViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
+    """
+    Вьюсет для работников.
+    """
+    model_class = Employee
+    queryset = Employee.objects.all()
+    lookup_field = 'uuid'
+    permission_classes = [IsPermittedToEmployeeProfile]
 
-#     http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
 #     @action(detail=True, methods=['post'])
 #     def change_position(self, request, *args, **kwargs):

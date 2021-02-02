@@ -53,7 +53,7 @@ def has_user_perm_to_employee(employee_uuid, user_uuid):
     return employee.branch.company.user.uuid == user_uuid or user.is_staff
 
 
-def has_perm_to_employee_user(employee_user_uuid, user_uuid):
+def has_user_perm_to_employee_user(employee_user_uuid, user_uuid):
     """
     Проверяет имеет ли пользователь доступ к учетной записи работника.
     """
