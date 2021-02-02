@@ -1,11 +1,12 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework.response import Response
-
+from rest_framework.exceptions import NotFound
 
 from api.v1 import mixins
 from api.v1.employees import serializers
 from api.v1.permissions import IsPermittedToEmployeeProfile
+from api.v1.accounts.serializers import EmployeeUserAccountSerializer
 
 from companies.models import EmployeeProfile
 from companies.utils import change_employee_position, transfer_employee_to_branch
@@ -21,6 +22,19 @@ class EmployeeViewSet(mixins.StatusViewSetMixin, viewsets.ModelViewSet):
     permission_classes = [IsPermittedToEmployeeProfile]
 
     http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def create(self, request, *args, **kwargs):
+        """
+        Создать учетную запись.
+        """
+        try:
+            branch_uuid = self.kwargs['branch_uuid']
+        except KeyError:
+            raise NoReverseMatch('URL должен содержать UUID филиала.')
+        data = request.data
+        data['branch'] = branch_uuid
+        
+        serializer = serializers.EmployeeCreateSerializer()
 
 #     @action(detail=True, methods=['post'])
 #     def change_position(self, request, *args, **kwargs):

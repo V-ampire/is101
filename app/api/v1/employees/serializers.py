@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
-from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
+from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer, EmployeeUserAccountSerializer
 
 from api.v1.positions.serializers import PositionSerializer
 
@@ -13,17 +13,36 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для валидации данных для создания работника.
     """
-    employee_position = PositionSerializer
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    position = PositionSerializer()
+    branch = serializers.UUIDField(format='hex_verbose')
 
     class Meta:
         model = EmployeeProfile
         fields = (
+            'username',
+            'password',
             'fio',
-            'employee_position',
+            'branch',
+            'position',
             'date_of_birth',
             'pasport',
             'pasport_scan'
         )
+
+    def validate(self, data):
+        user_serializer = EmployeeUserAccountSerializer(data={
+            'username': data['username'],
+            'password':data['password']
+        })
+        user_serializer.is_valid(raise_exception=True)
+        return data
+
+    def create(self, validated_data):
+        pass
+
+
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
