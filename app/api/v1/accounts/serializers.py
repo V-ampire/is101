@@ -24,6 +24,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
         """
         if self.instance:
             raise serializers.ValidationError("Для изменения пароля используйте функцию сброса пароля")
+        password_validation.validate_password(password_value)
         return password_value
 
 

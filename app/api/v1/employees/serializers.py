@@ -1,3 +1,5 @@
+from django.urls import NoReverseMatch
+
 from rest_framework import serializers
 
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
@@ -7,6 +9,8 @@ from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer, EmployeeU
 from api.v1.positions.serializers import PositionSerializer
 
 from companies.models import EmployeeProfile, Position, Branch
+from companies import validators
+from companies import utils
 
 
 class EmployeeCreateSerializer(serializers.ModelSerializer):
@@ -15,8 +19,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
-    position = PositionSerializer()
-    branch = serializers.UUIDField(format='hex_verbose')
+    position = serializers.UUIDField(format='hex_verbose', required=False)
 
     class Meta:
         model = EmployeeProfile
@@ -24,7 +27,6 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'fio',
-            'branch',
             'position',
             'date_of_birth',
             'pasport',
@@ -34,15 +36,22 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user_serializer = EmployeeUserAccountSerializer(data={
             'username': data['username'],
-            'password':data['password']
+            'password': data['password']
         })
         user_serializer.is_valid(raise_exception=True)
+        url_kwargs = self.context['view'].kwargs
+        try:
+            data['branch'] = url_kwargs['branch_uuid']
+        except KeyError:
+            raise NoReverseMatch('URL должен содержать UUID филиала.')
         return data
 
     def create(self, validated_data):
-        pass
-
-
+        branch_uuid = validated_data.pop('branch')
+        position_uuid = validated_data.pop('position', None)
+        username = validated_data.pop('username')
+        password = validated_data.pop('password')
+        return utils.create_employee(username, password, branch_uuid, position_uuid=position_uuid, **validated_data)
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -67,17 +76,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'pasport',
             'pasport_scan'
         )
-
-    def validate_user(self, user_uuid):
-        """
-        Возвращает объект accounts.UserAccount
-        """
-        user = validators.validate_user_data_for_create(uuid=user_uuid)
-        return user.uuid
-    
-    def create(self, validated_data):
-        user_uuid = validated_data.pop('user')
-        return utils.create_employee(user_uuid=user_uuid, **validated_data)
 
 
 class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
@@ -110,7 +108,7 @@ class ChangePositionSerializer(serializers.Serializer):
         fields = ('uuid',)
 
     def validate_uuid(self, position_uuid):
-        return validate_position_for_change(position_uuid)
+        return validators.validate_position_for_change(position_uuid)
 
 
 class ChangeBranchSerializer(serializers.Serializer):
@@ -123,5 +121,5 @@ class ChangeBranchSerializer(serializers.Serializer):
     def validate(self, validated_data):
         branch_uuid = validated_data['branch_uuid']
         employee_uuid = validated_data['employee_uuid']
-        validate_branch_for_transfer(branch_uuid, employee_uuid)
+        validators.validate_branch_for_transfer(branch_uuid, employee_uuid)
         return validated_data

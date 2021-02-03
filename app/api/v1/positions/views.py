@@ -10,8 +10,7 @@ from companies.models import Position
 from core.models import Statuses
 
 
-class PositionViewSet(mixins.ViewSetActionPermissionMixin, mixins.StatusViewSetMixin, 
-                        viewsets.ModelViewSet):
+class PositionViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для должностей.
     Для юрлиц доступнен только список активных должностей.

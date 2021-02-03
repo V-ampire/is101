@@ -7,7 +7,7 @@ from rest_framework.exceptions import NotFound
 from accounts.utils import is_company_user
 
 from companies.utils import has_user_perm_to_company, has_user_perm_to_branch, \
-    has_user_perm_to_employee, has_perm_to_employee_user
+    has_user_perm_to_employee, has_user_perm_to_employee_user
 from companies.models import CompanyProfile
 
 import logging
@@ -32,7 +32,7 @@ class IsPermittedToEmployeeUser(permissions.BasePermission):
         except AttributeError:
             logger.warning('У пользователя отсутствует атрибут uuid')
             return False
-        return has_perm_to_employee_user(employee_uuid, user_uuid)
+        return has_user_perm_to_employee_user(employee_uuid, user_uuid)
 
 
 class IsPermittedToCompanyProfile(permissions.BasePermission):

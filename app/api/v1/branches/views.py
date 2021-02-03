@@ -1,15 +1,16 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from api.v1 import mixins
 from api.v1.permissions import IsPermittedToBranch
 from api.v1.branches import serializers
-from api.v1.branches.validators import validate_branch_to_archivate
 
 from companies.models import Branch
 
 
-class BranchesViewSet(mixins.ViewSetActionPermissionMixin, mixins.StatusViewSetMixin, viewsets.ModelViewSet):
+class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для филиалов.
     """
