@@ -61,7 +61,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     user = ReadOnlyUserAccountSerializer()
     company = serializers.ReadOnlyField()
     branch = serializers.StringRelatedField(read_only=True)
-    position = PositionSerializer(read_only=True)
+    position = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = EmployeeProfile

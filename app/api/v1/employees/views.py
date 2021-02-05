@@ -39,12 +39,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         Создать учетную запись.
         Создать профиль.
         """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        import pdb; pdb.set_trace()
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        create_serializer = self.get_serializer(data=request.data)
+        create_serializer.is_valid(raise_exception=True)
+        employee = create_serializer.save()
+        employee_serializer = serializers.EmployeeSerializer(employee)
+        headers = self.get_success_headers(employee_serializer.data)
+        return Response(employee_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_destroy(self, instance):
         utils.delete_employee(instance.uuid)
@@ -59,7 +59,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee_uuid = kwargs.get('uuid')
         new_position_uuid = serializer.validated_data.get('uuid')
         employee = change_employee_position(employee_uuid, new_position_uuid)
-        # FIXME Исключение если не существуют
         employee_serializer = serializers.EmployeeSerializer(employee)
         headers = self.get_success_headers(employee_serializer.data)
         return Response(employee_serializer.data, headers=headers)

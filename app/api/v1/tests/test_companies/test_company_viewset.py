@@ -2,8 +2,8 @@ from rest_framework import status
 
 from accounts.factories import CompanyUserAccountModelFactory
 
-from company.factories import CompanyFactory
-from company.models import Company
+from companies.factories import CompanyFactory
+from companies.models import CompanyProfile
 
 from api.v1.tests.base import BaseViewSetTest
 
@@ -19,6 +19,10 @@ fake = Faker()
 
 @pytest.mark.django_db
 class TestViewset(BaseViewSetTest):
+    # Тест проверки доступа к каждому действию
+    # Тест успешного ответа
+    # Тест отказаного ответа
+    # Тест ответа на анонимный запрос
 
     app_name = 'api_v1'
     url_basename = 'companies'
@@ -27,96 +31,123 @@ class TestViewset(BaseViewSetTest):
     def setup_method(self, method):
         super().setup_method(method)
         self.tested_company = generate_to_db(CompanyFactory)[0]
-        self.permitted_users = self.tested_company.permitted_users
-        self.permitted_clients = [self.get_api_client(user=user) for user in self.permitted_users]
-
-    def test_list(self):
+    
+    def test_list_permission(self, mocker):
         url = self.get_action_url('list')
-        generate_to_db(self.factory_class, quantity=10)
-        
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
         admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
-        anonymous_response = self.anonymous_client.get(url)
-        permitted_responses = [
-            client.get(url) for client in self.permitted_clients
-        ]
+        assert mock_has_perm.call_count == 1
+    
+    def test_list_response_for_permitted(self, mocker):
+        generate_to_db(self.factory_class, quantity=10)
+        url = self.get_action_url('list')
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.get(url)
         expected_data = serializers.CompanyListSerializer(
             Company.objects.all().order_by('-status'), 
             many=True, 
             context={'request': admin_response.wsgi_request}
         ).data
-
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == expected_data
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-        for response in permitted_responses:
-            assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_retrieve_for_admins(self):
-        url = self.get_action_url('detail', uuid=self.tested_company.uuid)       
-        admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
+    def test_list_response_for_forbidden(self, mocker)
+        url = self.get_action_url('list')
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_list_for_anonymous_user(self):
         anonymous_response = self.anonymous_client.get(url)
-        expected_data = serializers.CompanySerializerForAdmin(
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_retrieve_permission(self, mocker):
+        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
+        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.get(url)
+        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
+
+    def test_retrieve_for_permitted(self, mocker):
+        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.get(url)
+        expected_data = serializers.CompanyListSerializer(
             self.tested_company, 
             context={'request': admin_response.wsgi_request}
         ).data
-
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == expected_data
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_retrive_for_forbidden(self, mocker):
+        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.get(url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_retrieve_for_anonymous_user(self):
+        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
+        anonymous_response = self.anonymous_client.get(url)
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_retrieve_for_permitted(self):
-        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
-        permitted_responses = [
-            client.get(url) for client in self.permitted_clients
-        ]
-        expected_data = [
-            serializers.CompanySerializerForPermitted(
-            self.tested_company, 
-            context={'request': response.wsgi_request}
-        ).data for response in permitted_responses
-        ]
-        for response in permitted_responses:
-            assert response.status_code == status.HTTP_200_OK
-            expected_data = serializers.CompanySerializerForPermitted(
-                self.tested_company, 
-                context={'request': response.wsgi_request}
-            ).data
-            assert expected_data == response.json()
-
-    def test_create(self):
+    def test_create_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
         data = generate_to_dict(CompanyFactory)
         data['user'] = self.company_user.uuid
         url = self.get_action_url('list')
         admin_response = self.admin_client.post(url, data=data)
-        employee_response = self.employee_client.post(url, data=data)
-        anonymous_response = self.anonymous_client.post(url, data=data)
-        tested_company = Company.objects.get(title=data['title'])
-        
-        assert tested_company.user == self.company_user
+        assert mock_has_perm.call_count == 1
+
+    def test_create_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        create_data = generate_to_dict(CompanyFactory)
+        create_data['user'] = self.company_user.uuid
+        url = self.get_action_url('list')
+        admin_response = self.admin_client.post(url, data=create_data)
+        self.company_user.refresh_from_db()
+        expected_company = self.comany.user.company_profile
+        expected_data = serializers.CompanyListSerializer(
+            expected_company, 
+            context={'request': admin_response.wsgi_request}
+        ).data
         assert admin_response.status_code == status.HTTP_201_CREATED
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == expected_data
+
+    def test_create_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        create_data = generate_to_dict(CompanyFactory)
+        create_data['user'] = self.company_user.uuid
+        url = self.get_action_url('list')
+        admin_response = self.admin_client.post(url, data=create_data)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_create_for_anonymous_user(self):
+        create_data = generate_to_dict(CompanyFactory)
+        create_data['user'] = self.company_user.uuid
+        url = self.get_action_url('list')
+        anonymous_response = self.anonymous_client.post(url, data=create_data)
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_create_with_invalid_user(self):
+    def test_patch_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm.return_value = True
         data = generate_to_dict(CompanyFactory)
-        data['user'] = self.employee_user.uuid
-        url = self.get_action_url('list')
-        admin_response = self.admin_client.post(url, data=data)
-        employee_response = self.employee_client.post(url, data=data)
-        anonymous_response = self.anonymous_client.post(url, data=data)
-        
-        assert not Company.objects.filter(title=data['title']).exists()
-        assert admin_response.status_code == status.HTTP_400_BAD_REQUEST
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        data.pop('user')
+        data.pop('logo')
+        url = self.get_action_url('detail', uuid=self.tested_company.uuid)
+        admin_response = self.admin_client.get(url)
+        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
+
+
+
+
 
     def test_patch_by_admin(self):
         data = generate_to_dict(CompanyFactory)
