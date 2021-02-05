@@ -5,7 +5,11 @@ from core.models import Statuses
 from companies import validators
 from companies import factories
 
+from faker import Faker
 import pytest
+
+
+fake = Faker()
 
 
 @pytest.mark.django_db
@@ -104,3 +108,46 @@ class TestValidateEmployeeToWork():
 
     def test_validate(self):
         employee = factories.EmployeeProfileFactory.create(status=Statuses.ARCHIVED)
+
+
+@pytest.mark.django_db
+class TestValidateBranchForTransfer():
+
+    def setup_method(self, method):
+        self.employee = factories.EmployeeProfileFactory()
+
+    def test_validate_branch_in_archive(self):
+        branch = factories.BranchFactory(status=Statuses.ARCHIVED)
+        exp_message = f'Невозможно перевести работника - филиал {branch} в архиве.'
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_branch_for_transfer(branch, self.employee)
+        assert exc_info.value.message == exp_message
+
+    def test_validate_with_different_companies(self):
+        branch = factories.BranchFactory()
+        exp_message = f'Невозможно перевести работника в филиал другого юрлица.'
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_branch_for_transfer(branch, self.employee)
+        assert exc_info.value.message == exp_message
+
+    def test_validate(self):
+        branch = factories.BranchFactory(company=self.employee.branch.company)
+        assert validators.validate_branch_for_transfer(branch, self.employee) is None
+
+
+@pytest.mark.django_db
+class TestPositionForChange():
+    
+    def test_validate_with_archived(self):
+        position = factories.PositionFactory(status=Statuses.ARCHIVED)
+        exp_message = f'Должность {position.title} находится в архиве.'
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_position_for_change(position)
+        assert exc_info.value.message == exp_message
+
+    def test_validate(self):
+        position = factories.PositionFactory()
+        assert validators.validate_position_for_change(position) is None

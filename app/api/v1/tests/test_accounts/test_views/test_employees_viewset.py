@@ -30,7 +30,7 @@ class TestViewSet(BaseViewSetTest):
         super().setup_method(method)
         self.tested_user = EmployeeUserAccountModelFactory.create()
 
-    def test_list(self):
+    def test_list(self, mocker):
         url = self.get_action_url('list')
         EmployeeUserAccountModelFactory.create_batch(10)
         
@@ -45,9 +45,7 @@ class TestViewSet(BaseViewSetTest):
         assert employee_response.status_code == status.HTTP_403_FORBIDDEN
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_retrieve(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_perm_to_employee_user')
-        mock_has_perm.return_value = False
+    def test_retrieve(self):
         url = self.get_action_url('detail', uuid=self.tested_user.uuid)
         admin_response = self.admin_client.get(url)
         company_response = self.company_client.get(url)
@@ -55,7 +53,6 @@ class TestViewSet(BaseViewSetTest):
         anonymous_response = self.anonymous_client.get(url)
 
         assert admin_response.status_code == status.HTTP_200_OK
-        assert admin_response.json() == expected_data
         assert company_response.status_code == status.HTTP_403_FORBIDDEN
         assert employee_response.status_code == status.HTTP_403_FORBIDDEN
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED

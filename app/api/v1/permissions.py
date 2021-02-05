@@ -40,7 +40,12 @@ class IsPermittedToCompanyProfile(permissions.BasePermission):
     Регулирует доступ к информации о юрлице.
     """
     def has_object_permission(self, request, view, company):
-        return has_user_perm_to_company(company.uuid, request.user.uuid)
+        try:
+            user_uuid = request.user.uuid
+        except AttributeError:
+            logger.warning('У пользователя отсутствует атрибут uuid')
+            return False
+        return has_user_perm_to_company(company.uuid, user_uuid)
 
 
 class CompanyNestedPemission(permissions.BasePermission):
@@ -63,7 +68,12 @@ class CompanyNestedPemission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         company = self.get_related_company(view)
-        return has_user_perm_to_company(company.uuid, request.user.uuid)
+        try:
+            user_uuid = request.user.uuid
+        except AttributeError:
+            logger.warning('У пользователя отсутствует атрибут uuid')
+            return False
+        return has_user_perm_to_company(company.uuid, user_uuid)
 
 
 class IsPermittedToBranch(CompanyNestedPemission):
@@ -73,7 +83,12 @@ class IsPermittedToBranch(CompanyNestedPemission):
     /companies/<company_uuid>/branches/branch_uuid/
     """
     def has_object_permission(self, request, view, branch):
-        return has_user_perm_to_branch(branch.uuid, request.user.uuid)
+        try:
+            user_uuid = request.user.uuid
+        except AttributeError:
+            logger.warning('У пользователя отсутствует атрибут uuid')
+            return False
+        return has_user_perm_to_branch(branch.uuid, user_uuid)
 
 
 class IsPermittedToEmployeeProfile(CompanyNestedPemission):
@@ -83,4 +98,9 @@ class IsPermittedToEmployeeProfile(CompanyNestedPemission):
     /companies/<company_uuid>/branches/<branch_uuid>/employees/employee_uuid
     """
     def has_object_permission(self, request, view, employee):
-        return has_user_perm_to_employee(employee.uuid, request.user.uuid)
+        try:
+            user_uuid = request.user.uuid
+        except AttributeError:
+            logger.warning('У пользователя отсутствует атрибут uuid')
+            return False
+        return has_user_perm_to_employee(employee.uuid, user_uuid)
