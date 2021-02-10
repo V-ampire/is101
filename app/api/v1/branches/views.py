@@ -15,24 +15,37 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     Вьюсет для филиалов.
     """
     model_class = Branch
-    queryset = Branch.objects.all()
     lookup_field = 'uuid'
     permission_classes = [IsPermittedToBranch]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     permission_action_classes = {
         'destroy': [IsAdminUser]
     }
 
     def get_queryset(self):
-        return self.queryset.filter(company__uuid=self.kwargs['company_uuid'])
+        return Branch.objects.filter(company__uuid=self.kwargs['company_uuid'])
 
     def get_serializer_class(self):
         if self.action == 'list':
             return serializers.BranchListSerializer
+        elif self.action == 'create':
+            return serializers.BranchCreateSerializer
         return serializers.BranchSerializer
 
     def perform_destroy(self, instance):
         utils.delete_branch(instance.uuid)
+
+    def create(self, request, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        create_data = request.data
+        create_data['company'] = self.kwargs['company_uuid']
+        create_serializer = serializer_class(data=create_data)
+        create_serializer.is_valid(raise_exception=True)
+        branch = create_serializer.save()
+        branch_serializer = serializers.BranchSerializer(branch)
+        headers = self.get_success_headers(branch_serializer.data)
+        return Response(branch_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=True, methods=['patch'])
     def to_archive(self, request, *args, **kwargs):

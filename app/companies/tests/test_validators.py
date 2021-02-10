@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
+from accounts.factories import CompanyUserAccountModelFactory, EmployeeUserAccountModelFactory
+
 from core.models import Statuses
 
 from companies import validators
@@ -151,3 +153,66 @@ class TestPositionForChange():
     def test_validate(self):
         position = factories.PositionFactory()
         assert validators.validate_position_for_change(position) is None
+
+
+@pytest.mark.django_db
+class TestValidateCompanyUser():
+
+    def test_call_is_company_user(self, mocker):
+        mock_is_user = mocker.patch('companies.validators.is_company_user')
+        tested_user = CompanyUserAccountModelFactory.create()
+        validators.validate_company_user(tested_user)
+        mock_is_user.assert_called_with(tested_user)
+
+    def test_validate_with_user_with_profile(self):
+        profile = factories.CompanyProfileFactory.create()
+        tested_user = profile.user
+        exp_message = f"К учетной записи {tested_user.username} уже привязан профиль юрлица."
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_company_user(tested_user)
+        assert exc_info.value.message == exp_message
+
+    def test_validate_with_invalid_user_role(self):
+        tested_user = EmployeeUserAccountModelFactory.create()
+        exp_message = f"Учетная запись {tested_user.username} не может быть использована для профиля юрлица"
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_company_user(tested_user)
+        assert exc_info.value.message == exp_message
+
+    def test_success_validate(self):
+        tested_user = CompanyUserAccountModelFactory.create()
+        assert validators.validate_company_user(tested_user) is None
+
+
+
+@pytest.mark.django_db
+class TestValidateEmployeeUser():
+
+    def test_call_is_cemployee_user(self, mocker):
+        mock_is_user = mocker.patch('companies.validators.is_employee_user')
+        tested_user = EmployeeUserAccountModelFactory.create()
+        validators.validate_employee_user(tested_user)
+        mock_is_user.assert_called_with(tested_user)
+
+    def test_validate_with_user_with_profile(self):
+        profile = factories.EmployeeProfileFactory.create()
+        tested_user = profile.user
+        exp_message = f"К учетной записи {tested_user.username} уже привязан профиль работника."
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_employee_user(tested_user)
+        assert exc_info.value.message == exp_message
+
+    def test_validate_with_invalid_user_role(self):
+        tested_user = CompanyUserAccountModelFactory.create()
+        exp_message = f"Учетная запись {tested_user.username} не может быть использована для профиля работника"
+        with pytest.raises(ValidationError) as exc:
+            exc_info = exc
+            validators.validate_employee_user(tested_user)
+        assert exc_info.value.message == exp_message
+
+    def test_success_validate(self):
+        tested_user = EmployeeUserAccountModelFactory.create()
+        assert validators.validate_employee_user(tested_user) is None

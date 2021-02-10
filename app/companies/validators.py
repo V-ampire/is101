@@ -8,17 +8,22 @@ from core.models import Statuses
 def validate_company_user(user):
     """
     Проверяет что у пользователя роль Юрлица.
+    Проверяет что к пользователю уже не привязан профиль.
     """
     if not is_company_user(user):
-        raise ValidationError(f"Учетная запись не может быть использована для профиля юрлица")
-
+        raise ValidationError(f"Учетная запись {user.username} не может быть использована для профиля юрлица")
+    if hasattr(user, 'company_profile'):
+        raise ValidationError(f"К учетной записи {user.username} уже привязан профиль юрлица.")
 
 def validate_employee_user(user):
     """
     Проверяет что у пользователя роль работника.
+    Проверяет что к пользователю уже не привязан профиль.
     """
     if not is_employee_user(user):
-        raise ValidationError(f"Учетная запись не может быть использована для профиля работника")
+        raise ValidationError(f"Учетная запись {user.username} не может быть использована для профиля работника")
+    if hasattr(user, 'employee_profile'):
+        raise ValidationError(f"К учетной записи {user.username} уже привязан профиль работника.")
 
 
 def validate_company_to_archive(company):

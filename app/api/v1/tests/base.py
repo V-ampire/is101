@@ -10,7 +10,6 @@ import os
 import pytest
 
 
-
 class BaseViewSetTest():
 
     app_name = None
@@ -34,3 +33,5 @@ class BaseViewSetTest():
         self.company_client = self.get_api_client(user=self.company_user)
         self.employee_client = self.get_api_client(user=self.employee_user)
         self.anonymous_client = self.get_api_client()
+        self.forbidden_data = {'detail': 'У вас недостаточно прав для выполнения данного действия.'}
+        self.unauth_data = {'detail': 'Учетные данные не были предоставлены.'}

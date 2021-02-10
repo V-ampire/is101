@@ -89,11 +89,16 @@ def create_employee(username, password, branch_uuid, position_uuid=None, **emplo
 
 
 def employee_to_archive(employee_uuid):
+    """
+    Переводит работника в архив.
+    Учетная запись деактивируется.
+    """
     employee = EmployeeProfile.objects.get(uuid=employee_uuid)
     user = employee.user
     with transaction.atomic():
         employee.to_archive()
         user.deactivate()
+    return employee
 
 
 def employee_to_work(employee_uuid):
@@ -106,6 +111,15 @@ def employee_to_work(employee_uuid):
     with transaction.atomic():
         employee.to_work()
         employee.user.activate()
+    return employee
+
+
+def create_branch(company_uuid, **branch_data):
+    """
+    Создает филиал.
+    """
+    company = CompanyProfile.objects.get(uuid=company_uuid)
+    return Branch.objects.create(company=company, **branch_data)
 
 
 def branch_to_archive(branch_uuid, force=False):
@@ -124,6 +138,7 @@ def branch_to_archive(branch_uuid, force=False):
         except ObjectDoesNotExist:
             pass
         branch.to_archive()
+    return branch
 
 
 def branch_to_work(branch_uuid):
@@ -134,6 +149,7 @@ def branch_to_work(branch_uuid):
     branch = Branch.objects.get(uuid=branch_uuid)
     validators.validate_branch_to_work(branch)
     branch.to_work()
+    return branch
 
 
 def company_to_archive(company_uuid, force=False):
@@ -156,6 +172,7 @@ def company_to_archive(company_uuid, force=False):
             pass
         company.to_archive()
         user.deactivate()
+    return company
 
 
 def company_to_work(company_uuid):
@@ -168,6 +185,7 @@ def company_to_work(company_uuid):
     with transaction.atomic():
         company.to_work()
         company.user.activate()
+    return company
 
 
 def delete_employee(employee_uuid):
@@ -237,3 +255,21 @@ def transfer_employee_to_branch(employee_uuid, branch_uuid):
     employee.branch = new_branch
     employee.save()
     return employee
+
+
+def position_to_archive(position_uuid):
+    """
+    Переводит должность в архив.
+    """
+    position = Position.objects.get(uuid=position_uuid)
+    position.to_archive()
+    return position
+
+
+def position_to_work(position_uuid):
+    """
+    Переводит должность в рабочий статус.
+    """
+    position = Position.objects.get(uuid=position_uuid)
+    position.to_work()
+    return position

@@ -37,7 +37,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         """
         try:
             user = get_user_model().company_objects.get(uuid=user_uuid)
-        except get_user_model().DoesNotExists:
+        except get_user_model().DoesNotExist:
             raise serializers.ValidationError(f'Учетная запись юрлица с uuid={user_uuid} не существует.')
         validators.validate_company_user(user)
         return user.uuid

@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ParseError
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import action
@@ -17,7 +18,6 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
     Метод PUT отключен т.к. запрещено обновлять учетную запись через данный вьюсет.
     """
     model_class = CompanyProfile
-    queryset = CompanyProfile.objects.all()
     lookup_field = 'uuid'
 
     permission_action_classes = {
@@ -33,7 +33,7 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
-        return self.queryset.order_by('-status')
+        return CompanyProfile.objects.all().order_by('-status')
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -62,6 +62,8 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
         В качестве нагрузки может быть передан булевый параметр force
         {"force": True/False}, который определяет режим перевода в арихив связанных сущностей.
         """
+        if request.data and request.content_type != 'application/json':
+            raise ParseError(detail='Данные должны быть переданы в формате application/json.')
         force = request.data.get('force', False)
         company = self.get_object()
         utils.company_to_archive(company.uuid, force=force)

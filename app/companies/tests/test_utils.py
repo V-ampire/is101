@@ -400,3 +400,22 @@ class TestTransferEmployeeToBranch():
         utils.transfer_employee_to_branch(employee.uuid, new_branch.uuid)
         employee.refresh_from_db()
         assert employee.branch == new_branch
+
+
+@pytest.mark.django_db
+class TestCreateToBranch():
+
+    def setup_method(self, method):
+        self.expected_company = factories.CompanyProfileFactory.create()
+        self.create_data = generate_to_dict(factories.BranchFactory)
+        self.create_data.pop('company')
+
+    def test_create(self):
+        utils.create_branch(self.expected_company.uuid, **self.create_data)
+        expected_branch = Branch.objects.get(**self.create_data)
+        assert expected_branch.company == self.expected_company
+
+    def test_with_company_does_not_exist(self):
+        company_uuid = fake.uuid4()
+        with pytest.raises(CompanyProfile.DoesNotExist):
+            utils.create_branch(company_uuid, **self.create_data)
