@@ -212,6 +212,7 @@ def delete_branch(branch_uuid):
             for employee in  branch.employees.all():
                 delete_employee(employee.uuid)
         except ObjectDoesNotExist:
+            # В филиале нет работников
             pass
         branch.delete()
 

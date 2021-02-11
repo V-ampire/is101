@@ -70,9 +70,10 @@ class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
             'email',
             'phone',
             'url',
-            'branches'
+            'branches',
+            'status',
         )
-        read_only_fields = ('user', 'branches')
+        read_only_fields = ('user', 'branches', 'status')
         extra_kwargs = {
             'url': {'view_name': 'api_v1:companies-detail', 'lookup_field': 'uuid'},
         }

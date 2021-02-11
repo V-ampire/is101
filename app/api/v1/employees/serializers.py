@@ -30,7 +30,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             'position',
             'date_of_birth',
             'pasport',
-            'pasport_scan'
+            'pasport_scan',
         )
 
     def validate(self, data):
@@ -60,8 +60,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     """
     user = ReadOnlyUserAccountSerializer()
     company = serializers.ReadOnlyField()
-    branch = serializers.StringRelatedField(read_only=True)
-    position = serializers.StringRelatedField(read_only=True)
+    branch = serializers.StringRelatedField()
+    position = serializers.StringRelatedField()
 
     class Meta:
         model = EmployeeProfile
@@ -74,8 +74,10 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'position',
             'date_of_birth',
             'pasport',
-            'pasport_scan'
+            'pasport_scan',
+            'status',
         )
+        read_only_fields = ('user', 'company', 'branch', 'position', 'status')
 
 
 class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
@@ -95,7 +97,8 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
             'uuid',
             'url',
             'fio',
-            'position'
+            'position',
+            'status',
         )
         extra_kwargs = {
             'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},

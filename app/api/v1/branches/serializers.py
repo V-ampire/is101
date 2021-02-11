@@ -21,7 +21,6 @@ class BranchCreateSerializer(serializers.ModelSerializer):
             'city',
             'address',
             'phone',
-            'status'
         )
 
     def validate_company(self, company_uuid):
