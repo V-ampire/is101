@@ -53,6 +53,7 @@ class BranchSerializer(serializers.ModelSerializer):
             'employees',
             'status'
         )
+        read_only_fields = ('status',)
 
 
 class BranchListSerializer(NestedHyperlinkedModelSerializer):
@@ -70,7 +71,9 @@ class BranchListSerializer(NestedHyperlinkedModelSerializer):
             'city',
             'address',
             'phone',
+            'status',
         )
         extra_kwargs = {
             'url': {'view_name': 'api_v1:company-branches-detail', 'lookup_field': 'uuid'},
         }
+        read_only_fields = ('status',)

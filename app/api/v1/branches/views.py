@@ -54,6 +54,8 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
         В качестве нагрузки может быть передан булевый параметр force
         {"force": True/False}, который определяет режим перевода в арихив связанных сущностей.
         """
+        if request.data and request.content_type != 'application/json':
+            raise ParseError(detail='Данные должны быть переданы в формате application/json.')
         force = request.data.get('force', False)
         branch = self.get_object()
         utils.branch_to_archive(branch.uuid, force=force)
