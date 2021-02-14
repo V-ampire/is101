@@ -8,7 +8,7 @@ from api.v1.employees import serializers
 from api.v1.permissions import IsPermittedToEmployeeProfile
 
 from companies.models import EmployeeProfile
-from companies.utils import change_employee_position, transfer_employee_to_branch
+from companies import utils
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -16,14 +16,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     Вьюсет для работников.
     """
     model_class = EmployeeProfile
-    queryset = EmployeeProfile.objects.all()
     lookup_field = 'uuid'
     permission_classes = [IsPermittedToEmployeeProfile]
 
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
-        return self.queryset.filter(branch__uuid=self.kwargs['branch_uuid'])
+        return EmployeeProfile.objects.filter(branch__uuid=self.kwargs['branch_uuid'])
 
 
     def get_serializer_class(self):
@@ -39,10 +38,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         Создать учетную запись.
         Создать профиль.
         """
-        create_serializer = self.get_serializer(data=request.data)
+        create_data = request.data.dict()
+        create_data['branch'] = self.kwargs['branch_uuid']
+        create_serializer = self.get_serializer(data=create_data)
         create_serializer.is_valid(raise_exception=True)
         employee = create_serializer.save()
-        employee_serializer = serializers.EmployeeSerializer(employee)
+        context = self.get_serializer_context()
+        employee_serializer = serializers.EmployeeSerializer(employee, context=context)
         headers = self.get_success_headers(employee_serializer.data)
         return Response(employee_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -54,12 +56,17 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         """
         Изменение должности.
         """
-        serializer = serializers.ChangePositionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        employee_uuid = kwargs.get('uuid')
-        new_position_uuid = serializer.validated_data.get('uuid')
-        employee = change_employee_position(employee_uuid, new_position_uuid)
-        employee_serializer = serializers.EmployeeSerializer(employee)
+        employee = self.get_object()
+        change_data = request.data.dict()
+        change_data['employee'] = employee.uuid
+        change_serializer = serializers.ChangePositionSerializer(data=change_data)
+        change_serializer.is_valid(raise_exception=True)
+        changed_employee = utils.change_employee_position(
+            change_serializer.validated_data.get('employee'),
+            change_serializer.validated_data.get('position')
+        )
+        context = self.get_serializer_context()
+        employee_serializer = serializers.EmployeeSerializer(changed_employee, context=context)
         headers = self.get_success_headers(employee_serializer.data)
         return Response(employee_serializer.data, headers=headers)
 
@@ -68,16 +75,19 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         """
         Перевод в другой филиал.
         """
-        serializer = serializers.ChangeBranchSerializer(data={
-            'employee_uuid': kwargs.get('uuid'),
-            'branch_uuid': request.data.get('uuid')
-        })
-        serializer.is_valid(raise_exception=True)
-        employee_uuid = serializer.validated_data.get['employee_uuid']
-        branch_uuid = serializer.validated_data.get['branch_uuid']
-        employee = transfer_employee_to_branch(employee_uuid, branch_uuid)
-        employee_serializer = serializers.EmployeeSerializer(employee)
-        return Response(employee_serializer.data)
+        employee = self.get_object()
+        transfer_data = request.data.dict()
+        transfer_data['employee'] = employee.uuid
+        transfer_serializer = serializers.ChangeBranchSerializer(data=transfer_data)
+        transfer_serializer.is_valid(raise_exception=True)
+        transfered_employee = utils.transfer_employee_to_branch(
+            transfer_serializer.validated_data.get('employee'),
+            transfer_serializer.validated_data.get('branch')
+        )
+        context = self.get_serializer_context()
+        employee_serializer = serializers.EmployeeSerializer(transfered_employee, context=context)
+        headers = self.get_success_headers(employee_serializer.data)
+        return Response(employee_serializer.data, headers=headers)
 
     @action(detail=True, methods=['patch'])
     def to_archive(self, request, *args, **kwargs):

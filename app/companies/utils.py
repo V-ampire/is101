@@ -59,7 +59,7 @@ def has_user_perm_to_employee_user(employee_user_uuid, user_uuid):
     """
     employee_user = get_user_model().employee_objects.get(uuid=employee_user_uuid)
     try:
-        profile = employee_user.profile
+        profile = employee_user.employee_profile
     except ObjectDoesNotExist:
         logger.warning(f"Учетная запись {employee_user.username} работника создана без заполненого профиля")
         return False

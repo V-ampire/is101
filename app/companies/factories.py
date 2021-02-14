@@ -65,4 +65,4 @@ class EmployeeProfileFactory(factory.django.DjangoModelFactory):
     employee_position = factory.SubFactory(PositionFactory)
     date_of_birth = factory.Faker('date')
     pasport = factory.Faker('pystr')
-    pasport_scan = factory.django.FileField(filename=fake.file_name(extension='pdf'))
+    pasport_scan = factory.django.ImageField(filename=fake.file_name(extension='jpg'))

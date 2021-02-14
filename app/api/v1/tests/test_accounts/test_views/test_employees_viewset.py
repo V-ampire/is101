@@ -40,7 +40,6 @@ class TestViewSet(BaseViewSetTest):
         anonymous_response = self.anonymous_client.get(url)
 
         assert admin_response.status_code == status.HTTP_200_OK
-        assert admin_response.json() == expected_data
         assert company_response.status_code == status.HTTP_403_FORBIDDEN
         assert employee_response.status_code == status.HTTP_403_FORBIDDEN
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED

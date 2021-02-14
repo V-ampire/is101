@@ -94,7 +94,7 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
                                     related_name='employees')
     employee_position = models.ForeignKey("companies.Position", on_delete=models.SET_NULL, null=True)
     date_of_birth = models.DateField("Дата рождения")
-    pasport = models.CharField("Паспортные данные", max_length=264)
+    pasport = models.CharField("Паспортные данные", max_length=264, unique=True)
     pasport_scan = models.FileField(
         "Скан паспорта", 
         upload_to=get_employee_pasport_scan_path, 
