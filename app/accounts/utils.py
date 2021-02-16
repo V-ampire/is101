@@ -102,4 +102,23 @@ def is_employee_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.EMPLOYEE
     return False
+
+
+def get_users_without_profile():
+    """
+    Возвращает учетные записи юрлиц или работников, у которых отсутствует заполненный профиль.
+    """
+    result = []
+    company_users = get_user_model().company_objects.all()
+    employee_users = get_user_model().employee_objects.all()
+    import pdb; pdb.set_trace()
+    for user in company_users:
+        if not hasattr(user, 'company_profile'):
+            result.append(user)
+    for user in employee_users:
+        if not hasattr(user, 'employee_profile'):
+            result.append(user)
+    return result
+
+
     

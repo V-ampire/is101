@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve --port 3000",
     "build:admin": "vue-cli-service build admin --dest dist/admin",
     "test:unit": "vue-cli-service test:unit",
+    "test:jest": "jest", 
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

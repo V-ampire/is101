@@ -5,7 +5,9 @@ from django.core.exceptions import ValidationError
 
 from accounts.models import IPAddress
 from accounts import utils
-from accounts.factories import BlockedIPAddressFactory, NotBlockedIPAddressFactory
+from accounts import factories
+
+from companies import factories as profile_factories
 
 from datetime import timedelta
 from faker import Faker
@@ -18,8 +20,8 @@ fake = Faker()
 
 @pytest.mark.django_db
 def test_process_ip_blocked():
-    blocked_ip = BlockedIPAddressFactory()
-    expired_blocked_ip = BlockedIPAddressFactory(unblock_time=fake.date_time_this_month(tzinfo=tzinfo))
+    blocked_ip = factories.BlockedIPAddressFactory()
+    expired_blocked_ip = factories.BlockedIPAddressFactory(unblock_time=fake.date_time_this_month(tzinfo=tzinfo))
     expected_blocked = utils.process_ip(blocked_ip.ip)
     expected_unblocked = utils.process_ip(expired_blocked_ip.ip)
     assert expected_blocked.is_blocked
@@ -28,7 +30,7 @@ def test_process_ip_blocked():
 
 @pytest.mark.django_db
 def test_process_ip_not_blocked():
-    expected_ip = NotBlockedIPAddressFactory()
+    expected_ip = factories.NotBlockedIPAddressFactory()
     result_ip = utils.process_ip(expected_ip.ip)
     assert expected_ip == result_ip
 
@@ -46,7 +48,7 @@ def test_process_attempt_for_15_min(mocker):
     mock_now = mocker.patch('accounts.models.timezone.now')
     mock_now.return_value = expected_now
     for attempts_num in settings.AUTH_ATTEMPTS['15_MINUTES_BLOCK']:
-        ip_address = NotBlockedIPAddressFactory(attempts=attempts_num-1)
+        ip_address = factories.NotBlockedIPAddressFactory(attempts=attempts_num-1)
         tested_ip_address = utils.process_attempt(ip_address.ip)
         assert tested_ip_address.is_blocked
         assert tested_ip_address.unblock_time == expected_now + timedelta(minutes=15)
@@ -58,7 +60,7 @@ def test_process_attempt_for_24_hours(mocker):
     mock_now = mocker.patch('accounts.models.timezone.now')
     mock_now.return_value = expected_now
     for attempts_num in settings.AUTH_ATTEMPTS['24_HOURS_BLOCK']:
-        ip_address = NotBlockedIPAddressFactory(attempts=attempts_num-1)
+        ip_address = factories.NotBlockedIPAddressFactory(attempts=attempts_num-1)
         tested_ip_address = utils.process_attempt(ip_address.ip)
         assert tested_ip_address.is_blocked
         assert tested_ip_address.unblock_time == expected_now + timedelta(minutes=24*60)
@@ -70,7 +72,7 @@ def test_process_attempt_reload_attempts(mocker):
     mock_now = mocker.patch('accounts.models.timezone.now')
     mock_now.return_value = expected_now
     attempts = max(settings.AUTH_ATTEMPTS['24_HOURS_BLOCK'])
-    ip_address = NotBlockedIPAddressFactory(attempts=max(settings.AUTH_ATTEMPTS['24_HOURS_BLOCK']))
+    ip_address = factories.NotBlockedIPAddressFactory(attempts=max(settings.AUTH_ATTEMPTS['24_HOURS_BLOCK']))
     tested_ip_address = utils.process_attempt(ip_address.ip)
     assert not tested_ip_address.is_blocked
     assert tested_ip_address.attempts == 1
@@ -89,3 +91,15 @@ def test_change_password_success(admin_user):
     utils.change_password(admin_user.pk, new_password)
     admin_user.refresh_from_db()
     assert check_password(new_password, admin_user.password)
+
+
+@pytest.mark.django_db
+def test_get_users_without_profile():
+    profile_factories.CompanyProfileFactory.create_batch(3)
+    profile_factories.EmployeeProfileFactory.create_batch(3)
+    expected_users = []
+    expected_users.extend(factories.CompanyUserAccountModelFactory.create_batch(3))
+    expected_users.extend(factories.EmployeeUserAccountModelFactory.create_batch(3))
+    factories.AdminUserAccountModelFactory.create_batch(3)
+    result = utils.get_users_without_profile()
+    assert result == expected_users

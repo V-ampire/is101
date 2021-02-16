@@ -7,7 +7,6 @@
       <ConfirmDialog ref="confirm"></ConfirmDialog>
     </div>
     <v-main>
-      <CompanyList><CompanyList/>
     </v-main>
   </v-app>
 </template>
@@ -24,7 +23,7 @@ export default {
 
   components: {
     'ConfirmDialog': ConfirmDialog,
-    'CompanyList': CompanyList,
+    //'CompanyList': CompanyList,
     'ErrorAlert': ErrorAlert
   },
 
