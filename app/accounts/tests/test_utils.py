@@ -100,6 +100,7 @@ def test_get_users_without_profile():
     expected_users = []
     expected_users.extend(factories.CompanyUserAccountModelFactory.create_batch(3))
     expected_users.extend(factories.EmployeeUserAccountModelFactory.create_batch(3))
+    expected_result = [user.uuid for user in expected_users]
     factories.AdminUserAccountModelFactory.create_batch(3)
-    result = utils.get_users_without_profile()
-    assert result == expected_users
+    result = utils.get_users_uuid_without_profile()
+    assert result == expected_result

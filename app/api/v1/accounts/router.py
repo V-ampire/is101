@@ -14,4 +14,10 @@ root_router.register(
 
 urls = [
     path('', include(root_router.urls)),
+    path('no_profiles', views.UsersWithNoProfileView.as_view(), name='accounts-no_profiles'),
+    path(
+        'no_profiles/count', 
+        views.UsersWithNoProfileCountView.as_view(), 
+        name='accounts-no_profiles-count'
+    ),
 ]

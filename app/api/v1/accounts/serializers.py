@@ -51,8 +51,8 @@ class EmployeeUserAccountSerializer(UserAccountSerializer):
 class ReadOnlyUserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('username', 'uuid')
-        read_only_fields = ('username', 'uuid')
+        fields = ('username', 'uuid', 'role', 'is_active')
+        read_only_fields = ('username', 'uuid', 'role', 'is_active')
 
 
 class ChangePasswordSerializer(serializers.Serializer):

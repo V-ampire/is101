@@ -1,7 +1,7 @@
 from accounts.models import UserAccount, Roles
 from accounts import factories
 
-from company.factories import EmployeeFactory
+from companies.factories import EmployeeProfileFactory
 
 import pytest
 
@@ -53,25 +53,4 @@ def test_employee_manager():
     tested = UserAccount.employee_objects.all()
     expected = UserAccount.objects.filter(role=Roles.EMPLOYEE)
     assert set(tested) == set(expected)
-
-
-@pytest.mark.django_db
-def test_activate_employee_without_profile():
-    employee_user = factories.EmployeeUserAccountModelFactory(is_active=False)
-    employee_user.is_active = True
-    employee_user.save()
-    employee_user.refresh_from_db()
-    assert not employee_user.is_active
-
-
-@pytest.mark.django_db
-def test_activate_employee_with_profile():
-    employee_user = factories.EmployeeUserAccountModelFactory.create(is_active=False)
-    employee_user.save()
-
-    employee = EmployeeFactory.create(user=employee_user)
-    employee_user.activate()
-    employee_user.refresh_from_db()
-    assert employee_user.is_active
-    
 

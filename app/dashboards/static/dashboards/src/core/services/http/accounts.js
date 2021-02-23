@@ -3,6 +3,7 @@ import http from "@/core/services/http/common"
 const baseEndpoint = '/accounts';
 const companiesEndpoint = `${baseEndpoint}/companies`;
 const employeesEndpoint = `${baseEndpoint}/employees`;
+const noProfilesEndpoint = `${baseEndpoint}/no_profiles`;
 
 export default {
 
@@ -67,7 +68,11 @@ export default {
        * Изменить пароль.
        * @param formData - должен содержать пароль и подтверждение пароля.
        */
-      return http.patch(`${companiesEndpoint}/${accountUuid}/change_password`)
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      return http.patch(
+        `${companiesEndpoint}/${accountUuid}/change_password`, formData, {'headers': headers})
     },
 
   },
@@ -133,7 +138,28 @@ export default {
        * Изменить пароль.
        * @param formData - должен содержать пароль и подтверждение пароля.
        */
-      return http.patch(`${employeesEndpoint}/${accountUuid}/change_password`)
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      return http.patch(
+        `${employeesEndpoint}/${accountUuid}/change_password`, formData, {'headers': headers})
+    },
+  },
+
+  noProfiles: {
+
+    list() {
+      /**
+       * Возвращает список учетных записей юрлиц и работников с незаполеным профилем.
+       */
+      return http.get(noProfilesEndpoint)
+    },
+
+    count() {
+      /**
+       * Возвращает количество учетных записей юрлиц и работников с незаполеным профилем.
+       */
+      return http.get(`${noProfilesEndpoint}/count`)
     }
   }
 }

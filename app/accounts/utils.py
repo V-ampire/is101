@@ -104,20 +104,20 @@ def is_employee_user(user):
     return False
 
 
-def get_users_without_profile():
+def get_users_uuid_without_profile():
     """
-    Возвращает учетные записи юрлиц или работников, у которых отсутствует заполненный профиль.
+    Возвращает список UUID учетных записей юрлиц или работников, 
+    у которых отсутствует заполненный профиль.
     """
     result = []
     company_users = get_user_model().company_objects.all()
     employee_users = get_user_model().employee_objects.all()
-    import pdb; pdb.set_trace()
     for user in company_users:
         if not hasattr(user, 'company_profile'):
-            result.append(user)
+            result.append(user.uuid)
     for user in employee_users:
         if not hasattr(user, 'employee_profile'):
-            result.append(user)
+            result.append(user.uuid)
     return result
 
 

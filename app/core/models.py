@@ -11,16 +11,16 @@ class TimeStamptedModel(models.Model):
         ordering = ('-created',)
 
 
-class Statuses(models.IntegerChoices):
-    WORKS = 1, 'Работает'
-    ARCHIVED = 0, 'В архиве'
+class Statuses(models.TextChoices):
+    WORKS = 'works', 'Работает'
+    ARCHIVED = 'archived', 'В архиве'
 
 
 class StatusModel(models.Model):
     """
     Модель позволяющая не удалять, а перемещать записи в архив.
     """
-    status = models.IntegerField("Статус", choices=Statuses.choices, default=Statuses.WORKS)
+    status = models.CharField("Статус", max_length=10, choices=Statuses.choices, default=Statuses.WORKS)
 
     class Meta:
         abstract = True
