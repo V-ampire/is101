@@ -61,8 +61,9 @@
       </div>
     </template>
     <template v-slot:item.title="{ item }">
-      <a v-if="item.status==statuses.works" href="#">{{ item.title }}</a>
-      <span v-else>{{ item.title }}</span>
+      <router-link
+        :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
+      >{{ item.title }}</router-link>
     </template>
   </v-data-table>
 </template>
