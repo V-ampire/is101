@@ -1,5 +1,5 @@
 import { ServerError, RequestError, SettingRequestError } from '@/core/services/errors/types';
-import { utils as eventUtils} from '@/core/services/events/utils';
+import eventUtils from '@/core/services/events/utils';
 
 export function processHttpError(error) {
   /**
@@ -13,7 +13,6 @@ export function processHttpError(error) {
   } else {
     httpError = new SettingRequestError(error);
   }
-  eventUtils.showErrorAlert(error.message);
-  console.log(httpError);
+  eventUtils.showErrorAlert(httpError.message);
   return httpError
 }

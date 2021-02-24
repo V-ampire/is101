@@ -190,16 +190,11 @@ export default {
 
 
 <style>
-  .archive {
+.archive {
   background-color:red;
   color: white;
   opacity: 0.5;
   pointer-events: none;
-}
-
-.archive a {
-  cursor: not-allowed;
-  color: white;
 }
 
 </style>
