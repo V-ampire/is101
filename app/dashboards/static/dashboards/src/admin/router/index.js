@@ -23,13 +23,11 @@ const routes = [
     path: '/companies',
     name: 'CompanyList',
     component: CompanyList,
-    children: [
-      {
-        path: ':companyUuid',
-        name: 'CompanyDetail',
-        component: CompanyDetail
-      }
-    ]
+  },
+  {
+    path: '/companies/:companyUuid',
+    name: 'CompanyDetail',
+    component: CompanyDetail
   }
 ]
 

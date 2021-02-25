@@ -5,10 +5,15 @@
 </template>
 
 <script>
+import companiesApi from "@/core/services/http/companies";
+// import statuses from "@/core/services/statuses";
+// import utils from '@/core/services/events/utils';
+import { processHttpError } from '@/core/services/errors/utils';
+
 export default {
   data () {
     return {
-
+      companyInfo: {}
     }
   },
   computed: {
@@ -20,8 +25,15 @@ export default {
     this.getCompanyInfo();
   },
   methods: {
-    getCompanyInfo() {
-      console.log(this.companyUuid);
+    async getCompanyInfo() {
+      let response;
+      try {
+        response = await companiesApi.detail(this.companyUuid);
+      } catch (err) {
+        return processHttpError(err);
+      }
+      const companyData = response.data;
+      console.log(companyData)
     }
   },
 }

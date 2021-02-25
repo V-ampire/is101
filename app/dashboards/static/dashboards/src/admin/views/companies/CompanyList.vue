@@ -21,6 +21,7 @@
       <v-row>
         <v-col cols="12">
           <CompanyListTable v-bind:search="search"/>
+          <router-view></router-view>
         </v-col>
       </v-row>
     </v-container>

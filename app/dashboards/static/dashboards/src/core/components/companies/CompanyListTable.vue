@@ -192,10 +192,12 @@ export default {
 
 <style>
 .archive {
-  background-color:red;
+  background-color: rgba(241, 6, 37, .5);
   color: white;
-  opacity: 0.5;
-  pointer-events: none;
+}
+
+.archive:hover {
+  color: black;
 }
 
 </style>
