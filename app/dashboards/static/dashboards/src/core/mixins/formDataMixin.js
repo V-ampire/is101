@@ -19,6 +19,11 @@ fields: {
 */
 
 export default {
+    data () {
+      return {
+        fields: {}
+      }
+    },
     methods: {
         getAsFormData () {
             const formData = new FormData();
@@ -40,8 +45,14 @@ export default {
             this.fields[fieldName].errors.push(errorMessage);
         },
         fromInitial (initialData) {
+          /**
+           * Устанавливает в свойство this.fields.value начальные данные
+           * @initialFields - начальный данные
+           */
           for (let key in initialData) {
-            
+            if (key in this.fields) {
+              this.fields[key].value = initialData[key]
+            }
           }
         },
         validate () {
