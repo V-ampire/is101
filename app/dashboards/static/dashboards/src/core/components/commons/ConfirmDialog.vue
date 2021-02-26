@@ -44,6 +44,8 @@
 Метод open() возвращает промис с результатом true/false 
 в зависимости от того поддтверждено ли действие.
 */
+import utils from '@/core/services/events/utils'
+
 export default {
   data: function () {
     return {
@@ -61,12 +63,11 @@ export default {
       }
     };
   },
+  mounted() {
+    utils.onOpenConfirmAction(this.open);
+  },
   methods: {
-    open(title, message, options) {
-      this.dialog = true;
-      this.title = title ? title : this.defautlTitle;
-      this.message = message;
-      this.options = Object.assign(this.options, options);
+    async getConfirmResult() {
       return new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
@@ -79,6 +80,14 @@ export default {
     cancel() {
       this.resolve(false);
       this.dialog = false;
+    },
+    async open(confirmParams) {
+      this.title = confirmParams.title ? confirmParams.title : this.defautlTitle;
+      this.message = confirmParams.message;
+      this.options = Object.assign(this.options, confirmParams.options);
+      this.dialog = true;
+      const result = await this.getConfirmResult();
+      utils.confirmAction(result);
     }
   }
 }

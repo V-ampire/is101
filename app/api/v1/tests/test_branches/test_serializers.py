@@ -33,11 +33,14 @@ class TestCreateBranchSerializer():
     def test_create(self, mocker):
         mock_create = mocker.patch('api.v1.branches.serializers.create_branch')
         expected_company_uuid = fake.uuid4()
+        expected_branch = mocker.Mock()
+        mock_create.return_value = expected_branch
         create_data = generate_to_dict(BranchFactory)
         create_data.pop('company')
         expected_branch_data = create_data.copy()
         create_data['company'] = expected_company_uuid
         serializer = serializers.BranchCreateSerializer()
-        serializer.create(create_data)
+        result = serializer.create(create_data)
         mock_create.assert_called_with(expected_company_uuid, **expected_branch_data)
+        assert result == expected_branch
 

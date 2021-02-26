@@ -2,6 +2,11 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
+from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from accounts.utils import get_users_uuid_without_profile
 
 from api.v1.accounts import serializers
 from api.v1.accounts import mixins
@@ -40,3 +45,29 @@ class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswo
     permission_action_classes = {
         "list": [IsAdminUser],
     }
+
+
+class UsersWithNoProfileView(generics.ListAPIView):
+    """
+    Список учетных записей юрлиц и работников у которых не заполнен профиль.
+    """
+    permission_classes = [IsAdminUser]
+    serializer_class = serializers.ReadOnlyUserAccountSerializer
+
+    def get_queryset(self):
+        users_uuid = get_users_uuid_without_profile()
+        return get_user_model().objects.filter(uuid__in=users_uuid)
+
+
+class UsersWithNoProfileCountView(APIView):
+    """
+    Количество учетных записей юрлиц и работников у которых не заполнен профиль.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, format=None):
+        users_uuid = get_users_uuid_without_profile()
+        return Response({'count': len(users_uuid)})
+
+
+

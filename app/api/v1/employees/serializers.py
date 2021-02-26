@@ -19,6 +19,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    branch = serializers.UUIDField(format='hex_verbose')
     position = serializers.UUIDField(format='hex_verbose', required=False)
 
     class Meta:
@@ -26,6 +27,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         fields = (
             'username',
             'password',
+            'branch',
             'fio',
             'position',
             'date_of_birth',
@@ -39,11 +41,6 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             'password': data['password']
         })
         user_serializer.is_valid(raise_exception=True)
-        url_kwargs = self.context['view'].kwargs
-        try:
-            data['branch'] = url_kwargs['branch_uuid']
-        except KeyError:
-            raise NoReverseMatch('URL должен содержать UUID филиала.')
         return data
 
     def create(self, validated_data):
@@ -106,23 +103,39 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
         
 
 class ChangePositionSerializer(serializers.Serializer):
-    uuid = serializers.UUIDField()
-    class Meta:
-        fields = ('uuid',)
+    position = serializers.UUIDField()
+    employee = serializers.UUIDField()
 
-    def validate_uuid(self, position_uuid):
-        return validators.validate_position_for_change(position_uuid)
+    class Meta:
+        fields = ('position', 'employee')
+
+    def validate_position(self, position_uuid):
+        try:
+            position = Position.objects.get(uuid=position_uuid)
+        except Position.DoesNotExist:
+            raise serializers.ValidationError(f'Должность с uuid={position_uuid} не существует.')
+        validators.validate_position_for_change(position)
+        return position_uuid
 
 
 class ChangeBranchSerializer(serializers.Serializer):
-    branch_uuid = serializers.UUIDField()
-    employee_uuid = serializers.UUIDField()
+    branch = serializers.UUIDField()
+    employee = serializers.UUIDField()
 
     class Meta:
-        fields = ('branch_uuid', 'employee_uuid')
+        fields = ('branch', 'employee')
 
     def validate(self, validated_data):
-        branch_uuid = validated_data['branch_uuid']
-        employee_uuid = validated_data['employee_uuid']
-        validators.validate_branch_for_transfer(branch_uuid, employee_uuid)
+        branch_uuid = validated_data['branch']
+        employee_uuid = validated_data['employee']
+        try:
+            branch = Branch.objects.get(uuid=branch_uuid)
+        except Branch.DoesNotExist:
+            raise serializers.ValidationError(f'Филиал с uuid={branch_uuid} не существует.')
+        
+        try:
+            employee = EmployeeProfile.objects.get(uuid=employee_uuid)
+        except EmployeeProfile.DoesNotExist:
+            raise serializers.ValidationError(f'Работник с uuid={employee_uuid} не существует.')
+        validators.validate_branch_for_transfer(branch, employee)
         return validated_data

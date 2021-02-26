@@ -30,7 +30,7 @@ class BranchCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         company_uuid = validated_data.pop('company')
-        create_branch(company_uuid, **validated_data)
+        return create_branch(company_uuid, **validated_data)
 
 
 

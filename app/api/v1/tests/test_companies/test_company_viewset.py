@@ -7,8 +7,7 @@ from companies.models import CompanyProfile
 
 from api.v1.tests.base import BaseViewSetTest
 
-from api.v1.branches.views import BranchesViewSet
-from api.v1.branches import serializers
+from api.v1.companies import serializers
 
 from factory_generator import generate_to_db, generate_to_dict
 from faker import Faker

@@ -1,5 +1,4 @@
 from rest_framework import status
-from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.factories import CompanyUserAccountModelFactory
 
@@ -132,6 +131,7 @@ class TestCreateAction(BaseViewSetTest):
         super().setup_method(method)
         self.tested_company = CompanyProfileFactory.create()
         self.create_data = generate_to_dict(BranchFactory)
+        self.create_data.pop('company')
         self.url = self.get_action_url('list', company_uuid=self.tested_company.uuid)
 
     def test_create_permission(self, mocker):
@@ -178,14 +178,16 @@ class TestPatchAction(BaseViewSetTest):
         self.patch_data = {
             'phone': fake.phone_number()
         }
-        self.url = self.get_action_url('list', company_uuid=self.tested_company.uuid)
+        self.url = self.get_action_url(
+            'detail', company_uuid=self.tested_company.uuid, uuid=self.tested_branch.uuid
+        )
 
     def test_patch_permission(self, mocker):
         mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
         mock_has_company_perm.return_value = True
         mock_has_branch_perm = mocker.patch('api.v1.permissions.has_user_perm_to_branch')
         mock_has_branch_perm.return_value = False
-        admin_response = self.admin_client.get(self.url)
+        admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
         mock_has_branch_perm.assert_called_with(self.tested_branch.uuid, self.admin_user.uuid)
 
@@ -201,7 +203,7 @@ class TestPatchAction(BaseViewSetTest):
             context={'request': admin_response.wsgi_request}
         ).data
         assert self.tested_branch.phone == self.patch_data['phone']
-        assert admin_response.status_code == status.HTTP_201_CREATED
+        assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == expected_data
 
     def test_patch_for_forbidden_to_company(self, mocker):
@@ -239,13 +241,13 @@ class TestDestroyAction(BaseViewSetTest):
         )
 
     def test_destroy_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
         mock_has_perm.call_count == 1
 
     def test_destroy_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
         mock_has_perm.return_value = True
         mock_delete = mocker.patch('api.v1.branches.views.utils.delete_branch')
         admin_response = self.admin_client.delete(self.url)
@@ -254,7 +256,7 @@ class TestDestroyAction(BaseViewSetTest):
         assert admin_response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_patch_for_forbidden_to_branch(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -311,7 +313,7 @@ class TestToArchiveAction(BaseViewSetTest):
         expected_force = True
         data = {'force': expected_force}
         admin_response = self.admin_client.patch(self.url, data=data, format='json')
-        mock_to_archive.assert_called_with(self.tested_company.uuid, force=expected_force)
+        mock_to_archive.assert_called_with(self.tested_branch.uuid, force=expected_force)
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == self.expected_data
 

@@ -1,1 +1,0 @@
-export const ON_APP_ERROR = 'onAppError';

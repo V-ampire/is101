@@ -1,28 +1,39 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import CompanyList from '@/views/companies/CompanyList.vue'
+import Main from '@/admin/views/Main.vue'
+import NoProfileslist from '@/admin/views/accounts/NoProfilesList.vue'
+import CompanyList from '@/admin/views/companies/CompanyList.vue'
+import CompanyDetail from '@/admin/views/companies/CompanyDetail.vue'
+import config from '@/config'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'CompanyList',
-    component: CompanyList
+    name: 'Main',
+    component: Main
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
+  {
+    path: '/no_profiles',
+    name: 'NoProfileslist',
+    component: NoProfileslist
+  },
+  {
+    path: '/companies',
+    name: 'CompanyList',
+    component: CompanyList,
+  },
+  {
+    path: '/companies/:companyUuid',
+    name: 'CompanyDetail',
+    component: CompanyDetail
+  }
 ]
 
 const router = new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
+  base: config.baseUrl,
   routes
 })
 

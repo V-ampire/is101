@@ -50,3 +50,7 @@ a:hover {
 .username {
   font-weight: 600;
 }
+
+.accounts-alert {
+  font-size: 0.1rem;
+}

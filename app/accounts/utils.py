@@ -102,4 +102,23 @@ def is_employee_user(user):
     if isinstance(user, UserAccount):
         return user.role == Roles.EMPLOYEE
     return False
+
+
+def get_users_uuid_without_profile():
+    """
+    Возвращает список UUID учетных записей юрлиц или работников, 
+    у которых отсутствует заполненный профиль.
+    """
+    result = []
+    company_users = get_user_model().company_objects.all()
+    employee_users = get_user_model().employee_objects.all()
+    for user in company_users:
+        if not hasattr(user, 'company_profile'):
+            result.append(user.uuid)
+    for user in employee_users:
+        if not hasattr(user, 'employee_profile'):
+            result.append(user.uuid)
+    return result
+
+
     
