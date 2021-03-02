@@ -1,4 +1,5 @@
-import http from "@/core/services/http/common"
+import http from "@/core/services/http/common";
+import errorUtils from "@/core/services/errors/utils";
 
 const baseEndpoint = '/accounts';
 const companiesEndpoint = `${baseEndpoint}/companies`;
@@ -13,11 +14,22 @@ export default {
       /**
        * Загрузить список учетных записей юрлиц.
        */
-      return http.get(companiesEndpoint)
+      try {
+        return http.get(`${companiesEndpoint}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     detail(accountUuid) {
-      return http.get(`${companiesEndpoint}/${accountUuid}`)
+      /**
+       * Загрузить информацию об учетной записи.
+       */
+      try {
+        return http.get(`${companiesEndpoint}/${accountUuid}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     create(formData) {
@@ -27,7 +39,11 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.post(companiesEndpoint, formData, {headers: headers})
+      try {
+        return http.post(`${companiesEndpoint}/`, formData, {headers: headers})
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     update(accountUuid, formData) {
@@ -37,30 +53,47 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.patch(
-        `${companiesEndpoint}/${accountUuid}`, formData, {headers: headers}
-      )
+      try {
+        return http.patch(
+          `${companiesEndpoint}/${accountUuid}/`, formData, {headers: headers}
+        )
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
+      
     },
 
     delete(accountUuid) {
       /**
        * Удалить ученую запись.
        */
-      return http.delete(`${companiesEndpoint}/${accountUuid}`)
+      try {
+        return http.delete(`${companiesEndpoint}/${accountUuid}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     activate(accountUuid) {
       /**
        * Перевести учетную запись в активный статус.
        */
-      return http.patch(`${companiesEndpoint}/${accountUuid}/activate`)
+      try {
+        return http.patch(`${companiesEndpoint}/${accountUuid}/activate/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     deactivate(accountUuid) {
       /**
        * Перевести учетную запись в неактивный статус, доступ будет ограничен.
        */
-      return http.patch(`${companiesEndpoint}/${accountUuid}/deactivate`)
+      try {
+        return http.patch(`${companiesEndpoint}/${accountUuid}/deactivate/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     changePassword(accountUuid, formData) {
@@ -71,8 +104,14 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.patch(
-        `${companiesEndpoint}/${accountUuid}/change_password`, formData, {'headers': headers})
+      try {
+        return http.patch(
+          `${companiesEndpoint}/${accountUuid}/change_password/`, 
+          formData, 
+          {'headers': headers})
+        } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
   },
@@ -83,11 +122,19 @@ export default {
       /**
        * Загрузить список учетных записей юрлиц.
        */
-      return http.get(employeesEndpoint)
+      try {
+        return http.get(`${employeesEndpoint}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     detail(accountUuid) {
-      return http.get(`${employeesEndpoint}/${accountUuid}`)
+      try {
+        return http.get(`${employeesEndpoint}/${accountUuid}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     create(formData) {
@@ -97,7 +144,11 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.post(employeesEndpoint, formData, {headers: headers})
+      try {
+        return http.post(`${employeesEndpoint}/`, formData, {headers: headers})
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     update(accountUuid, formData) {
@@ -107,30 +158,46 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.patch(
-        `${employeesEndpoint}/${accountUuid}`, formData, {headers: headers}
-      )
+      try {
+        return http.patch(
+          `${employeesEndpoint}/${accountUuid}/`, formData, {headers: headers}
+        )
+        } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     delete(accountUuid) {
       /**
        * Удалить ученую запись.
        */
-      return http.delete(`${employeesEndpoint}/${accountUuid}`)
+      try {
+        return http.delete(`${employeesEndpoint}/${accountUuid}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     activate(accountUuid) {
       /**
        * Перевести учетную запись в активный статус.
        */
-      return http.patch(`${employeesEndpoint}/${accountUuid}/activate`)
+      try {
+        return http.patch(`${employeesEndpoint}/${accountUuid}/activate/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     deactivate(accountUuid) {
       /**
        * Перевести учетную запись в неактивный статус, доступ будет ограничен.
        */
-      return http.patch(`${employeesEndpoint}/${accountUuid}/deactivate`)
+      try {
+        return http.patch(`${employeesEndpoint}/${accountUuid}/deactivate/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     changePassword(accountUuid, formData) {
@@ -141,8 +208,14 @@ export default {
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
-      return http.patch(
-        `${employeesEndpoint}/${accountUuid}/change_password`, formData, {'headers': headers})
+      try {
+        return http.patch(
+          `${employeesEndpoint}/${accountUuid}/change_password/`, 
+          formData, 
+          {'headers': headers})
+        } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
   },
 
@@ -152,14 +225,22 @@ export default {
       /**
        * Возвращает список учетных записей юрлиц и работников с незаполеным профилем.
        */
-      return http.get(noProfilesEndpoint)
+      try {
+        return http.get(`${noProfilesEndpoint}/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     },
 
     count() {
       /**
        * Возвращает количество учетных записей юрлиц и работников с незаполеным профилем.
        */
-      return http.get(`${noProfilesEndpoint}/count`)
+      try {
+        return http.get(`${noProfilesEndpoint}/count/`)
+      } catch (err) {
+        throw errorUtils.checkHttpError(err)
+      }
     }
   }
 }

@@ -44,7 +44,7 @@
         <div class="delete-btn">
           <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn 
+              <v-btn
                 color="primary"
                 x-small
                 fab
@@ -72,8 +72,8 @@
 /* Таблица со списком юр. лиц */
 import companiesApi from "@/core/services/http/companies";
 import statuses from "@/core/services/statuses";
-import utils from '@/core/services/events/utils';
-import { processHttpError } from '@/core/services/errors/utils';
+import eventUtils from '@/core/services/events/utils';
+import errorUtils from '@/core/services/errors/utils';
 
 export default {
   data () {
@@ -109,14 +109,16 @@ export default {
       try {
         response = await companiesApi.list();
       } catch (err) {
-        return processHttpError(err);
+        const httpError = errorUtils.checkHttpError(err);
+        eventUtils.showErrorAlert(httpError.message);
+        throw err
       }
       const companiesData = response.data;
       if (Array.isArray(companiesData)) {
         this.companiesList = companiesData;
       } else {
         const errorMessage = 'Не удалось загрузить данные с сервера.';
-        utils.showErrorAlert(errorMessage);
+        eventUtils.showErrorAlert(errorMessage);
         console.log(`Не удалось загрузить список юрлиц. Получен ответ ${response}`);
       }
     },
@@ -124,12 +126,14 @@ export default {
       const confirmParams = {
         message: `Вы действительно хотите удалить юрлицо ${company.title}`
       }
-      utils.onConfirmAction(confirmParams, async (result) => {
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
             await companiesApi.delete(company.uuid);
           } catch (err) {
-            return processHttpError(err);
+            const httpError = errorUtils.checkHttpError(err);
+            eventUtils.showErrorAlert(httpError.message);
+            throw err
           }
           this.getCompanies();
         }
@@ -142,12 +146,14 @@ export default {
       const confirmParams = {
         message: message
       }
-      utils.onConfirmAction(confirmParams, async (result) => {
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
             await companiesApi.toArchive(company.uuid, true);
           } catch (err) {
-            return processHttpError(err);
+            const httpError = errorUtils.checkHttpError(err);
+            eventUtils.showErrorAlert(httpError.message);
+            throw err
           }
           this.getCompanies();
         }
@@ -157,12 +163,14 @@ export default {
       const confirmParams = {
         message: `Вы действительно хотите вернуть юрлицо ${company.title} в работу?`
       }
-      utils.onConfirmAction(confirmParams, async (result) => {
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
             await companiesApi.toWork(company.uuid);
           } catch (err) {
-            return processHttpError(err);
+            const httpError = errorUtils.checkHttpError(err);
+            eventUtils.showErrorAlert(httpError.message);
+            throw err
           }
           this.getCompanies();
         }
@@ -170,9 +178,8 @@ export default {
     }
   },
   computed: {
-    items: function() {
+    items () {
       let result = [];
-      // FIXME обработать случай с отсутствием ключей
       for (let company of this.companiesList) {
         result.push({
           title: company.title,

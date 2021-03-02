@@ -1,4 +1,5 @@
-import http from "@/core/services/http/common"
+import http from "@/core/services/http/common";
+import errorUtils from "@/core/services/errors/utils";
 
 const endpoint = '/companies';
 
@@ -8,14 +9,22 @@ export default {
     /**
      * Загрузить список юрлиц.
      */
-    return http.get(`${endpoint}/`)
+    try {
+      return http.get(`${endpoint}/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
 
   detail(companyUuid) {
     /**
      * Загрузить информацю о юрлице.
      */
-    return http.get(`${endpoint}/${companyUuid}/`)
+    try {
+      return http.get(`${endpoint}/${companyUuid}/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
 
 	create(formData) {
@@ -24,8 +33,12 @@ export default {
      */
 		const headers = {
 			'Content-Type': 'multipart/form-data'
-		};
-		return http.post(`${endpoint}/`, formData, {headers: headers})
+    };
+    try {
+      return http.post(`${endpoint}/`, formData, {headers: headers})
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
   
   update(companyUuid, formData) {
@@ -34,15 +47,23 @@ export default {
      */
     const headers = {
 			'Content-Type': 'multipart/form-data'
-		};
-    return http.patch(`${endpoint}/${companyUuid}/`, formData, {headers: headers})
+    };
+    try {
+      return http.patch(`${endpoint}/${companyUuid}/`, formData, {headers: headers})
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
 
   delete(companyUuid) {
     /**
      * Удалить юрлицо. Будет удалена учетная запись.
      */
-    return http.delete(`${endpoint}/${companyUuid}/`)
+    try {
+      return http.delete(`${endpoint}/${companyUuid}/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
 
   toArchive(companyUuid, force=false) {
@@ -55,13 +76,21 @@ export default {
     const headers = {
 			'Content-Type': 'application/json'
     };
-    return http.patch(`${endpoint}/${companyUuid}/to_archive/`, {'force': force}, {headers: headers})
+    try {
+      return http.patch(`${endpoint}/${companyUuid}/to_archive/`, {'force': force}, {headers: headers})
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   },
 
   toWork(companyUuid) {
     /**
      * Переводит юрлицо в активный статус.
      */
-    return http.patch(`${endpoint}/${companyUuid}/to_work/`)
+    try {
+      return http.patch(`${endpoint}/${companyUuid}/to_work/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
   }
 }

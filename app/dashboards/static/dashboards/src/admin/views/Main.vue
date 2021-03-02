@@ -46,6 +46,8 @@
 
 <script>
 import accounts from '@/core/services/http/accounts';
+import eventUtils from '@/core/services/events/utils';
+import errorUtils from '@/core/services/errors/utils';
 
 export default {
   data: () => ({
@@ -58,7 +60,14 @@ export default {
 
   methods: {
     async getNoProfilesCount() {
-      let response = await accounts.noProfiles.count();
+      let response;
+      try {
+        response = await accounts.noProfiles.count();
+      } catch (err) {
+        const httpError = errorUtils.checkHttpError(err);
+        eventUtils.showErrorAlert(httpError.message);
+        throw err
+      }
       const count = response.data.count;
       if (Number.isInteger(count)) {
         this.noProfileCount = count;

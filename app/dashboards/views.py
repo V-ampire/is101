@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
+from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.http import HttpResponse
 
 
 class AdminAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -12,3 +14,4 @@ class AdminAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 class AdminDashboardView(AdminAccessMixin, TemplateView):
     template_name = 'dashboards/admin.html'
+

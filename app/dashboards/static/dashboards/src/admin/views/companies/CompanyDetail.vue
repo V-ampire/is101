@@ -6,15 +6,21 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="4">
+      <v-col cols="5">
         <v-card>
-        <v-card-title>
-          Учетная запись
+        <v-card-title class="subtitle-1">
+          Редактировать учетную запись
         </v-card-title>
+        <v-card-text>
+          <EditAccountForm
+            v-if="!!companyInfo.user" 
+            :accountUuid="companyInfo.user.uuid" 
+            ref="editAccountForm"></EditAccountForm>
+        </v-card-text>
       </v-card>
       </v-col>
-      <v-col cols="8">
-        <EditCompanyForm v-bind:initial="companyInfo" ref="editCompanyForm"></EditCompanyForm>
+      <v-col cols="7">
+        <EditCompanyForm ref="editCompanyForm"></EditCompanyForm>
       </v-col>
     </v-row>
   </v-container>
@@ -23,9 +29,9 @@
 <script>
 import companiesApi from '@/core/services/http/companies';
 import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
-// import statuses from "@/core/services/statuses";
-import eventsUtils from '@/core/services/events/utils';
-import { processHttpError } from '@/core/services/errors/utils';
+import EditAccountForm from '@/core/components/accounts/EditAccountForm';
+import eventUtils from '@/core/services/events/utils';
+import errorUtils from '@/core/services/errors/utils';
 
 export default {
   data () {
@@ -35,14 +41,20 @@ export default {
   },
   components: {
     EditCompanyForm: EditCompanyForm,
+    EditAccountForm: EditAccountForm,
   },
   computed: {
     companyUuid() {
       return this.$route.params.companyUuid;
-    }
+    },
   },
-  mounted() {
-    this.getCompanyInfo();
+  async mounted() {
+    let vm = this;
+    this.companyInfo = await this.getCompanyInfo();
+    this.$nextTick(() => {
+      vm.$refs.editCompanyForm.setInitial(this.companyInfo);
+      vm.$refs.editAccountForm.setInitial(this.companyInfo.user);
+    });
   },
   methods: {
     async getCompanyInfo() {
@@ -50,10 +62,12 @@ export default {
       try {
         response = await companiesApi.detail(this.companyUuid);
       } catch (err) {
-        return processHttpError(err);
+        const httpError = errorUtils.checkHttpError(err);
+        eventUtils.showErrorAlert(httpError.message);
+        throw err
       }
       if (response.data.uuid == this.companyUuid) {
-        this.companyInfo = response.data;
+        return response.data
       } else {
         eventsUtils.showErrorAlert('Не удалось загрузить данные с сервера.');
         console.log(`Не удалось информацию о юрлице. Получен ответ ${response}`);
