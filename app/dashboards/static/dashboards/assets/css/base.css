@@ -54,3 +54,7 @@ a:hover {
 .accounts-alert {
   font-size: 0.1rem;
 }
+
+.fixed {
+  position: fixed;
+}

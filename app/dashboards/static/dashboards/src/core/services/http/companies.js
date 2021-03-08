@@ -5,92 +5,106 @@ const endpoint = '/companies';
 
 export default {
 
-  list() {
+  async list() {
     /**
      * Загрузить список юрлиц.
      */
+    let response;
     try {
-      return http.get(`${endpoint}/`)
+      response = await http.get(`${endpoint}/`)
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
 
-  detail(companyUuid) {
+  async detail(companyUuid) {
     /**
      * Загрузить информацю о юрлице.
      */
+    let response;
     try {
-      return http.get(`${endpoint}/${companyUuid}/`)
+      response = await http.get(`${endpoint}/${companyUuid}/`)
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
 
-	create(formData) {
+	async create(formData) {
     /**
      * Заполнить профиль юрлица.
      */
+    let response;
 		const headers = {
 			'Content-Type': 'multipart/form-data'
     };
     try {
-      return http.post(`${endpoint}/`, formData, {headers: headers})
+      response = await http.post(`${endpoint}/`, formData, {headers: headers})
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
   
-  update(companyUuid, formData) {
+  async update(companyUuid, formData) {
     /**
      * Обновить данные юрлица.
      */
+    let response;
     const headers = {
 			'Content-Type': 'multipart/form-data'
     };
     try {
-      return http.patch(`${endpoint}/${companyUuid}/`, formData, {headers: headers})
+      response = await http.patch(`${endpoint}/${companyUuid}/`, formData, {headers: headers})
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
 
-  delete(companyUuid) {
+  async delete(companyUuid) {
     /**
      * Удалить юрлицо. Будет удалена учетная запись.
      */
+    let response;
     try {
-      return http.delete(`${endpoint}/${companyUuid}/`)
+      response = await http.delete(`${endpoint}/${companyUuid}/`)
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
 
-  toArchive(companyUuid, force=false) {
+  async toArchive(companyUuid, force=false) {
     /**
      * Переводит юрлицо в архи. Учетная запись будет отключена.
      * @param force - если не указан или false, то в случае если у юрлица числятся работники
      * с активным статусом - будет возвращена ошибка. Если true то все работники будут также 
      * переведены в архивный статус.
      */
+    let response;
     const headers = {
 			'Content-Type': 'application/json'
     };
     try {
-      return http.patch(`${endpoint}/${companyUuid}/to_archive/`, {'force': force}, {headers: headers})
+      response = await http.patch(`${endpoint}/${companyUuid}/to_archive/`, {'force': force}, {headers: headers})
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   },
 
-  toWork(companyUuid) {
+  async toWork(companyUuid) {
     /**
      * Переводит юрлицо в активный статус.
      */
+    let response;
     try {
-      return http.patch(`${endpoint}/${companyUuid}/to_work/`)
+      response = await http.patch(`${endpoint}/${companyUuid}/to_work/`)
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
+    return response
   }
 }

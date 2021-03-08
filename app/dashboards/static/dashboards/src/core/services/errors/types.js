@@ -19,6 +19,7 @@ export class ServerError extends HttpError {
     super('Сервер вернул ошибку! Повторите попытку чуть позже...');
     this.name = "ServerError";
     this.error = error;
+    this.data = error.response.data;
   }
 }
 

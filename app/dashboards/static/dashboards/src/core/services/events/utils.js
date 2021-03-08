@@ -1,4 +1,5 @@
-import { ON_APP_ERROR, ON_OPEN_CONFIRM, ON_CONFIRM_RESULT } from '@/core/services/events/types'
+import { ON_APP_ERROR, ON_OPEN_CONFIRM, ON_CONFIRM_RESULT,  ON_APP_SUCCESS} 
+  from '@/core/services/events/types'
 import eventBus from '@/core/services/events/eventBus'
 
 export default {
@@ -15,6 +16,19 @@ export default {
      * @handler - обработчик в который будет передано сообщение об ошибке.
      */
     eventBus.$on(ON_APP_ERROR, handler);
+  },
+  showSuccessEvent(successMessage) {
+    /**
+     * Показать окно успешным результатом.
+     */
+    eventBus.$emit(ON_APP_SUCCESS, successMessage)
+  },
+  onSuccessEvent(handler) {
+    /**
+     * Вклюить обработку успешных сообщений.
+     * @handler - обработчик в который будет передано сообщение.
+     */
+    eventBus.$on(ON_APP_SUCCESS, handler);
   },
   onConfirmAction(confirmParams, action) {
     /**

@@ -10,237 +10,273 @@ export default {
 
   companies: {
 
-    list() {
+    async list() {
       /**
        * Загрузить список учетных записей юрлиц.
        */
+      let response;
       try {
-        return http.get(`${companiesEndpoint}/`)
+        response = await http.get(`${companiesEndpoint}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    detail(accountUuid) {
+    async detail(accountUuid) {
       /**
        * Загрузить информацию об учетной записи.
        */
+      let response;
       try {
-        return http.get(`${companiesEndpoint}/${accountUuid}/`)
+        response = await http.get(`${companiesEndpoint}/${accountUuid}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    create(formData) {
+    async create(formData) {
       /**
        * Создать учетную запись юрлица.
        */
+      let response;
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
       try {
-        return http.post(`${companiesEndpoint}/`, formData, {headers: headers})
+        response = await http.post(`${companiesEndpoint}/`, formData, {headers: headers})
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    update(accountUuid, formData) {
+    async update(accountUuid, formData) {
       /**
        * Обновить данные учетной записи.
        */
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
+      let response;
       try {
-        return http.patch(
+        response = await http.patch(
           `${companiesEndpoint}/${accountUuid}/`, formData, {headers: headers}
         )
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
       
     },
 
-    delete(accountUuid) {
+    async delete(accountUuid) {
       /**
        * Удалить ученую запись.
        */
+      let response;
       try {
-        return http.delete(`${companiesEndpoint}/${accountUuid}/`)
+        response = await http.delete(`${companiesEndpoint}/${accountUuid}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    activate(accountUuid) {
+    async activate(accountUuid) {
       /**
        * Перевести учетную запись в активный статус.
        */
+      let response;
       try {
-        return http.patch(`${companiesEndpoint}/${accountUuid}/activate/`)
+        response = await http.patch(`${companiesEndpoint}/${accountUuid}/activate/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    deactivate(accountUuid) {
+    async deactivate(accountUuid) {
       /**
        * Перевести учетную запись в неактивный статус, доступ будет ограничен.
        */
+      let response;
       try {
-        return http.patch(`${companiesEndpoint}/${accountUuid}/deactivate/`)
+        response = await http.patch(`${companiesEndpoint}/${accountUuid}/deactivate/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    changePassword(accountUuid, formData) {
+    async changePassword(accountUuid, formData) {
       /**
        * Изменить пароль.
        * @param formData - должен содержать пароль и подтверждение пароля.
        */
+      let response;
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
       try {
-        return http.patch(
+        response = await http.patch(
           `${companiesEndpoint}/${accountUuid}/change_password/`, 
           formData, 
           {'headers': headers})
         } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
   },
 
   employees: {
 
-    list() {
+    async list() {
       /**
        * Загрузить список учетных записей юрлиц.
        */
+      let response;
       try {
-        return http.get(`${employeesEndpoint}/`)
+        response = await http.get(`${employeesEndpoint}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    detail(accountUuid) {
+    async detail(accountUuid) {
+      let response;
       try {
-        return http.get(`${employeesEndpoint}/${accountUuid}/`)
+        response = await http.get(`${employeesEndpoint}/${accountUuid}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    create(formData) {
+    async create(formData) {
       /**
        * Создать учетную запись юрлица.
        */
+      let response;
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
       try {
-        return http.post(`${employeesEndpoint}/`, formData, {headers: headers})
+        response = await http.post(`${employeesEndpoint}/`, formData, {headers: headers})
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    update(accountUuid, formData) {
+    async update(accountUuid, formData) {
       /**
        * Обновить данные учетной записи.
        */
+      let response;
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
       try {
-        return http.patch(
+        response = await http.patch(
           `${employeesEndpoint}/${accountUuid}/`, formData, {headers: headers}
         )
         } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    delete(accountUuid) {
+    async delete(accountUuid) {
       /**
        * Удалить ученую запись.
        */
+      let response;
       try {
-        return http.delete(`${employeesEndpoint}/${accountUuid}/`)
+        response = await http.delete(`${employeesEndpoint}/${accountUuid}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    activate(accountUuid) {
+    async activate(accountUuid) {
       /**
        * Перевести учетную запись в активный статус.
        */
+      let response;
       try {
-        return http.patch(`${employeesEndpoint}/${accountUuid}/activate/`)
+        response = await http.patch(`${employeesEndpoint}/${accountUuid}/activate/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    deactivate(accountUuid) {
+    async deactivate(accountUuid) {
       /**
        * Перевести учетную запись в неактивный статус, доступ будет ограничен.
        */
+      let response;
       try {
-        return http.patch(`${employeesEndpoint}/${accountUuid}/deactivate/`)
+        response = await http.patch(`${employeesEndpoint}/${accountUuid}/deactivate/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    changePassword(accountUuid, formData) {
+    async changePassword(accountUuid, formData) {
       /**
        * Изменить пароль.
        * @param formData - должен содержать пароль и подтверждение пароля.
        */
+      let response;
       const headers = {
         'Content-Type': 'multipart/form-data'
       };
       try {
-        return http.patch(
+        response = await http.patch(
           `${employeesEndpoint}/${accountUuid}/change_password/`, 
           formData, 
           {'headers': headers})
         } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
   },
 
   noProfiles: {
 
-    list() {
+    async list() {
       /**
        * Возвращает список учетных записей юрлиц и работников с незаполеным профилем.
        */
+      let response;
       try {
-        return http.get(`${noProfilesEndpoint}/`)
+        response = await http.get(`${noProfilesEndpoint}/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     },
 
-    count() {
+    async count() {
       /**
        * Возвращает количество учетных записей юрлиц и работников с незаполеным профилем.
        */
+      let response;
       try {
-        return http.get(`${noProfilesEndpoint}/count/`)
+        response = await http.get(`${noProfilesEndpoint}/count/`)
       } catch (err) {
         throw errorUtils.checkHttpError(err)
       }
+      return response
     }
   }
 }
