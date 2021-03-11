@@ -121,6 +121,9 @@ export default {
         },
       }   
     },
+    mounted() {
+      this.setInitial(this.initialData);
+    },
     methods: {
       async switchIsActive () {
         this.isActiveInProgress = true;
@@ -153,7 +156,8 @@ export default {
               }
               throw err
           }
-          eventUtils.showSuccessEvent('Логин обновлен!')
+          eventUtils.showSuccessEvent('Логин обновлен!');
+          eventUtils.reloadData();
         }
       }
     },

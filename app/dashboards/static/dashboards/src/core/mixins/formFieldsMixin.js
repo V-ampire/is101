@@ -21,7 +21,7 @@ export default {
     data () {
       return {
         fields: null,
-        initialData: null,
+        initialData: null
       }
     },
     methods: {
@@ -48,10 +48,12 @@ export default {
            * @initialFields - начальный данные
            */
           this.initialData = initialData;
-          for (let key in initialData) {
-            if (key in this.fields) {
-              this.fields[key].value = initialData[key]
-            }
+          if (this.initialData) {
+            for (let key in initialData) {
+              if (key in this.fields) {
+                this.fields[key].value = initialData[key]
+              }
+            }  
           }
         },
         validate () {

@@ -12,11 +12,34 @@
             hide-details
           ></v-text-field>
         </v-col>
-        <!-- <v-col cols="4">
-          <v-card-actions> -->
-            <!-- <CreateCompanyDialog/> -->
-          <!-- </v-card-actions>
-        </v-col> -->
+        <v-col cols="4">
+          <v-card-actions>
+            <v-dialog
+              v-model="dialog"
+              persistent
+              max-width="600px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Добавить юрлицо
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title class="subtitle-1">Добавить новое юрлицо</v-card-title>
+                <v-tabs
+                  background-color="deep-purple accent-4"
+                  center-active
+                  dark
+                >
+                
+              </v-card>
+            </v-dialog>
+          </v-card-actions>
+        </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">

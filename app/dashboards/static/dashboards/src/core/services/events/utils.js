@@ -1,4 +1,4 @@
-import { ON_APP_ERROR, ON_OPEN_CONFIRM, ON_CONFIRM_RESULT,  ON_APP_SUCCESS} 
+import { ON_APP_ERROR, ON_OPEN_CONFIRM, ON_CONFIRM_RESULT,  ON_APP_SUCCESS, ON_RELOAD } 
   from '@/core/services/events/types'
 import eventBus from '@/core/services/events/eventBus'
 
@@ -56,5 +56,17 @@ export default {
      * @result - рзультат подтверждения действия.
      */
     eventBus.$emit(ON_CONFIRM_RESULT, result);
+  },
+  onReloadEvent(handler) {
+    /**
+     * Устанавливает обработчик на событие обновление данных.
+     */
+    eventBus.$on(ON_RELOAD, handler);
+  },
+  reloadData(params) {
+    /**
+     * Вызывает обновление данных.
+     */
+    eventBus.$emit(ON_RELOAD, params);
   }
 }

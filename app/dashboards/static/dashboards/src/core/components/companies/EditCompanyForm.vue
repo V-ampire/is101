@@ -147,6 +147,9 @@ export default {
   props: {
     companyUuid: String
   },
+  mounted() {
+    this.setInitial(this.initialData);
+  },
   methods: {
     async updateCompanyInfo() {
       if (this.validate()) {

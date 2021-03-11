@@ -19,7 +19,7 @@
                 ref="editAccountForm"></EditAccountForm>
             </v-card-text>
           </v-card>
-          <v-card>
+          <v-card class="mb-3">
             <v-card-title class="subtitle-1">
               Статус юрлица
             </v-card-title>
@@ -31,6 +31,16 @@
                 ref="editCompanyStatusForm"></EditCompanyStatusForm>
             </v-card-text>
           </v-card>
+          <v-card>
+            <v-card-title class="subtitle-1">Филиалы юрлица</v-card-title>
+            <v-card-text>
+              <BranchListTable
+                v-if="!!companyInfo.branches"
+                :branchList="companyInfo.branches"
+                ref="branchListTable"
+              ></BranchListTable>
+            </v-card-text>
+          </v-card>
         </div>
       </v-col>
       <v-col cols="7">
@@ -40,6 +50,7 @@
           </v-card-title>
           <v-card-text>
             <EditCompanyForm
+              v-if="!!companyInfo"
               :companyUuid="companyUuid"
               ref="editCompanyForm"
             ></EditCompanyForm>
@@ -55,18 +66,20 @@ import companiesApi from '@/core/services/http/companies';
 import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
 import EditCompanyStatusForm from '@/core/components/companies/EditCompanyStatusForm';
 import EditAccountForm from '@/core/components/accounts/EditAccountForm';
+import BranchListTable from '@/core/components/branches/BranchListTable';
 import eventUtils from '@/core/services/events/utils';
 
 export default {
   data () {
     return {
-      companyInfo: {},
+      companyInfo: null,
     }
   },
   components: {
     EditCompanyForm: EditCompanyForm,
     EditAccountForm: EditAccountForm,
-    EditCompanyStatusForm: EditCompanyStatusForm
+    EditCompanyStatusForm: EditCompanyStatusForm,
+    BranchListTable: BranchListTable
   },
   computed: {
     companyUuid() {
@@ -74,12 +87,16 @@ export default {
     },
   },
   async mounted() {
-    let vm = this;
     this.companyInfo = await this.getCompanyInfo();
-    this.$nextTick(() => {
-      vm.$refs.editCompanyForm.setInitial(this.companyInfo);
-      vm.$refs.editAccountForm.setInitial(this.companyInfo.user);
+    await this.$nextTick(() => {
+      this.$refs.editAccountForm.setInitial(this.companyInfo.user);
+      this.$refs.editCompanyForm.setInitial(this.companyInfo);
     });
+    eventUtils.onReloadEvent(async () => {
+      this.companyInfo = await this.getCompanyInfo();
+      this.$refs.editAccountForm.setInitial(this.companyInfo.user);
+      this.$refs.editCompanyForm.setInitial(this.companyInfo);
+    })
   },
   methods: {
     async getCompanyInfo() {

@@ -2,7 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="items"
-    :item-class="getRowClasses"
+    :item-class="getStatusClasses"
     :sort-by="status"
     :search="search"
   >
@@ -75,8 +75,10 @@
 import companiesApi from "@/core/services/http/companies";
 import statuses from "@/core/services/statuses";
 import eventUtils from '@/core/services/events/utils';
+import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 
 export default {
+  mixins: [statusClassesMixin],
   data () {
     return {
       headers: [
@@ -113,11 +115,6 @@ export default {
     this.getCompanies();
   },
   methods: {
-    getRowClasses: function(item) {
-      if (item.status == statuses.archived) {
-        return 'archive'
-      }
-    },
     async getCompanies() {
       let response;
       try {
@@ -192,16 +189,3 @@ export default {
   },
 }
 </script>
-
-
-<style>
-.archive {
-  background-color: rgba(241, 6, 37, .5);
-  color: white;
-}
-
-.archive:hover {
-  color: black;
-}
-
-</style>
