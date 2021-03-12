@@ -169,7 +169,7 @@ export default {
         eventUtils.showSuccessEvent('Данные изменены!');
       }
     },
-    clean(formFields) {
+    cleanFields(formFields) {
       // Если лого не файл - удалить из полей.
       console.log(formFields.logo)
       if (!(formFields.logo instanceof File)) {

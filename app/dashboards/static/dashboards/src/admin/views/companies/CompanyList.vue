@@ -30,12 +30,9 @@
               </template>
               <v-card>
                 <v-card-title class="subtitle-1">Добавить новое юрлицо</v-card-title>
-                <v-tabs
-                  background-color="deep-purple accent-4"
-                  center-active
-                  dark
-                >
-                
+                <v-card-text>
+                  <CreateCompanyForm></CreateCompanyForm>
+                </v-card-text>
               </v-card>
             </v-dialog>
           </v-card-actions>
@@ -55,7 +52,8 @@
 /*
 Вью для отображения списка компаний.
 */
-import CompanyListTable from '@/core/components/companies/CompanyListTable'
+import CompanyListTable from '@/core/components/companies/CompanyListTable';
+import CreateCompanyForm from '@/core/components/companies/CreateCompanyForm';
 
 export default {
   data () {

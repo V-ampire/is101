@@ -27,14 +27,14 @@ export default {
     methods: {
         getAsFormData (fields=[]) {
           const formData = new FormData();
-          const formFields = this.clean(this._getFormFields(fields));
+          const formFields = this.cleanFields(this._getFormFields(fields));
           for (let field in formFields) {
             formData.append(field, formFields[field]);
           }
           return formData
         },
         getAsObject (fields=[]) {
-          return this.clean(this._getFormFields(fields));
+          return this.cleanFields(this._getFormFields(fields));
         },
         setErrorMessages (fieldName, errorMessages=[]) {
           /**
@@ -59,7 +59,7 @@ export default {
         validate () {
           return this.$refs.form.validate();
         },
-        clean (formFields) {
+        cleanFields(formFields) {
           /**
            * Переопределив этот метод можно изменить, либо проверить поля перед тем,
            * как из них будут получены значения для методов getAsFormData и getAsObject.
