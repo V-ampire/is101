@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from companies import models, utils, validators
 
-from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer
+from api.v1.accounts.serializers import ReadOnlyUserAccountSerializer, CompanyUserAccountSerializer
 from api.v1.branches.serializers import BranchListSerializer
 
 
@@ -14,12 +14,14 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     Сериалайзер для создания юр. лица для админов.
     Содержит uuid учетной записи юрлица.
     """
-    user = serializers.UUIDField(format='hex_verbose')
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = models.CompanyProfile
         fields = (
-            'user',
+            'username',
+            'password',
             'title',
             'logo',
             'tagline',
@@ -31,20 +33,18 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             'phone',
         )
 
-    def validate_user(self, user_uuid):
-        """
-        Возвращает uuid объекта accounts.UserAccount
-        """
-        try:
-            user = get_user_model().company_objects.get(uuid=user_uuid)
-        except get_user_model().DoesNotExist:
-            raise serializers.ValidationError(f'Учетная запись юрлица с uuid={user_uuid} не существует.')
-        validators.validate_company_user(user)
-        return user.uuid
+    def validate(self, data):
+        user_serializer = CompanyUserAccountSerializer(data={
+            'username': data['username'],
+            'password': data['password']
+        })
+        user_serializer.is_valid(raise_exception=True)
+        return data
     
     def create(self, validated_data):
-        user_uuid = validated_data.pop('user')
-        return utils.create_company(user_uuid=user_uuid, **validated_data)
+        username = validated_data.pop('username')
+        password = validated_data.pop('password')
+        return utils.create_company(username, password, **validated_data)
 
 
 class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):

@@ -66,13 +66,14 @@ def has_user_perm_to_employee_user(employee_user_uuid, user_uuid):
     return has_user_perm_to_employee(profile.uuid, user_uuid)
 
 
-def create_company(user_uuid, **company_data):
+def create_company(username, password, **company_data):
     """
-    Создать юрлицо.
-    :param user_uuid: UUID созданной учетной записи с ролью Юрлица.
+    Создать учетку юрлица.
+    Создать профиль юрлица.
     """
-    user = get_user_model().company_objects.get(uuid=user_uuid)
-    return CompanyProfile.objects.create(user=user, **company_data)
+    with transaction.atomic():
+        user = get_user_model().company_objects.create_user(username=username, password=password)
+        return CompanyProfile.objects.create(user=user, **company_data)
 
 
 def create_employee(username, password, branch_uuid, position_uuid=None, **employee_data):
