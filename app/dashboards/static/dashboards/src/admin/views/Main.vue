@@ -27,18 +27,22 @@
               right
               activator=".accounts-alert-btn"
             >
-              Найдено {{ noProfileCount }} учетных записей с незаполненым профилем!
+              <span class="accounts-alert-note">
+                Найдено {{ noProfileCount }} учетных записей с незаполненым профилем!
+              </span>
             </v-tooltip>
           </div>
         </div>
       </v-list-item>
       <v-divider></v-divider>
       <v-list-item>
-        <router-link 
-          to="/companies"
-        >
-          Юридические лица
-        </router-link>
+        <div class="companies">
+          <router-link 
+            to="/companies"
+          >
+            Юридические лица
+          </router-link>
+        </div>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -47,7 +51,6 @@
 <script>
 import accounts from '@/core/services/http/accounts';
 import eventUtils from '@/core/services/events/utils';
-import errorUtils from '@/core/services/errors/utils';
 
 export default {
   data: () => ({
@@ -64,8 +67,7 @@ export default {
       try {
         response = await accounts.noProfiles.count();
       } catch (err) {
-        const httpError = errorUtils.checkHttpError(err);
-        eventUtils.showErrorAlert(httpError.message);
+        eventUtils.showErrorAlert(err.message);
         throw err
       }
       const count = response.data.count;

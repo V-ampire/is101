@@ -1,74 +1,54 @@
-import config from '@/config';
 import statuses from "@/core/services/statuses";
 import roles from "@/core/services/accounts/roles";
 
 import faker from 'faker';
 
 
-function keyFromObject(object) {
+function randomFromObject(object) {
   const keys = Object.keys(object);
   const index = Math.floor(Math.random() * keys.length)
-  return keys[index]
+  return object[keys[index]]
 }
 
 
+export function CompanyUserData(fields=[]) {
+  const companyData = {
+    uuid: faker.random.uuid(),
+    username: faker.internet.userName(),
+    is_active: faker.random.boolean(),
+    role: roles.company,
+    is_staff: false,
+    date_joined: faker.date.past(),
+  };
 
-export function UserDetailData () {
-  /**
-   * Фабрика данных учетной записи для ресурса информации о юрлице.
-   */
-  return {
-    "username": faker.internet.userName(),
+  if (fields.length > 0) {
+    if (fields.indexOf('uuid') == -1) {
+      delete companyData.uuid
+    }
+    if (fields.indexOf('username') == -1) {
+      delete companyData.username
+    }
+    if (fields.indexOf('is_active') == -1) {
+      delete companyData.is_active
+    }
+    if (fields.indexOf('role') == -1) {
+      delete companyData.role
+    }
+    if (fields.indexOf('is_staff') == -1) {
+      delete companyData.is_staff
+    }
+    if (fields.indexOf('date_joined') == -1) {
+      delete companyData.date_joined
+    }
+  }
+  return companyData
+}
+
+
+export function CompanyProfileData(fields=[]) {
+
+  const companyData = {
     "uuid": faker.random.uuid(),
-    "role": keyFromObject(roles),
-    "is_active": keyFromObject({true: true, false: false})
-  }
-}
-
-
-export function CompanyDataForList(fields={}) {
-  const uuid = faker.random.uuid();
-
-  return {
-    "uuid": uuid || fields.uuid,
-    "url": `${config.apiRoot}/companies/${uuid}/` || fields.url,
-    "city": faker.address.city() || fields.city,
-    "address": faker.address.streetAddress() || fields.address,
-    "title": faker.company.companyName() || fields.title,
-    "status": keyFromObject(statuses) || fields.status
-  }
-}
-
-
-export function CompanyListData (n) {
-  /**
-   * Фабрика данных юрлица для ресурса списка.
-   */
-  let companiesList = [];
-
-  for(let i = 0; i < n; i++) {
-    companiesList.push(CompanyDataForList());
-  };
-
-  return companiesList
-}
-
-
-export function CompanyDetailData() {
-  /**
-   * Фабрика данных юрлица для ресурса подробной информации.
-   */
-  const uuid = faker.random.uuid()
-  let branches = [];
-  const length = 5;
-
-  for(let i = 0; i < length; i++) {
-    branches.push(BranchListData());
-  };
-
-  return {
-    "uuid": uuid,
-    "user": UserDetailData(),
     "title": faker.company.companyName(),
     "logo": faker.image.imageUrl(),
     "tagline": faker.lorem.sentence(),
@@ -78,25 +58,40 @@ export function CompanyDetailData() {
     "address": faker.address.streetAddress(),
     "email": faker.internet.email(),
     "phone": faker.phone.phoneNumber(),
-    "url": `${config.apiRoot}/companies/${uuid}/`,
-    "branches": branches,
-    "status": keyFromObject(statuses)
+    "status": randomFromObject(statuses)
+  };
+
+  if (fields.length > 0) {
+    if (fields.indexOf('uuid') == -1) {
+      delete companyData.uuid
+    }
+    if (fields.indexOf('title') == -1) {
+      delete companyData.title
+    }
+    if (fields.indexOf('logo') == -1) {
+      delete companyData.logo
+    }
+    if (fields.indexOf('tagline') == -1) {
+      delete companyData.tagline
+    }
+    if (fields.indexOf('inn') == -1) {
+      delete companyData.inn
+    }
+    if (fields.indexOf('ogrn') == -1) {
+      delete companyData.ogrn
+    }
+    if (fields.indexOf('city') == -1) {
+      delete companyData.city
+    }
+    if (fields.indexOf('address') == -1) {
+      delete companyData.address
+    }
+    if (fields.indexOf('phone') == -1) {
+      delete companyData.phone
+    }
+    if (fields.indexOf('status') == -1) {
+      delete companyData.status
+    }
   }
-}
-
-
-export function BranchListData() {
-  /**
-   * Фабрика данных филиала для ресурса информации о юрлице.
-   */
-  const uuid = faker.random.uuid()
-
-  return {
-    "uuid": uuid,
-    "url": `${config.apiRoot}/companies/${faker.random.uuid()}/branches/${uuid}`,
-    "city": faker.address.city(),
-    "address": faker.address.streetAddress(),
-    "phone": faker.phone.phoneNumber(),
-    "status": keyFromObject(statuses)
-  }
+  return companyData
 }

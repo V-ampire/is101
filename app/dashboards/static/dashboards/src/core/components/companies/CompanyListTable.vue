@@ -2,7 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="items"
-    :item-class="getRowClasses"
+    :item-class="getStatusClasses"
     :sort-by="status"
     :search="search"
   >
@@ -61,9 +61,11 @@
       </div>
     </template>
     <template v-slot:item.title="{ item }">
-      <router-link
-        :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
-      >{{ item.title }}</router-link>
+      <div class="detail-link">
+        <router-link
+          :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
+        >{{ item.title }}</router-link>
+      </div>
     </template>
   </v-data-table>
 </template>
@@ -73,9 +75,10 @@
 import companiesApi from "@/core/services/http/companies";
 import statuses from "@/core/services/statuses";
 import eventUtils from '@/core/services/events/utils';
-import errorUtils from '@/core/services/errors/utils';
+import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 
 export default {
+  mixins: [statusClassesMixin],
   data () {
     return {
       headers: [
@@ -89,28 +92,35 @@ export default {
       statuses: statuses
     }
   },
-
   props: {
     search: String
   },
-
+  computed: {
+    items () {
+      let result = [];
+      for (let company of this.companiesList) {
+        result.push({
+          title: company.title,
+          city: company.city,
+          address: company.address,
+          status: statuses[company.status],
+          url: company.url,
+          uuid: company.uuid
+        });
+      }
+      return result
+    }
+  },
   mounted () {
     this.getCompanies();
   },
-
   methods: {
-    getRowClasses: function(item) {
-      if (item.status == statuses.archived) {
-        return 'archive'
-      }
-    },
     async getCompanies() {
       let response;
       try {
         response = await companiesApi.list();
       } catch (err) {
-        const httpError = errorUtils.checkHttpError(err);
-        eventUtils.showErrorAlert(httpError.message);
+        eventUtils.showErrorAlert(err.message);
         throw err
       }
       const companiesData = response.data;
@@ -131,10 +141,10 @@ export default {
           try {
             await companiesApi.delete(company.uuid);
           } catch (err) {
-            const httpError = errorUtils.checkHttpError(err);
-            eventUtils.showErrorAlert(httpError.message);
+            eventUtils.showErrorAlert(err.message);
             throw err
           }
+          eventUtils.showSuccessEvent('Юрлицо удалено!');
           this.getCompanies();
         }
       });
@@ -151,10 +161,10 @@ export default {
           try {
             await companiesApi.toArchive(company.uuid, true);
           } catch (err) {
-            const httpError = errorUtils.checkHttpError(err);
-            eventUtils.showErrorAlert(httpError.message);
+            eventUtils.showErrorAlert(err.message);
             throw err
           }
+          eventUtils.showSuccessEvent('Юрлицо переведено в архив!');
           this.getCompanies();
         }
       });
@@ -168,43 +178,14 @@ export default {
           try {
             await companiesApi.toWork(company.uuid);
           } catch (err) {
-            const httpError = errorUtils.checkHttpError(err);
-            eventUtils.showErrorAlert(httpError.message);
+            eventUtils.showErrorAlert(err.message);
             throw err
           }
+          eventUtils.showSuccessEvent('Юрлицо в работе!');
           this.getCompanies();
         }
       });
     }
   },
-  computed: {
-    items () {
-      let result = [];
-      for (let company of this.companiesList) {
-        result.push({
-          title: company.title,
-          city: company.city,
-          address: company.address,
-          status: statuses[company.status],
-          url: company.url,
-          uuid: company.uuid
-        });
-      }
-      return result
-    }
-  }
 }
 </script>
-
-
-<style>
-.archive {
-  background-color: rgba(241, 6, 37, .5);
-  color: white;
-}
-
-.archive:hover {
-  color: black;
-}
-
-</style>

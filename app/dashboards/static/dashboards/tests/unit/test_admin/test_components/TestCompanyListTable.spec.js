@@ -2,23 +2,17 @@ import Vuetify from 'vuetify';
 import CompanyListTable from '@/core/components/companies/CompanyListTable';
 import companies from '@/core/services/http/companies';
 import statuses from "@/core/services/statuses";
+import router from '@/admin/router';
 
-import { createLocalVue, mount } from '@vue/test-utils';
-import { CompanyListData, CompanyDataForList } from '@/core/factories';
+import { createLocalVue, mount, shallowMount } from '@vue/test-utils';
+import { CompanyApi } from '../apiFactories';
 import flushPromises from 'flush-promises';
+import faker from 'faker';
 
 describe('Тест CompanyListTable.vue', () => {
 
-  const expectedCompaniesList = CompanyListData(5);
+  const expectedCompaniesList = CompanyApi.list(5);
 
-  const expectedHeaders = [
-    {text: 'Название юр. лица', value: 'title'},
-    {text: 'Город', value: 'city' },
-    {text: 'Адрес', value: 'address' },
-    {text: 'Статус', value: 'status' },
-    {text: 'Действия', value: 'actions', sortable: false}
-  ];
-  
   const localVue = createLocalVue();
   let vuetify;
 
@@ -34,90 +28,157 @@ describe('Тест CompanyListTable.vue', () => {
     const wrapper = mount(CompanyListTable, {
       localVue,
       vuetify,
+      router
     });
 
     await flushPromises();
 
-    expect(mockList).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.companiesList).toEqual(expectedCompaniesList);
-    expect(wrapper.vm.statuses).toEqual(statuses);
-    expect(wrapper.vm.headers).toEqual(expectedHeaders);
+    // expect(wrapper.vm.statuses).toEqual(statuses);
+    // expect(wrapper.vm.headers).toEqual(expectedHeaders);
+  });
+
+  it('Тест привязки параметров к таблице vuetify', async () => {
+    const wrapper = mount(CompanyListTable, {
+      localVue,
+      vuetify,
+      router
+    });
+
+    await flushPromises();
+
+    const expectedHeaders = [
+      {text: 'Название юр. лица', value: 'title'},
+      {text: 'Город', value: 'city' },
+      {text: 'Адрес', value: 'address' },
+      {text: 'Статус', value: 'status' },
+      {text: 'Действия', value: 'actions', sortable: false}
+    ];
+    const expectedSearch = faker.lorem.word();
+
+    wrapper.setData({
+      companiesList: expectedCompaniesList, 
+      headers: expectedHeaders,
+      statuses: statuses
+    });
+
+    wrapper.setProps({search: expectedSearch});
+
+    const dataTable = wrapper.findComponent({name: 'v-data-table'});
+
+    expect(dataTable.props().headers).toEqual(wrapper.vm.headers);
+    expect(dataTable.props().items).toEqual(wrapper.vm.companiesList);
+    expect(dataTable.props().search).toEqual(wrapper.props.search);
   });
 
   it('Тест клика по кнопку удаления юрлица', async done => {
 
-    const expectedList = [CompanyDataForList({status: statuses.works})];
+    const expectedCompany = CompanyApi.list(1)[0];
+    expectedCompany.status = statuses.works;
 
     const wrapper = mount(CompanyListTable, {
       localVue,
       vuetify,
+      router
     });
+
+    await flushPromises();
 
     const mockDelete = jest.spyOn(wrapper.vm, 'deleteCompany');
     
     await wrapper.setData({
-      companiesList: expectedList
+      companiesList: [expectedCompany]
     });
-
-    const expectedItem = wrapper.vm.items[0]
 
     await wrapper.find('.delete-btn button').trigger('click');
 
     wrapper.vm.$nextTick(() => {
       expect(mockDelete).toHaveBeenCalledTimes(1);
-      expect(mockDelete).toHaveBeenCalledWith(expectedItem);
+      expect(mockDelete).toHaveBeenCalledWith(expectedCompany);
       done();
     });
   });
 
   it('Тест клика на кнопку архивирования юрлица', async done => {
-    const expectedList = [CompanyDataForList({status: statuses.works})];
+    const expectedCompany = CompanyApi.list(1)[0];
+    expectedCompany.status = statuses.works;
 
     const wrapper = mount(CompanyListTable, {
       localVue,
       vuetify,
+      router
     });
+
+    await flushPromises();
 
     const mockArchive = jest.spyOn(wrapper.vm, 'toAchiveCompany');
     
     await wrapper.setData({
-      companiesList: expectedList
+      companiesList: [expectedCompany]
     });
-
-    const expectedItem = wrapper.vm.items[0]
 
     await wrapper.find('.status-btn button').trigger('click');
 
     wrapper.vm.$nextTick(() => {
       expect(mockArchive).toHaveBeenCalledTimes(1);
-      expect(mockArchive).toHaveBeenCalledWith(expectedItem);
+      expect(mockArchive).toHaveBeenCalledWith(expectedCompany);
       done();
     });
   });
 
   it('Тест клика на кнопку деархивирования юрлица', async done => {
-    const expectedList = [CompanyDataForList({status: statuses.archived})];
+    const expectedCompany = CompanyApi.list(1)[0];
+    expectedCompany.status = statuses.archived;
 
     const wrapper = mount(CompanyListTable, {
       localVue,
       vuetify,
+      router
     });
+
+    await flushPromises();
 
     const mockToWork = jest.spyOn(wrapper.vm, 'toWorkCompany');
     
     await wrapper.setData({
-      companiesList: expectedList
+      companiesList: [expectedCompany]
     });
-
-    const expectedItem = wrapper.vm.items[0]
 
     await wrapper.find('.status-btn button').trigger('click');
 
     wrapper.vm.$nextTick(() => {
       expect(mockToWork).toHaveBeenCalledTimes(1);
-      expect(mockToWork).toHaveBeenCalledWith(expectedItem);
+      expect(mockToWork).toHaveBeenCalledWith(expectedCompany);
       done();
     });
+  });
+
+  it('Тест сслыки на подробную информацию о юрлице', async () => {
+    const expectedCompany = CompanyApi.list(1)[0];
+    expectedCompany.status = statuses.archived;
+
+    const wrapper = mount(CompanyListTable, {
+      localVue,
+      vuetify,
+      router
+    });
+
+    await flushPromises();
+
+    await wrapper.setData({
+      companiesList: [expectedCompany]
+    });
+
+    const expectedHref = router.resolve({
+      name: 'CompanyDetail',
+      params: {companyUuid: expectedCompany.uuid}
+    }).href;
+
+    const companyDetailLink = wrapper.find('.detail-link a');
+
+    expect(companyDetailLink.text()).toEqual(expectedCompany.title);
+    expect(companyDetailLink.attributes().href).toEqual(expectedHref);
+
   })
 })
 

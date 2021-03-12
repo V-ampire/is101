@@ -1,13 +1,13 @@
 <template>
     <v-snackbar
       v-model="showAlert"
-      color="error"
+      color="success"
       top
     >
       {{ message }}
       <template v-slot:action="{ attrs }">
         <v-btn
-          color="error"
+          color="success"
           x-small
           fab
           v-bind="attrs"
@@ -25,9 +25,9 @@ import alertMixin from '@/core/mixins/alertMixin';
 
 export default {
   mixins: [alertMixin],
-
+  
   mounted: function() {
-    utils.onErrorEvent(this.open);
+    utils.onSuccessEvent(this.open);
   },
 }
 </script>

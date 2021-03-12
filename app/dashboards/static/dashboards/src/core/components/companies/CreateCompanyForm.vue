@@ -91,10 +91,10 @@
 
 <script>
 	import validators from '@/core/validators'
-	import formDataMixin from '@/core/mixins/formDataMixin'
+	import formFieldsMixin from '@/core/mixins/formFieldsMixin'
 
 	export default {
-		mixins: [formDataMixin],
+		mixins: [formFieldsMixin],
 		data () {
 			return {
 				fields: {

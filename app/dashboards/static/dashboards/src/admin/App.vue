@@ -2,6 +2,7 @@
   <v-app>
     <div class="modals">
       <ErrorAlert ref="errorAlert"></ErrorAlert>
+      <SuccessAlert ref="successAlert"></SuccessAlert>
       <ConfirmDialog ref="confirmDialog"></ConfirmDialog>
     </div>
     <v-main>
@@ -12,6 +13,7 @@
 
 <script>
 import ErrorAlert from '@/core/components/commons/ErrorAlert'
+import SuccessAlert from '@/core/components/commons/SuccessAlert'
 import ConfirmDialog from '@/core/components/commons/ConfirmDialog'
 
 export default {
@@ -23,6 +25,7 @@ export default {
 
   components: {
     'ErrorAlert': ErrorAlert,
+    'SuccessAlert': SuccessAlert,
     'ConfirmDialog': ConfirmDialog
   },
 };

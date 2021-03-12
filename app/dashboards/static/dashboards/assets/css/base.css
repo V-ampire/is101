@@ -54,3 +54,16 @@ a:hover {
 .accounts-alert {
   font-size: 0.1rem;
 }
+
+.fixed {
+  position: fixed;
+}
+
+.archive {
+  background-color: rgba(241, 6, 37, .5);
+  color: white;
+}
+
+.archive:hover {
+  color: black;
+}
