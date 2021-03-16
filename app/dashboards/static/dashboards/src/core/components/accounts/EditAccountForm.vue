@@ -145,14 +145,14 @@ export default {
         if (this.validate()) {
           const formData = this.getAsFormData(['username']);
           try {
-              await accountsApi.companies.update(this.accountUuid, formData);
-            } catch (err) {
-              if (err instanceof ServerError && !!err.data.username) {
-                this.setErrorMessages('username', err.data.username)
-              } else {
-                eventUtils.showErrorAlert(err.message);
-              }
-              throw err
+            await accountsApi.companies.update(this.accountUuid, formData);
+          } catch (err) {
+            if (err instanceof ServerError && !!err.data.username) {
+              this.setErrorMessages('username', err.data.username)
+            } else {
+              eventUtils.showErrorAlert(err.message);
+            }
+            throw err
           }
           eventUtils.showSuccessEvent('Логин обновлен!');
           eventUtils.reloadData();

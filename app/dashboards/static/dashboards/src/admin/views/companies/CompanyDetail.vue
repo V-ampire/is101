@@ -27,7 +27,7 @@
               <EditCompanyStatusForm
                 v-if="!!companyInfo.status" 
                 :companyUuid="companyUuid"
-                :currentStatus="companyInfo.status"
+                :companyStatus="companyInfo.status"
                 ref="editCompanyStatusForm"></EditCompanyStatusForm>
             </v-card-text>
           </v-card>
@@ -96,7 +96,7 @@ export default {
     EditCompanyForm: EditCompanyForm,
     EditAccountForm: EditAccountForm,
     EditCompanyStatusForm: EditCompanyStatusForm,
-    BranchListTable: BranchListTable
+    BranchListTable: BranchListTable,
   },
   computed: {
     companyUuid() {

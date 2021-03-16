@@ -30,7 +30,7 @@ export default {
     performAction() {
       try {
         this.inProgress = true;
-        this.$emit('onAction')
+        this.$emit('onAction');
       } finally {
         this.inProgress = false;
       }

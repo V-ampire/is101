@@ -1,15 +1,23 @@
 <template>
+  <StatusForm
+    :currentStatus="companyStatus"
+    @onToArchive="toArchve()"
+    @onToWork="toWork()"
+  ></StatusForm>
 </template>
 
 <script>
 import companiesApi from '@/core/services/http/companies';
 import eventUtils from '@/core/services/events/utils';
-import statusFormMixin from '@/core/mixins/statusFormMixin';
+import StatusForm from '@/core/components/commons/StatusForm';
 
 export default {
-  mixins: [statusFormMixin],
+  components: {
+    StatusForm: StatusForm
+  },
   props: {
     companyUuid: String,
+    companyStatus: String
   },
   data () {
     return {
