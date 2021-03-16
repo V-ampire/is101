@@ -23,7 +23,6 @@ export const CompanyApi = {
     return companiesList
   },
   detail() {
-
     const company = CompanyProfileData([
       'uuid',
       'title',
@@ -42,6 +41,25 @@ export const CompanyApi = {
     company.url = `${config.apiRoot}/companies/${company.uuid}/`;
     return company
   },
+  create() {
+    const company = CompanyProfileData([
+      'uuid',
+      'title',
+      'logo',
+      'tagline',
+      'inn',
+      'ogrn',
+      'city',
+      'address',
+      'email',
+      'phone',
+      //'branches',
+      'status',
+    ]);
+    company.user = CompanyUserData(['username', 'uuid', 'role', 'is_active'])
+    company.url = `${config.apiRoot}/companies/${company.uuid}/`;
+    return company
+  }
 }
 
 

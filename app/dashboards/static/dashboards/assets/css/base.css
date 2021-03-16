@@ -55,8 +55,8 @@ a:hover {
   font-size: 0.1rem;
 }
 
-.fixed {
-  position: fixed;
+.text-wrap-normal {
+  overflow-wrap: normal;
 }
 
 .archive {

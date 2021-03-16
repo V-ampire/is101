@@ -16,8 +16,8 @@
           <v-card-actions>
             <v-dialog
               v-model="dialog"
-              persistent
               max-width="600px"
+              @click:outside="resetCreateCompanyForm()"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -31,7 +31,9 @@
               <v-card>
                 <v-card-title class="subtitle-1">Добавить новое юрлицо</v-card-title>
                 <v-card-text>
-                  <CreateCompanyForm></CreateCompanyForm>
+                  <CreateCompanyForm
+                    ref="createCompanyform"
+                  ></CreateCompanyForm>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -40,7 +42,10 @@
       </v-row>
       <v-row>
         <v-col cols="12">
-          <CompanyListTable v-bind:search="search"/>
+          <CompanyListTable
+            ref="companyListTable"
+            v-bind:search="search"
+          ></CompanyListTable>
           <router-view></router-view>
         </v-col>
       </v-row>
@@ -54,6 +59,7 @@
 */
 import CompanyListTable from '@/core/components/companies/CompanyListTable';
 import CreateCompanyForm from '@/core/components/companies/CreateCompanyForm';
+import eventUtils from '@/core/services/events/utils';
 
 export default {
   data () {
@@ -63,6 +69,17 @@ export default {
   },
   components: {
     CompanyListTable: CompanyListTable,
+    CreateCompanyForm: CreateCompanyForm
+  },
+  mounted () {
+    eventUtils.onReloadEvent(async () => {
+      this.$refs.companyListTable.reloadCompanies();
+    })
+  },
+  methods: {
+    resetCreateCompanyForm() {
+      this.$refs.createCompanyform.reset();
+    }
   },
 }
 </script>

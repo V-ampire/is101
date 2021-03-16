@@ -63,6 +63,9 @@ export default {
      */
     eventBus.$on(ON_RELOAD, handler);
   },
+  offReloadEvent(handler) {
+    eventBus.$off(ON_RELOAD, handler);
+  },
   reloadData(params) {
     /**
      * Вызывает обновление данных.

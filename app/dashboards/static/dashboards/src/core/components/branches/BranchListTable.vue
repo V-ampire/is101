@@ -4,14 +4,14 @@
     :items="items"
     :item-class="getRowClasses"
     :sort-by="status"
-    :search="search"
+    :items-per-page="5"
     dense
   >
     <template v-slot:item.address="{ item }">
       <div class="detail-link body-2">
         <router-link
-          :to="{ name: 'BranchDetail', params: { companyUuid: this.companyUuid, branchUuid: item.uuid }}"
-        >{{ item.title }}</router-link>
+          :to="{ name: 'BranchDetail', params: { companyUuid: companyUuid, branchUuid: item.uuid }}"
+        >{{ item.address }}</router-link>
       </div>
     </template>
 
@@ -26,14 +26,12 @@ export default {
   mixins: [statusClassesMixin],
   props: {
     branchList: Array,
-    companyUuid: String
   },
   data () {
     return {
       headers: [
         {text: 'Адрес', value: 'address'},
       ],
-      search: ''
     }
   },
   computed: {
@@ -48,6 +46,9 @@ export default {
       }
       return branches
     },
+    companyUuid() {
+      return this.$route.params.companyUuid;
+    }
   },
   methods: {
     getRowClasses(item) {

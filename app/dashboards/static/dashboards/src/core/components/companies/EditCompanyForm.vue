@@ -104,14 +104,10 @@
       </div>
     </div>
     <div class="form-btn">
-      <v-btn
-        small
-        block
-        color="primary" 
-        @click="updateCompanyInfo()"
-      >
-        Обновить информацию
-      </v-btn>
+      <FormButton 
+        @onAction="updateCompanyInfo()"
+        label="Обновить информацию"
+      ></FormButton>
     </div>
   </v-form>
 </template>
@@ -122,9 +118,13 @@ import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import CompanyApi from '@/core/services/http/companies';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
+import FormButton from '@/core/components/commons/FormButton';
 
 export default {
   mixins: [formFieldsMixin],
+  components: {
+    FormButton: FormButton
+  },
   data () {
     return {
       fields: {
@@ -141,7 +141,8 @@ export default {
       rules: {
         required: validators.required('Обязательное поле.'),
         emailMatch: validators.emailMatch('Не валидный имеил.')
-      }
+      },
+      inProgress: false,
     }
   },
   props: {
@@ -151,8 +152,12 @@ export default {
     this.setInitial(this.initialData);
   },
   methods: {
+    testButton() {
+      console.log(this.fields.title.value);
+    },
     async updateCompanyInfo() {
       if (this.validate()) {
+        this.inProgress = true;
         const formData = this.getAsFormData();
         try {
           await CompanyApi.update(this.companyUuid, formData)
@@ -165,13 +170,14 @@ export default {
             eventUtils.showErrorAlert(err.message);
           }
           throw err
+        } finally {
+          this.inProgress = false;
         }
         eventUtils.showSuccessEvent('Данные изменены!');
       }
     },
     cleanFields(formFields) {
       // Если лого не файл - удалить из полей.
-      console.log(formFields.logo)
       if (!(formFields.logo instanceof File)) {
         delete formFields.logo;
       }

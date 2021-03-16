@@ -24,16 +24,24 @@ describe('Тест для отображения страницы редакти
     const wrapper = mount(CompanyDetail, {
       localVue,
       vuetify,
-      router
+      router,
+      data () {
+        return {
+          companyInfo: expectedCompany,
+        }
+      }
     });
 
     await flushPromises();
 
-    await wrapper.setData({
-      companyInfo: expectedCompany
-    });
 
     const expectedH1 = `Юрлицо ${expectedCompany.title}`;
+
+    const rout = wrapper.vm.$router.resolve({name: 'BranchDetail', params: {
+      companyUuid: 'company', branchUuid: 'branch'
+    }})
+
+    console.log(rout.href)
 
     expect(wrapper.find('h1').text()).toEqual(expectedH1);
   });

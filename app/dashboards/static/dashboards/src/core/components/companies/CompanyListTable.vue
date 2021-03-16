@@ -111,8 +111,8 @@ export default {
       return result
     }
   },
-  mounted () {
-    this.getCompanies();
+  async mounted () {
+    this.companiesList = await this.getCompanies();
   },
   methods: {
     async getCompanies() {
@@ -123,14 +123,16 @@ export default {
         eventUtils.showErrorAlert(err.message);
         throw err
       }
-      const companiesData = response.data;
-      if (Array.isArray(companiesData)) {
-        this.companiesList = companiesData;
+      if (Array.isArray(response.data)) {
+        return response.data
       } else {
         const errorMessage = 'Не удалось загрузить данные с сервера.';
         eventUtils.showErrorAlert(errorMessage);
         console.log(`Не удалось загрузить список юрлиц. Получен ответ ${response}`);
       }
+    },
+    async reloadCompanies() {
+      this.companiesList = await this.getCompanies();
     },
     deleteCompany(company) {
       const confirmParams = {
@@ -145,7 +147,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо удалено!');
-          this.getCompanies();
+          eventUtils.reloadData();
         }
       });
     },
@@ -165,7 +167,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо переведено в архив!');
-          this.getCompanies();
+          eventUtils.reloadData();
         }
       });
     },
@@ -182,7 +184,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо в работе!');
-          this.getCompanies();
+          eventUtils.reloadData();
         }
       });
     }

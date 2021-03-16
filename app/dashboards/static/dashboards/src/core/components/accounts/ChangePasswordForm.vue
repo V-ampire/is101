@@ -31,14 +31,10 @@
       </div>
       <div class="form-btn">
         <div class="form-btn-change mb-3">
-          <v-btn 
-            color="primary"
-            small
-            block
-            @click="changePassword()"
-          >
-            Изменить пароль
-          </v-btn>
+          <FormButton
+            label="Изменить пароль"
+            @onAction="changePassword()"
+          ></FormButton>
         </div>
         <div class="form-btn-generate">
           <v-btn
@@ -59,12 +55,16 @@
 import validators from '@/core/validators';
 import { generatePassword } from '@/core/services/accounts/utils';
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
+import FormButton from '@/core/components/commons/FormButton';
 import accountsApi from '@/core/services/http/accounts';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 
 export default {
   mixins: [formFieldsMixin],
+  components: {
+    FormButton: FormButton
+  },
   props: {
     accountUuid: String
   },

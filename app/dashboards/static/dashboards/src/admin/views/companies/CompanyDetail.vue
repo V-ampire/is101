@@ -27,11 +27,11 @@
               <EditCompanyStatusForm
                 v-if="!!companyInfo.status" 
                 :companyUuid="companyUuid"
-                :companyStatus="companyInfo.status"
+                :currentStatus="companyInfo.status"
                 ref="editCompanyStatusForm"></EditCompanyStatusForm>
             </v-card-text>
           </v-card>
-          <v-card>
+          <v-card class="mb-3">
             <v-card-title class="subtitle-1">Филиалы юрлица</v-card-title>
             <v-card-text>
               <BranchListTable
@@ -39,6 +39,23 @@
                 :branchList="companyInfo.branches"
                 ref="branchListTable"
               ></BranchListTable>
+            </v-card-text>
+          </v-card>
+          <v-card>
+            <v-card-title class="subtitle-1">Удалить юрлицо</v-card-title>
+            <v-card-subtitle class="body-2 text-wrap-normal">
+              При удалении юрлица одновременно будет удалена вся информация 
+              о филиалах и работниках юрлица. Также будет удалена его учетная запись.
+            </v-card-subtitle>
+            <v-card-text>
+              <v-btn 
+                color="error"
+                small
+                block
+                @click="deleteCompany()"
+              >
+                Удалить юрлицо
+              </v-btn>
             </v-card-text>
           </v-card>
         </div>
@@ -92,13 +109,14 @@ export default {
       this.$refs.editAccountForm.setInitial(this.companyInfo.user);
       this.$refs.editCompanyForm.setInitial(this.companyInfo);
     });
-    eventUtils.onReloadEvent(async () => {
+    eventUtils.onReloadEvent(this.reloadData);
+  },
+  methods: {
+    async reloadData() {
       this.companyInfo = await this.getCompanyInfo();
       this.$refs.editAccountForm.setInitial(this.companyInfo.user);
       this.$refs.editCompanyForm.setInitial(this.companyInfo);
-    })
-  },
-  methods: {
+    },
     async getCompanyInfo() {
       let response;
       try {
@@ -113,7 +131,25 @@ export default {
         eventUtils.showErrorAlert('Не удалось загрузить данные с сервера.');
         console.log(`Не удалось информацию о юрлице. Получен ответ ${response}`);
       }
-    }
+    },
+    deleteCompany() {
+      const confirmParams = {
+        message: `Вы действительно хотите удалить юрлицо ${this.companyInfo.title}`
+      }
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
+        if (result) {
+          try {
+            await companiesApi.delete(this.companyUuid);
+          } catch (err) {
+            eventUtils.showErrorAlert(err.message);
+            throw err
+          }
+          eventUtils.showSuccessEvent('Юрлицо удалено!');
+          eventUtils.offReloadEvent(this.reloadData);
+          this.$router.push({name: 'CompanyList'});
+        }
+      });
+    },
   },
 }
 </script>

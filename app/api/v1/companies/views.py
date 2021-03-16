@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
 
 from api.v1 import mixins
 from api.v1.companies import serializers
@@ -51,6 +52,20 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
             if self.request.user.is_staff:
                 return serializers.CompanySerializerForAdmin
             return serializers.CompanySerializerForPermitted
+
+    def create(self, request, *args, **kwargs):
+        """
+        Создать учетную запись.
+        Создать профиль.
+        """
+        create_serializer = self.get_serializer(data=request.data)
+        create_serializer.is_valid(raise_exception=True)
+        company = create_serializer.save()
+        context = self.get_serializer_context()
+        company_serializer = serializers.CompanySerializerForAdmin(company, context=context)
+        headers = self.get_success_headers(company_serializer.data)
+        return Response(company_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
     def perform_destroy(self, instance):
         utils.delete_company(instance.uuid)

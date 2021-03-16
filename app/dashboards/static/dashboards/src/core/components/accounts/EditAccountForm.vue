@@ -41,14 +41,10 @@
             ></v-text-field>
           </div>
           <div class="username-field-btn">
-            <v-btn
-              small
-              block
-              color="primary" 
-              @click="updateUsername()"
-            >
-              Обновить логин
-            </v-btn>
+            <FormButton
+            label="Обновить логин"
+              @onAction="updateUsername()"
+            ></FormButton>
           </div>
         </div>
         <div class="password-field">
@@ -91,15 +87,17 @@ import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import accountsApi from '@/core/services/http/accounts';
 import eventUtils from '@/core/services/events/utils';
 import ChangePasswordForm from '@/core/components/accounts/ChangePasswordForm';
+import FormButton from '@/core/components/commons/FormButton';
 import { ServerError } from '@/core/services/errors/types';
 
 export default {
     mixins: [formFieldsMixin],
+    components: {
+      FormButton: FormButton,
+      ChangePasswordForm: ChangePasswordForm
+    },
     props: {
       accountUuid: String
-    },
-    components: {
-      ChangePasswordForm: ChangePasswordForm
     },
     data () {
       return {

@@ -150,14 +150,10 @@
       </div>
     </div>
     <div class="form-btn mb-3">
-      <v-btn
-        small
-        block
-        color="primary" 
-        @click="createCompany()"
-      >
-        Создать юрлицо
-      </v-btn>
+      <FormButton
+        label="Создать юрлицо"
+        @onAction="createCompany()"
+      ></FormButton>
     </div>
     <div class="form-message">
       <v-alert
@@ -177,16 +173,20 @@ import validators from '@/core/validators';
 import CompanyApi from '@/core/services/http/companies';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
+import FormButton from '@/core/components/commons/FormButton';
 
 export default {
   mixins: [formFieldsMixin],
+  components: {
+    FormButton: FormButton
+  },
   data () {
     return {
       fields: {
         username: { value: '', errors: [] },
         password: { value: '', errors: [] },
         title: { value: '', errors: [] },
-        logo: { value: '', errors: [] },
+        logo: { value: null, errors: [] },
         tagline: { value: '', errors: [] },
         inn: { value: '', errors: [] },
         ogrn: { value: '', errors: [] },
@@ -202,9 +202,10 @@ export default {
           /(?=.*[0-9])(?=.*[a-zA-Z])/,
           'Пароль должен содержать цифры и буквы.'
         ),
+        min: validators.minLength(8, 'Минимальная длина 8 символов.'),
       },
       showPassword: false,
-      successHtml: null
+      successHtml: null,
     }
   },
   methods: {
@@ -224,7 +225,7 @@ export default {
           }
           throw err
         }
-        afterCreate(response.data);
+        this.afterCreate(response.data);
         eventUtils.reloadData();
       }
     },
@@ -234,7 +235,15 @@ export default {
        * @companyData - данные созданной компании
        */
       // Создать html со ссылкой на новое юрлицо
-      // Очистить поля формы
+      const route = this.$router.resolve({
+        name: 'CompanyDetail', params: { companyUuid: companyData.uuid }
+      });
+      this.successHtml = `
+        Юрлицо <a href="${route.href}">${companyData.title}</a> успешно создано.`;
+    },
+    reset() {
+      this.$refs.form.reset();
+      this.successHtml = null;
     }
   }
 }
