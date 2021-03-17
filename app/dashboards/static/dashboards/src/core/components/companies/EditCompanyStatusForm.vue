@@ -58,7 +58,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо в работе. Доступ разрешен.');
-          eventUtils.reloadData();
+          this.$emit('onReload');
         }
       });
     },

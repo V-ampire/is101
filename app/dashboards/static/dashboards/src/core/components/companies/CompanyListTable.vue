@@ -1,5 +1,5 @@
 <template>
-  <v-data-table
+  <!-- <v-data-table
     :headers="headers"
     :items="items"
     :item-class="getStatusClasses"
@@ -7,7 +7,6 @@
     :search="search"
   >
     <template v-slot:item.actions="{ item }">
-      <!-- Колонка с кнопками архивирования/в работу и удаления -->
       <div class="action-icons d-flex">
         <div class="status-btn mr-1">
           <v-tooltip left v-if="item.status==statuses.works">
@@ -67,7 +66,22 @@
         >{{ item.title }}</router-link>
       </div>
     </template>
-  </v-data-table>
+  </v-data-table> -->
+  <ListTable
+    :headers="headers"
+    :items="items"
+    :search="search"
+  >
+    <template v-slot:itemLink>
+      <template v-slot:item.title="{ item }">
+        <div class="detail-link">
+          <router-link
+            :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
+          >{{ item.title }}</router-link>
+        </div>
+      </template>
+    </template>
+  </ListTable>
 </template>
 
 <script>
@@ -76,9 +90,13 @@ import companiesApi from "@/core/services/http/companies";
 import statuses from "@/core/services/statuses";
 import eventUtils from '@/core/services/events/utils';
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
+import ListTable from '@/core/components/commons/ListTable';
 
 export default {
   mixins: [statusClassesMixin],
+  components: {
+    ListTable: ListTable
+  },
   data () {
     return {
       headers: [

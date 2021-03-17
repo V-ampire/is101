@@ -6,8 +6,7 @@
         <v-col cols="8">
           <v-text-field
             v-model="search"
-            append-icon="mdi-magnify"
-            label="Поиск"
+            label="Поиск юрлица"
             single-line
             hide-details
           ></v-text-field>

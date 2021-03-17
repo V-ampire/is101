@@ -64,7 +64,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Филиал в работе.');
-          eventUtils.reloadData();
+          this.$emit('onReload');
         }
       });
     },

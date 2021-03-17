@@ -16,7 +16,7 @@
             <v-card-text>
               <BranchStatusForm
                 v-if="!!branchInfo.status" 
-                :currentStatus="branchInfo.status"
+                :branchStatus="branchInfo.status"
                 :branchUuid="branchUuid"
                 :companyUuid="companyUuid"
                 @onReload="reloadData()"
@@ -56,7 +56,35 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12"></v-col>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title class="subtitle-1">Сотрудники филиала</v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="8">
+                  <v-text-field
+                    v-model="searchEmployee"
+                    label="Поиск сотрудника"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">Создать</v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <EmployeeListTable
+                    ref="employeeListTable"
+                    :search="searchEmployee"
+                    :employeeList="branchInfo.employees"
+                  ></EmployeeListTable>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -66,15 +94,18 @@ import branchesApi from '@/core/services/http/branches';
 import eventUtils from '@/core/services/events/utils';
 import BranchStatusForm from '@/core/components/branches/BranchStatusForm';
 import EditBranchForm from '@/core/components/branches/EditBranchForm';
+import EmployeeListTable from '@/core/components/employees/EmployeeListTable';
 
 export default {
   components: {
     BranchStatusForm: BranchStatusForm,
-    EditBranchForm: EditBranchForm
+    EditBranchForm: EditBranchForm,
+    EmployeeListTable: EmployeeListTable
   },
   data() {
     return {
       branchInfo: null,
+      searchEmployee: ''
     }
   },
   async mounted() {
