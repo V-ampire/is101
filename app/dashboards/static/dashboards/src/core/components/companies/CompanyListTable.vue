@@ -72,15 +72,13 @@
     :items="items"
     :search="search"
   >
-    <template v-slot:itemLink>
-      <template v-slot:item.title="{ item }">
-        <div class="detail-link">
-          <router-link
-            :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
-          >{{ item.title }}</router-link>
-        </div>
+      <template v-slot:itemLink="{ item }">
+      <div class="detail-link">
+        <router-link
+          :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
+        >{{ item.linkText }}</router-link>
+      </div>
       </template>
-    </template>
   </ListTable>
 </template>
 
@@ -100,7 +98,7 @@ export default {
   data () {
     return {
       headers: [
-        {text: 'Название юр. лица', value: 'title'},
+        {text: 'Название юр. лица', value: 'linkText'},
         {text: 'Город', value: 'city' },
         {text: 'Адрес', value: 'address' },
         {text: 'Статус', value: 'status' },
@@ -118,7 +116,7 @@ export default {
       let result = [];
       for (let company of this.companiesList) {
         result.push({
-          title: company.title,
+          linkText: company.title,
           city: company.city,
           address: company.address,
           status: statuses[company.status],

@@ -60,14 +60,10 @@
         </div>
       </div>
     </template>
-    <slot name="itemLink"></slot>
-    <!-- <template v-slot:item.linkText="{ item }">
-      <div class="detail-link">
-        <router-link
-          :to="{ name: itemRouteName, params: itemRouteParams}"
-        >{{ item.linkText }}</router-link>
-      </div>
-    </template> -->
+    
+    <template v-slot:item.linkText="{ item }">
+      <slot name="itemLink" v-bind:item="item"></slot>
+    </template>
   </v-data-table>
 </template>
 
@@ -75,7 +71,6 @@
 /**
  * Базовый компонент для таблиц сущностей приложения.
  * Предоставляет кнопки для архивации/деархивации и удаления объектов.
- * Объект должен содержать заголовок linkText - это значение будет текстом ссылки на страницу информации об объекте.
  */
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 import statuses from "@/core/services/statuses";
