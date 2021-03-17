@@ -1,6 +1,6 @@
 <template>
   <v-form ref="form">
-    <div v-if="!!fields.title" class="title-field d-flex flex-column mb-3">
+    <div class="title-field d-flex flex-column mb-3">
       <div class="title-field-label subtitle-2 mb-2">Название компании</div>
       <div class="title-field-input">
         <v-text-field
@@ -10,7 +10,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.logo" class="logo-field d-flex flex-column">
+    <div class="logo-field d-flex flex-column">
       <div class="logo-field-label subtitle-2 mb-2">
         Логотип компании
       </div>
@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!!fields.tagline" class="tagline-field d-flex flex-column mb-3">
+    <div class="tagline-field d-flex flex-column mb-3">
       <div class="tagline-field-label subtitle-2 mb-2">Слоган компании</div>
       <div class="tagline-field-input">
         <v-text-field
@@ -42,7 +42,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.inn" class="inn-field d-flex flex-column mb-3">
+    <div class="inn-field d-flex flex-column mb-3">
       <div class="inn-field-label subtitle-2 mb-2">ИНН компании</div>
       <div class="inn-field-input">
         <v-text-field
@@ -52,7 +52,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.ogrn" class="ogrn-field d-flex flex-column mb-3">
+    <div class="ogrn-field d-flex flex-column mb-3">
       <div class="ogrn-field-label subtitle-2 mb-2">ОГРН\ОГРНИП компании</div>
       <div class="ogrn-field-input">
         <v-text-field
@@ -62,7 +62,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.city" class="city-field d-flex flex-column mb-3">
+    <div class="city-field d-flex flex-column mb-3">
       <div class="city-field-label subtitle-2 mb-2">Город</div>
       <div class="city-field-input">
         <v-text-field
@@ -72,7 +72,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.address" class="address-field d-flex flex-column mb-3">
+    <div class="address-field d-flex flex-column mb-3">
       <div class="address-field-label subtitle-2 mb-2">Адрес, без города</div>
       <div class="address-field-input">
         <v-text-field
@@ -82,7 +82,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.email" class="email-field d-flex flex-column mb-3">
+    <div class="email-field d-flex flex-column mb-3">
       <div class="email-field-label subtitle-2 mb-2">E-mail</div>
       <div class="email-field-input">
         <v-text-field
@@ -93,7 +93,7 @@
         ></v-text-field>
       </div>
     </div>
-    <div v-if="!!fields.phone" class="phone-field d-flex flex-column mb-3">
+    <div class="phone-field d-flex flex-column mb-3">
       <div class="phone-field-label subtitle-2 mb-2">Телефон</div>
       <div class="phone-field-input">
         <v-text-field
@@ -142,22 +142,14 @@ export default {
         required: validators.required('Обязательное поле.'),
         emailMatch: validators.emailMatch('Не валидный имеил.')
       },
-      inProgress: false,
     }
   },
   props: {
     companyUuid: String
   },
-  mounted() {
-    this.setInitial(this.initialData);
-  },
   methods: {
-    testButton() {
-      console.log(this.fields.title.value);
-    },
     async updateCompanyInfo() {
       if (this.validate()) {
-        this.inProgress = true;
         const formData = this.getAsFormData();
         try {
           await CompanyApi.update(this.companyUuid, formData)
@@ -170,8 +162,6 @@ export default {
             eventUtils.showErrorAlert(err.message);
           }
           throw err
-        } finally {
-          this.inProgress = false;
         }
         eventUtils.showSuccessEvent('Данные изменены!');
       }

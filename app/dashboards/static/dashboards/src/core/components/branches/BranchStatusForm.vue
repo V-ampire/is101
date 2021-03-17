@@ -1,15 +1,15 @@
 <template>
   <StatusForm
-    :currentStatus="companyStatus"
-    @onToArchive="toArchve()"
+    :currentStatus="branchStatus"
+    @onToArchive="toArchive()"
     @onToWork="toWork()"
   ></StatusForm>
 </template>
 
 <script>
-import companiesApi from '@/core/services/http/companies';
 import eventUtils from '@/core/services/events/utils';
 import StatusForm from '@/core/components/commons/StatusForm';
+import branchesApi from '@/core/services/http/branches';
 
 export default {
   components: {
@@ -17,17 +17,23 @@ export default {
   },
   props: {
     companyUuid: String,
-    companyStatus: String
+    branchUuid: String,
+    branchStatus: String
   },
-  data () {
+  data() {
     return {
 
     }
   },
+  computed: {
+    api() {
+      return branchesApi(this.companyUuid)
+    }
+  },
   methods: {
-    toArchve () {
-      const message = `Вы действительно хотите перевести в архив юрлицо?
-      В этом случае все филиалы и работники юрлица также будут переведены в архив.`;
+    toArchive () {
+      const message = `Вы действительно хотите перевести в архив филиал?
+      В этом случае все работники филиала также будут переведены в архив.`;
 
       const confirmParams = {
         message: message
@@ -35,29 +41,29 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toArchive(this.companyUuid, true);
+            await this.api.toArchive(this.branchUuid, true);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
           }
-          eventUtils.showSuccessEvent('Юрлицо переведено в архив. Доступ ограничен.');
+          eventUtils.showSuccessEvent('Филиал переведен в архив.');
           this.$emit('onReload');
         }
       });
     },
     toWork () {
         const confirmParams = {
-        message: `Вы действительно хотите вернуть юрлицо в работу?`
+        message: `Вы действительно хотите вернуть филиал в работу?`
       }
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toWork(this.companyUuid);
+            await this.api.toWork(this.branchUuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
           }
-          eventUtils.showSuccessEvent('Юрлицо в работе. Доступ разрешен.');
+          eventUtils.showSuccessEvent('Филиал в работе.');
           eventUtils.reloadData();
         }
       });

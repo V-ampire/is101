@@ -19,7 +19,7 @@
           color="primary"
           small
           block
-          @click="toArchve()"
+          @click="toArchive()"
         >
           <v-icon class="mr-2" small>fa-archive</v-icon> Перевести в архив
         </v-btn>

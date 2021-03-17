@@ -155,7 +155,6 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Логин обновлен!');
-          eventUtils.reloadData();
         }
       }
     },

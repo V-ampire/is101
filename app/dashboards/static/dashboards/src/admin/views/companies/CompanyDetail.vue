@@ -28,6 +28,7 @@
                 v-if="!!companyInfo.status" 
                 :companyUuid="companyUuid"
                 :companyStatus="companyInfo.status"
+                @onReload="reloadData()"
                 ref="editCompanyStatusForm"></EditCompanyStatusForm>
             </v-card-text>
           </v-card>
@@ -109,7 +110,6 @@ export default {
       this.$refs.editAccountForm.setInitial(this.companyInfo.user);
       this.$refs.editCompanyForm.setInitial(this.companyInfo);
     });
-    eventUtils.onReloadEvent(this.reloadData);
   },
   methods: {
     async reloadData() {
@@ -145,7 +145,6 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо удалено!');
-          eventUtils.offReloadEvent(this.reloadData);
           this.$router.push({name: 'CompanyList'});
         }
       });

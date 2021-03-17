@@ -3,7 +3,7 @@ import errorUtils from "@/core/services/errors/utils";
 
 export default function branchesApi(companyUuid) {
 
-  const endpoint = `/companies/${companyUuid}`;
+  const endpoint = `/companies/${companyUuid}/branches`;
 
   return {
     async list() {
