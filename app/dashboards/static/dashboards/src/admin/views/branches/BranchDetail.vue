@@ -147,18 +147,17 @@ export default {
     },
     deleteBranch() {
       const confirmParams = {
-        message: `Вы действительно хотите удалить филиал ${this.companyInfo.title}?`
+        message: `Вы действительно хотите удалить филиал ${this.branchInfo.address}?`
       }
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await this.api.delete(this.companyUuid);
+            await this.api.delete(this.branchUuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
           }
           eventUtils.showSuccessEvent('Филиал удален!');
-          eventUtils.offReloadEvent(this.reloadData);
           this.$router.push({name: 'CompanyDetail', params: {companyUuid: this.companyUuid}});
         }
       });

@@ -226,7 +226,7 @@ export default {
           throw err
         }
         this.afterCreate(response.data);
-        eventUtils.reloadData();
+        this.$emit('onReload');
       }
     },
     afterCreate(companyData) {

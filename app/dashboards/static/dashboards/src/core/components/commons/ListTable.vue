@@ -71,6 +71,8 @@
 /**
  * Базовый компонент для таблиц сущностей приложения.
  * Предоставляет кнопки для архивации/деархивации и удаления объектов.
+ * Предоставляет слот для создания ссылки на страницу информации об объекте,
+ * для этого необходимо задать заголовок linkText и определить слот itemLink
  */
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 import statuses from "@/core/services/statuses";
@@ -89,15 +91,12 @@ export default {
   },
   methods: {
     toArchiveItem(item) {
-      console.log('toArchiveItem')
       this.$emit('onToArchiveItem', item);
     },
     toWorkItem(item) {
-      console.log('toWorkItem')
       this.$emit('onToWorkItem', item);
     },
     deleteItem(item) {
-      console.log('deleteItem')
       this.$emit('onDeleteItem', item);
     },
   }

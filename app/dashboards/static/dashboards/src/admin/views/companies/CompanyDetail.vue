@@ -39,8 +39,32 @@
                 v-if="!!companyInfo.branches"
                 :branchList="companyInfo.branches"
                 ref="branchListTable"
+                @onReload="reloadData()"
               ></BranchListTable>
             </v-card-text>
+            <v-card-actions>
+              <v-dialog
+                v-model="dialog"
+                max-width="600px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                    small
+                    block
+                  >
+                    Добавить филиал
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title class="subtitle-1">Добавить новый филиал</v-card-title>
+                  <v-card-text>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
+            </v-card-actions>
           </v-card>
           <v-card>
             <v-card-title class="subtitle-1">Удалить юрлицо</v-card-title>

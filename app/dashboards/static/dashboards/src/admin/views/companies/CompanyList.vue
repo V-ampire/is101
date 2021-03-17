@@ -32,6 +32,7 @@
                 <v-card-text>
                   <CreateCompanyForm
                     ref="createCompanyform"
+                    @onReload="reloadCompanyList()"
                   ></CreateCompanyForm>
                 </v-card-text>
               </v-card>
@@ -58,7 +59,6 @@
 */
 import CompanyListTable from '@/core/components/companies/CompanyListTable';
 import CreateCompanyForm from '@/core/components/companies/CreateCompanyForm';
-import eventUtils from '@/core/services/events/utils';
 
 export default {
   data () {
@@ -70,14 +70,12 @@ export default {
     CompanyListTable: CompanyListTable,
     CreateCompanyForm: CreateCompanyForm
   },
-  mounted () {
-    eventUtils.onReloadEvent(async () => {
-      this.$refs.companyListTable.reloadCompanies();
-    })
-  },
   methods: {
     resetCreateCompanyForm() {
       this.$refs.createCompanyform.reset();
+    },
+    reloadCompanyList() {
+      this.$refs.companyListTable.reloadCompanies();
     }
   },
 }

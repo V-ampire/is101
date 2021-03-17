@@ -1,84 +1,19 @@
 <template>
-  <!-- <v-data-table
-    :headers="headers"
-    :items="items"
-    :item-class="getStatusClasses"
-    :sort-by="status"
-    :search="search"
-  >
-    <template v-slot:item.actions="{ item }">
-      <div class="action-icons d-flex">
-        <div class="status-btn mr-1">
-          <v-tooltip left v-if="item.status==statuses.works">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn  
-                color="primary"
-                x-small
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="toAchiveCompany(item)"
-              >
-                <v-icon small>fa-archive</v-icon>
-              </v-btn>
-            </template>
-            В архив
-          </v-tooltip>
-          <v-tooltip left v-else>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn  
-                color="primary"
-                x-small
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="toWorkCompany(item)"
-              >
-                <v-icon small>fa-briefcase</v-icon>
-              </v-btn>
-            </template>
-            В работу
-          </v-tooltip>
-        </div>
-        <div class="delete-btn">
-          <v-tooltip left>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                color="primary"
-                x-small
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="deleteCompany(item)"
-              >
-                <v-icon small>fa-trash-alt</v-icon>
-              </v-btn>
-            </template>
-            Удалить
-          </v-tooltip>
-        </div>
-      </div>
-    </template>
-    <template v-slot:item.title="{ item }">
-      <div class="detail-link">
-        <router-link
-          :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
-        >{{ item.title }}</router-link>
-      </div>
-    </template>
-  </v-data-table> -->
   <ListTable
     :headers="headers"
     :items="items"
     :search="search"
+    @onToArchiveItem="toAchiveCompany"
+    @onToWorkItem="toWorkCompany"
+    @onDeleteItem="deleteCompany"
   >
-      <template v-slot:itemLink="{ item }">
+    <template v-slot:itemLink="{ item }">
       <div class="detail-link">
         <router-link
           :to="{ name: 'CompanyDetail', params: { companyUuid: item.uuid }}"
         >{{ item.linkText }}</router-link>
       </div>
-      </template>
+    </template>
   </ListTable>
 </template>
 
@@ -152,7 +87,7 @@ export default {
     },
     deleteCompany(company) {
       const confirmParams = {
-        message: `Вы действительно хотите удалить юрлицо ${company.title}`
+        message: `Вы действительно хотите удалить юрлицо ${company.linkText}`
       }
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
@@ -163,12 +98,12 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо удалено!');
-          eventUtils.reloadData();
+          this.reloadCompanies();
         }
       });
     },
     toAchiveCompany(company) {
-      const message = `Вы действительно хотите перевести в архив юрлицо ${company.title}?
+      const message = `Вы действительно хотите перевести в архив юрлицо ${company.linkText}?
       В этом случае все филиалы и работники юрлица также будут переведены в архив.`;
 
       const confirmParams = {
@@ -183,13 +118,13 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо переведено в архив!');
-          eventUtils.reloadData();
+          this.reloadCompanies();
         }
       });
     },
     toWorkCompany(company) {
       const confirmParams = {
-        message: `Вы действительно хотите вернуть юрлицо ${company.title} в работу?`
+        message: `Вы действительно хотите вернуть юрлицо ${company.linkText} в работу?`
       }
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
@@ -200,7 +135,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо в работе!');
-          eventUtils.reloadData();
+          this.reloadCompanies();
         }
       });
     }
