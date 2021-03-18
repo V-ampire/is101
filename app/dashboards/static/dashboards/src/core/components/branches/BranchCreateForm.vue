@@ -44,7 +44,7 @@
     <div class="form-btn mb-3">
       <FormButton
         label="Создать филиал"
-        @onAction="createBranch()"
+        @onAction="create()"
       ></FormButton>
     </div>
     <div class="form-message">
@@ -60,15 +60,13 @@
 </template>
 
 <script>
-import formFieldsMixin from '@/core/mixins/formFieldsMixin';
+import createFormMixin from '@/core/mixins/createFormMixin';
 import validators from '@/core/validators';
-import {branchesApi} from '@/core/services/http/clients';
-import eventUtils from '@/core/services/events/utils';
-import { ServerError } from '@/core/services/errors/types';
+import { branchesApi } from '@/core/services/http/clients';
 import FormButton from '@/core/components/commons/FormButton';
 
 export default {
-  mixins: [formFieldsMixin],
+  mixins: [createFormMixin],
   components: {
     FormButton: FormButton
   },
@@ -85,7 +83,6 @@ export default {
       rules: {
         required: validators.required('Обязательное поле.'),
       },
-      successHtml: null,
     }
   },
   computed: {
@@ -94,26 +91,6 @@ export default {
     }
   },
   methods: {
-    async createBranch() {
-      let response;
-      if (this.validate()) {
-        const formData = this.getAsFormData();
-        try {
-          response = await this.api.create(formData);
-        } catch (err) {
-          if (err instanceof ServerError) {
-            for (let field of Object.keys(err.data)) {
-              this.setErrorMessages(field, err.data[field])
-            }
-          } else {
-            eventUtils.showErrorAlert(err.message);
-          }
-          throw err
-        }
-        this.afterCreate(response.data);
-        this.$emit('onReload');
-      }
-    },
     afterCreate(branchData) {
       const route = this.$router.resolve({
         name: 'BranchDetail', params: { companyUuid: this.companyUuid, branchUuid: branchData.uuid }
@@ -121,10 +98,6 @@ export default {
       this.successHtml = `
         Филиал <a href="${route.href}">${branchData.address}</a> успешно создан.`;
     },
-    reset() {
-      this.$refs.form.reset();
-      this.successHtml = null;
-    }
   }
 }
 </script>

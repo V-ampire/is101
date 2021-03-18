@@ -152,7 +152,7 @@
     <div class="form-btn mb-3">
       <FormButton
         label="Создать юрлицо"
-        @onAction="createCompany()"
+        @onAction="create()"
       ></FormButton>
     </div>
     <div class="form-message">
@@ -168,15 +168,13 @@
 </template>
 
 <script>
-import formFieldsMixin from '@/core/mixins/formFieldsMixin';
+import createFormMixin from '@/core/mixins/createFormMixin';
 import validators from '@/core/validators';
-import {companiesApi} from '@/core/services/http/clients';
-import eventUtils from '@/core/services/events/utils';
-import { ServerError } from '@/core/services/errors/types';
+import { companiesApi } from '@/core/services/http/clients';
 import FormButton from '@/core/components/commons/FormButton';
 
 export default {
-  mixins: [formFieldsMixin],
+  mixins: [createFormMixin],
   components: {
     FormButton: FormButton
   },
@@ -205,7 +203,6 @@ export default {
         min: validators.minLength(8, 'Минимальная длина 8 символов.'),
       },
       showPassword: false,
-      successHtml: null,
     }
   },
   computed: {
@@ -214,26 +211,6 @@ export default {
     }
   },
   methods: {
-    async createCompany () {
-      let response;
-      if (this.validate()) {
-        const formData = this.getAsFormData();
-        try {
-          response = await this.api.create(formData);
-        } catch (err) {
-          if (err instanceof ServerError) {
-            for (let field of Object.keys(err.data)) {
-              this.setErrorMessages(field, err.data[field])
-            }
-          } else {
-            eventUtils.showErrorAlert(err.message);
-          }
-          throw err
-        }
-        this.afterCreate(response.data);
-        this.$emit('onReload');
-      }
-    },
     afterCreate(companyData) {
       /**
        * Устанавливает сообщение об успешном создании.
@@ -246,10 +223,6 @@ export default {
       this.successHtml = `
         Юрлицо <a href="${route.href}">${companyData.title}</a> успешно создано.`;
     },
-    reset() {
-      this.$refs.form.reset();
-      this.successHtml = null;
-    }
   }
 }
 </script>

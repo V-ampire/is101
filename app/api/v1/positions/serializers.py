@@ -7,7 +7,7 @@ class PositionSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для должностей.
     """
-    status = serializers.IntegerField(required=False, read_only=True)
+    status = serializers.CharField(required=False, read_only=True)
 
     class Meta:
         model = Position

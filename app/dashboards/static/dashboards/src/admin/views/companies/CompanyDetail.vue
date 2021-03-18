@@ -46,6 +46,7 @@
               <v-dialog
                 v-model="dialog"
                 max-width="600px"
+                @click:outside="resetBranchCreateForm()"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -166,7 +167,7 @@ export default {
         console.log(`Не удалось информацию о юрлице. Получен ответ ${response}`);
       }
     },
-    deleteCompany() {
+    async deleteCompany() {
       const confirmParams = {
         message: `Вы действительно хотите удалить юрлицо ${this.companyInfo.title}`
       }
@@ -183,6 +184,9 @@ export default {
         }
       });
     },
+    resetBranchCreateForm() {
+      this.$refs.resetBranchCreateForm.reset()
+    }
   },
 }
 </script>

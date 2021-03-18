@@ -1,4 +1,4 @@
-import { ApiClient, EmployeeApiClient } from '@/core/services/http/base';
+import { ApiClient, EmployeeApiClient, PositionsClient } from '@/core/services/http/base';
 
 
 export function companiesApi() {
@@ -19,4 +19,11 @@ export function employeesApi(companyUuid, branchUuid) {
   const endpoint = `/companies/${companyUuid}/branches/${branchUuid}/employees`;
 
   return new EmployeeApiClient(endpoint)
+}
+
+
+export function positionsApi() {
+  const endpoint = '/positions';
+
+  return new PositionsClient(endpoint)
 }

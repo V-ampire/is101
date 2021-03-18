@@ -71,7 +71,38 @@
                     hide-details
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">Создать</v-col>
+                <v-col cols="4">
+                  <v-card-actions>
+                  <v-dialog
+                    v-model="dialog"
+                    max-width="600px"
+                    @click:outside="resetEmployeeCreateForm()"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        color="primary"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        Добавить работника
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title class="subtitle-1">
+                        Добавить нового работника
+                      </v-card-title>
+                      <v-card-text>
+                        <EmployeeCreateForm
+                          :companyUuid="companyUuid"
+                          :branchUuid="branchUuid"
+                          ref="employeeCreateForm"
+                          @onReload="reloadData()"
+                        ></EmployeeCreateForm>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                  </v-card-actions>
+                </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12">
@@ -97,12 +128,14 @@ import eventUtils from '@/core/services/events/utils';
 import BranchStatusForm from '@/core/components/branches/BranchStatusForm';
 import EditBranchForm from '@/core/components/branches/EditBranchForm';
 import EmployeeListTable from '@/core/components/employees/EmployeeListTable';
+import EmployeeCreateForm from '@/core/components/employees/EmployeeCreateForm';
 
 export default {
   components: {
     BranchStatusForm: BranchStatusForm,
     EditBranchForm: EditBranchForm,
-    EmployeeListTable: EmployeeListTable
+    EmployeeListTable: EmployeeListTable,
+    EmployeeCreateForm: EmployeeCreateForm
   },
   data() {
     return {
@@ -147,7 +180,7 @@ export default {
       this.branchInfo = await this.getBranchInfo();
       this.$refs.editBranchForm.setInitial(this.branchInfo);
     },
-    deleteBranch() {
+    async deleteBranch() {
       const confirmParams = {
         message: `Вы действительно хотите удалить филиал ${this.branchInfo.address}?`
       }
@@ -163,6 +196,9 @@ export default {
           this.$router.push({name: 'CompanyDetail', params: {companyUuid: this.companyUuid}});
         }
       });
+    },
+    resetEmployeeCreateForm() {
+      this.$refs.employeeCreateForm.reset()
     }
   },
 }

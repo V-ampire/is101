@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.v1.positions.serializers import PositionSerializer
+from api.v1.positions.validators import validate_status_param
 from api.v1 import mixins
 from api.v1.permissions import IsCompanyUser
 
@@ -32,6 +33,10 @@ class PositionViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
         queryset = Position.objects.all()
         if not self.request.user.is_staff:
             return queryset.filter(status=Statuses.WORKS)
+        filter_status = self.request.query_params.get('status', None)
+        if filter_status:
+            validate_status_param(filter_status)
+            return queryset.filter(status=filter_status)
         return queryset
 
     @action(detail=True, methods=['patch'])

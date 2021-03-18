@@ -166,3 +166,23 @@ export class EmployeeApiClient extends ApiClient {
 
   }
 }
+
+
+export class PositionsClient extends ApiClient {
+  /**
+   * Клиент для API должностей.
+   * Добавляет в метод list() возможность фильтрации по статусу.
+   */
+  async list(status=null) {
+    if (!status) {
+      return super.list()
+    }
+    let response;
+    try {
+      response = await http.get(`${this.endpoint}/?status=${status}`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
+    return response
+  }
+}

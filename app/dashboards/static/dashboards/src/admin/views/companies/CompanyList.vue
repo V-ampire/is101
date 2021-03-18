@@ -46,7 +46,6 @@
             ref="companyListTable"
             v-bind:search="search"
           ></CompanyListTable>
-          <router-view></router-view>
         </v-col>
       </v-row>
     </v-container>
