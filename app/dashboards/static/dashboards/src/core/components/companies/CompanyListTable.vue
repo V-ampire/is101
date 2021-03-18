@@ -19,7 +19,7 @@
 
 <script>
 /* Таблица со списком юр. лиц */
-import companiesApi from "@/core/services/http/companies";
+import {companiesApi} from "@/core/services/http/clients";
 import statuses from "@/core/services/statuses";
 import eventUtils from '@/core/services/events/utils';
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
@@ -40,13 +40,15 @@ export default {
         {text: 'Действия', value: 'actions', sortable: false}
       ],
       companiesList: [],
-      statuses: statuses
     }
   },
   props: {
     search: String
   },
   computed: {
+    api() {
+      return companiesApi()
+    },
     items () {
       let result = [];
       for (let company of this.companiesList) {
@@ -69,7 +71,7 @@ export default {
     async getCompanies() {
       let response;
       try {
-        response = await companiesApi.list();
+        response = await this.api.list();
       } catch (err) {
         eventUtils.showErrorAlert(err.message);
         throw err
@@ -92,7 +94,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.delete(company.uuid);
+            await this.api.delete(company.uuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
@@ -112,7 +114,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toArchive(company.uuid, true);
+            await this.api.toArchive(company.uuid, true);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
@@ -129,7 +131,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toWork(company.uuid);
+            await this.api.toWork(company.uuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err

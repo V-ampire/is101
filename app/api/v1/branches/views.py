@@ -41,7 +41,7 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
 
     def create(self, request, *args, **kwargs):
         create_data = request.data.dict()
-        create_data['company'] = self.kwargs['company_uuid']
+        create_data['company_uuid'] = self.kwargs['company_uuid']
         create_serializer = self.get_serializer(data=create_data)
         create_serializer.is_valid(raise_exception=True)
         branch = create_serializer.save()

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import companiesApi from '@/core/services/http/companies';
+import {companiesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import StatusForm from '@/core/components/commons/StatusForm';
 
@@ -24,6 +24,11 @@ export default {
 
     }
   },
+  computed: {
+    api() {
+      return companiesApi()
+    }
+  },
   methods: {
     toArchve () {
       const message = `Вы действительно хотите перевести в архив юрлицо?
@@ -35,7 +40,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toArchive(this.companyUuid, true);
+            await this.api.toArchive(this.companyUuid, true);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err
@@ -52,7 +57,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.toWork(this.companyUuid);
+            await this.api.toWork(this.companyUuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err

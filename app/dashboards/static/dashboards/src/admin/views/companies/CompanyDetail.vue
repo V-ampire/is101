@@ -61,6 +61,11 @@
                 <v-card>
                   <v-card-title class="subtitle-1">Добавить новый филиал</v-card-title>
                   <v-card-text>
+                    <BranchCreateForm
+                      :companyUuid="companyUuid"
+                      ref="branchCreateForm"
+                      @onReload="reloadData()"
+                    ></BranchCreateForm>
                   </v-card-text>
                 </v-card>
               </v-dialog>
@@ -104,11 +109,12 @@
 </template>
 
 <script>
-import companiesApi from '@/core/services/http/companies';
+import {companiesApi} from '@/core/services/http/clients';
 import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
 import EditCompanyStatusForm from '@/core/components/companies/EditCompanyStatusForm';
 import EditAccountForm from '@/core/components/accounts/EditAccountForm';
 import BranchListTable from '@/core/components/branches/BranchListTable';
+import BranchCreateForm from '@/core/components/branches/BranchCreateForm';
 import eventUtils from '@/core/services/events/utils';
 
 export default {
@@ -122,11 +128,15 @@ export default {
     EditAccountForm: EditAccountForm,
     EditCompanyStatusForm: EditCompanyStatusForm,
     BranchListTable: BranchListTable,
+    BranchCreateForm: BranchCreateForm
   },
   computed: {
     companyUuid() {
       return this.$route.params.companyUuid;
     },
+    api() {
+      return companiesApi()
+    }
   },
   async mounted() {
     this.companyInfo = await this.getCompanyInfo();
@@ -144,7 +154,7 @@ export default {
     async getCompanyInfo() {
       let response;
       try {
-        response = await companiesApi.detail(this.companyUuid);
+        response = await this.api.detail(this.companyUuid);
       } catch (err) {
         eventUtils.showErrorAlert(err.message);
         throw err
@@ -163,7 +173,7 @@ export default {
       eventUtils.onConfirmAction(confirmParams, async (result) => {
         if (result) {
           try {
-            await companiesApi.delete(this.companyUuid);
+            await this.api.delete(this.companyUuid);
           } catch (err) {
             eventUtils.showErrorAlert(err.message);
             throw err

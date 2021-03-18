@@ -49,6 +49,7 @@
               v-if="!!branchInfo"
               :companyUuid="companyUuid"
               :branchUuid="branchUuid"
+              @onReload="reloadData()"
               ref="editBranchForm"
             ></EditBranchForm>
           </v-card-text>
@@ -78,6 +79,7 @@
                     ref="employeeListTable"
                     :search="searchEmployee"
                     :employeeList="branchInfo.employees"
+                    @onReload="reloadData()"
                   ></EmployeeListTable>
                 </v-col>
               </v-row>
@@ -90,7 +92,7 @@
 </template>
 
 <script>
-import branchesApi from '@/core/services/http/branches';
+import {branchesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import BranchStatusForm from '@/core/components/branches/BranchStatusForm';
 import EditBranchForm from '@/core/components/branches/EditBranchForm';

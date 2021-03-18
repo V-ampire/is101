@@ -170,7 +170,7 @@
 <script>
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import validators from '@/core/validators';
-import CompanyApi from '@/core/services/http/companies';
+import {companiesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 import FormButton from '@/core/components/commons/FormButton';
@@ -208,13 +208,18 @@ export default {
       successHtml: null,
     }
   },
+  computed: {
+    api() {
+      return companiesApi()
+    }
+  },
   methods: {
     async createCompany () {
       let response;
       if (this.validate()) {
         const formData = this.getAsFormData();
         try {
-          response = await CompanyApi.create(formData);
+          response = await this.api.create(formData);
         } catch (err) {
           if (err instanceof ServerError) {
             for (let field of Object.keys(err.data)) {

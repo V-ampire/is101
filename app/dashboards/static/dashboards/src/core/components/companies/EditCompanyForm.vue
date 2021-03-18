@@ -115,7 +115,7 @@
 <script>
 import validators from '@/core/validators';
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
-import CompanyApi from '@/core/services/http/companies';
+import {companiesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 import FormButton from '@/core/components/commons/FormButton';
@@ -147,12 +147,17 @@ export default {
   props: {
     companyUuid: String
   },
+  computed: {
+    api() {
+      return companiesApi()
+    }
+  },
   methods: {
     async updateCompanyInfo() {
       if (this.validate()) {
         const formData = this.getAsFormData();
         try {
-          await CompanyApi.update(this.companyUuid, formData)
+          await this.api.update(this.companyUuid, formData)
         } catch (err) {
           if (err instanceof ServerError) {
             for (let field of Object.keys(err.data)) {

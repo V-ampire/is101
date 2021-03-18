@@ -42,7 +42,7 @@
 
 <script>
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
-import branchesApi from '@/core/services/http/branches';
+import {branchesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 import FormButton from '@/core/components/commons/FormButton';

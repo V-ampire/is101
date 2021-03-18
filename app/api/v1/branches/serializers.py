@@ -11,13 +11,12 @@ class BranchCreateSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для создания филиала.
     """
-    company = serializers.UUIDField(format='hex_verbose')
+    company_uuid = serializers.UUIDField(format='hex_verbose')
 
     class Meta:
         model = Branch
         fields = (
-            'company',
-            'uuid',
+            'company_uuid',
             'city',
             'address',
             'phone',
@@ -29,7 +28,7 @@ class BranchCreateSerializer(serializers.ModelSerializer):
         return company_uuid
 
     def create(self, validated_data):
-        company_uuid = validated_data.pop('company')
+        company_uuid = validated_data.pop('company_uuid')
         return create_branch(company_uuid, **validated_data)
 
 

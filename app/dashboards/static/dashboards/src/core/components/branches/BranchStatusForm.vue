@@ -9,7 +9,7 @@
 <script>
 import eventUtils from '@/core/services/events/utils';
 import StatusForm from '@/core/components/commons/StatusForm';
-import branchesApi from '@/core/services/http/branches';
+import {branchesApi} from '@/core/services/http/clients';
 
 export default {
   components: {
