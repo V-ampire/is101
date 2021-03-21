@@ -24,7 +24,6 @@ class CompanyProfile(TimeStamptedModel, StatusModel):
     ogrn = models.CharField("ОГРН\ОГРНИП", max_length=15, unique=True)
     city = models.CharField("Город", max_length=64, default="Комсомольск-на-Амуре") # FIXME батарейка для городов
     address = models.CharField("Адрес, без города", max_length=264)
-    email = models.EmailField("Имеил")
     phone = models.CharField("Номер телефона", max_length=32)
 
     def clean(self):

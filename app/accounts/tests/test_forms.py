@@ -16,7 +16,8 @@ def test_clean_is_superuser_for_company_role():
         'username': fake.user_name(),
         'is_superuser': True,
         'role': tested_role,
-        'date_joined': fake.date()
+        'date_joined': fake.date(),
+        'email': fake.company_email()
     }
     form = forms.UserAccountChangeForm(data=tested_data)
     assert form.errors['__all__'] == [_(f'User with role {tested_role} can not be a superuser')]
@@ -29,7 +30,8 @@ def test_clean_is_superuser_for_employee_role():
         'username': fake.user_name(),
         'is_superuser': True,
         'role': tested_role,
-        'date_joined': fake.date()
+        'date_joined': fake.date(),
+        'email': fake.company_email()
     }
     form = forms.UserAccountChangeForm(data=tested_data)
     assert form.errors['__all__'] == [_(f'User with role {tested_role} can not be a superuser')]
@@ -42,7 +44,8 @@ def test_clean_is_superuser_for_admin_role():
         'username': fake.user_name(),
         'is_superuser': True,
         'role': tested_role,
-        'date_joined': fake.date()
+        'date_joined': fake.date(),
+        'email': fake.company_email()
     }
     form = forms.UserAccountChangeForm(data=tested_data)
     assert not form.errors

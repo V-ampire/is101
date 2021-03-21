@@ -141,8 +141,9 @@ class TestCreateAction(BaseViewSetTest):
         self.create_data.pop('user')
         self.create_data.pop('employee_position')
         self.create_data.pop('branch')
-        self.create_data['username'] = fake.user_name()
+        self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
         self.create_data['password'] = fake.password()
+        self.create_data['email'] = fake.email()
         self.url = self.get_action_url(
             'list', 
             company_uuid=self.tested_company.uuid, 

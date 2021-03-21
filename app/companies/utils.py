@@ -66,17 +66,19 @@ def has_user_perm_to_employee_user(employee_user_uuid, user_uuid):
     return has_user_perm_to_employee(profile.uuid, user_uuid)
 
 
-def create_company(username, password, **company_data):
+def create_company(username, email, password, **company_data):
     """
     Создать учетку юрлица.
     Создать профиль юрлица.
     """
     with transaction.atomic():
-        user = get_user_model().company_objects.create_user(username=username, password=password)
+        user = get_user_model().company_objects.create_user(
+            username=username, email=email, password=password)
         return CompanyProfile.objects.create(user=user, **company_data)
 
 
-def create_employee(username, password, branch_uuid, position_uuid=None, **employee_data):
+def create_employee(username, email, password, branch_uuid, 
+                    position_uuid=None, **employee_data):
     """
     Создать учетку работника.
     Создать профиль работника.
@@ -84,7 +86,8 @@ def create_employee(username, password, branch_uuid, position_uuid=None, **emplo
     branch = Branch.objects.get(uuid=branch_uuid)
     position = Position.objects.get(uuid=position_uuid) if position_uuid else None
     with transaction.atomic():
-        user = get_user_model().employee_objects.create_user(username=username, password=password)
+        user = get_user_model().employee_objects.create_user(
+            username=username, email=email, password=password)
         return EmployeeProfile.objects.create(user=user, branch=branch, 
                                                 employee_position=position, **employee_data)
 

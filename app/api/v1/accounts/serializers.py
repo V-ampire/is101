@@ -11,7 +11,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'uuid', 'password', 'is_active')
+        fields = ('username', 'email', 'uuid', 'password', 'is_active')
         reda_only_fields = ('is_active',)
 
     def create(self, validated_data):
@@ -35,7 +35,8 @@ class CompanyUserAccountSerializer(UserAccountSerializer):
     def create(self, validated_data):
         username = validated_data['username']
         password = validated_data['password']
-        return get_user_model().company_objects.create_user(username, password)
+        email = validated_data['email']
+        return get_user_model().company_objects.create_user(username, email, password)
 
 
 class EmployeeUserAccountSerializer(UserAccountSerializer):
@@ -45,14 +46,15 @@ class EmployeeUserAccountSerializer(UserAccountSerializer):
     def create(self, validated_data):
         username = validated_data['username']
         password = validated_data['password']
-        return get_user_model().employee_objects.create_user(username, password)
+        email = validated_data['email']
+        return get_user_model().employee_objects.create_user(username, email, password)
     
     
 class ReadOnlyUserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('username', 'uuid', 'role', 'is_active')
-        read_only_fields = ('username', 'uuid', 'role', 'is_active')
+        fields = ('username', 'email', 'uuid', 'role', 'is_active')
+        read_only_fields = ('username', 'email', 'uuid', 'role', 'is_active')
 
 
 class ChangePasswordSerializer(serializers.Serializer):

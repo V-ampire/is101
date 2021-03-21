@@ -23,7 +23,6 @@ class CompanyProfileFactory(factory.django.DjangoModelFactory):
     ogrn = factory.Faker('pystr', max_chars=15)
     city = factory.Faker('city')
     address = factory.Faker('address')
-    email = factory.Faker('company_email')
     phone = factory.Faker('phone_number')
     logo = factory.django.ImageField(filename=fake.file_name(extension='jpg'))
     tagline = factory.Faker('catch_phrase')

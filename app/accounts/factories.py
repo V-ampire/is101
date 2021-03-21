@@ -39,6 +39,7 @@ class AdminUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
+    email = factory.Faker('company_email')
     role = Roles.ADMIN
 
 
@@ -51,6 +52,7 @@ class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
+    email = factory.Faker('company_email')
     role = Roles.COMPANY
 
 
@@ -64,4 +66,5 @@ class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
 
     username = factory.Faker('user_name')
     password = factory.Faker('password')
+    email = factory.Faker('company_email')
     role = Roles.EMPLOYEE

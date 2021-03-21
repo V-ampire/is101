@@ -21,6 +21,18 @@ class IsCompanyUser(permissions.BasePermission):
         return is_company_user(request.user)
 
 
+class IsAdminOrOwnerCompanyUser(permissions.BasePermission):
+    """
+    Доступ для владельца учетной записи юрлица либо админа.
+    """
+    def has_object_permission(self, request, view, company_user):
+        try:
+            return request.user.uuid == company_user.uuid or request.user.is_staff
+        except AttributeError:
+            logger.warning('У пользователя отсутствует атрибут uuid')
+            return False
+
+
 class IsPermittedToEmployeeUser(permissions.BasePermission):
     """
     Регулирует доступ к учетной записи работника.

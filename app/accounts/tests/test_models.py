@@ -14,13 +14,13 @@ fake = Faker()
 @pytest.mark.django_db
 def test_is_staff():
     admin_user = UserAccount.objects.create_user(
-        fake.user_name(), Roles.ADMIN, fake.password()
+        fake.user_name(), fake.email(), Roles.ADMIN, fake.password()
     )
     company_user = UserAccount.objects.create_user(
-        fake.user_name(), Roles.COMPANY, fake.password()
+        fake.user_name(), fake.email(), Roles.COMPANY, fake.password()
     )
     employee_user = UserAccount.objects.create_user(
-        fake.user_name(), Roles.EMPLOYEE, fake.password()
+        fake.user_name(), fake.email(), Roles.EMPLOYEE, fake.password()
     )
     assert admin_user.is_staff == True
     assert company_user.is_staff == False
@@ -29,7 +29,7 @@ def test_is_staff():
 
 @pytest.mark.django_db
 def test_create_superuser():
-    superuser = UserAccount.objects.create_superuser(fake.user_name(), fake.password())
+    superuser = UserAccount.objects.create_superuser(fake.user_name(), fake.email(), fake.password())
     assert superuser.is_superuser
     assert superuser.is_staff
     assert superuser.role == Roles.ADMIN

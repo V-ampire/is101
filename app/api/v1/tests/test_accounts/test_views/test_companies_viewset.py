@@ -19,166 +19,330 @@ fake = Faker()
 
 
 @pytest.mark.django_db
-class TestViewSet(BaseViewSetTest):
-
+class TestListAction(BaseViewSetTest):
     app_name = 'api_v1'
     url_basename = 'account-companies'
 
-    def test_list(self):
-        url = self.get_action_url('list')
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.url = self.get_action_url('list')
+
+    def test_permisson(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.get(self.url)
+        assert mock_has_perm.call_count == 1
+
+    def test_list_response_for_permitted(self, mocker):
         generate_to_db(CompanyUserAccountModelFactory, quantity=10)
-        
-        admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
-        anonymous_response = self.anonymous_client.get(url)
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.get(self.url)
         expected_data = CompanyUserAccountSerializer(
             get_user_model().company_objects.all(), 
             many=True, 
             context={'request': admin_response.wsgi_request}
         ).data
-
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == expected_data
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_retrieve(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        url = self.get_action_url('detail', uuid=tested_account.uuid)
-        admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
-        anonymous_response = self.anonymous_client.get(url)
+    def test_list_response_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.get(self.url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+
+    def test_list_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.get(self.url)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestRetrieveAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.tested_account = CompanyUserAccountModelFactory.create()
+        self.url = self.get_action_url('detail', uuid=self.tested_account.uuid)
+
+    def test_permisson(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.get(self.url)
+        assert mock_has_perm.call_count == 1
+
+    def test_retrieve_response_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = True
+        company_response = self.company_client.get(self.url)
         expected_data = CompanyUserAccountSerializer(
-            tested_account, 
+            self.tested_account, 
+            context={'request': company_response.wsgi_request}
+        ).data
+        assert company_response.status_code == status.HTTP_200_OK
+        assert company_response.json() == expected_data
+
+    def test_retrive_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.get(self.url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+
+    def test_retrieve_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.get(self.url)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestCreateAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.create_data = generate_to_dict(CompanyUserAccountModelFactory)
+        self.create_data.pop('role')
+        self.url = self.get_action_url('list')
+
+    def test_create_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.post(self.url, data=self.create_data)
+        assert mock_has_perm.call_count == 1
+
+    def test_create_for_permitted(self):
+        # FIXME Убедится что в данных генерятся валидные данные
+        admin_response = self.admin_client.post(self.url, data=self.create_data)
+        expected_data = CompanyUserAccountSerializer(
+            get_user_model().company_objects.get(username=self.create_data['username']), 
             context={'request': admin_response.wsgi_request}
         ).data
-
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert admin_response.json() == expected_data
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_patch(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        expected_username = fake.user_name()
-        url = self.get_action_url('detail', uuid=tested_account.uuid)
-        data = {'username': expected_username}
-        admin_response = self.admin_client.patch(url, data=data)
-        company_response = self.company_client.patch(url, data=data)
-        employee_response = self.employee_client.patch(url, data=data)
-        anonymous_response = self.anonymous_client.patch(url, data=data)
-        tested_account.refresh_from_db()
-        expected_data = CompanyUserAccountSerializer(
-            tested_account, 
-            context={'request': admin_response.wsgi_request}
-        ).data
-
-        assert tested_account.username == expected_username
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert admin_response.json() == expected_data
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_patch_password(self):
-        """
-        Пароль можно менять только через действие change_password.
-        """
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        url = self.get_action_url('detail', uuid=tested_account.uuid)
-        expected_password = fake.password()
-        data = {'password': expected_password}
-        admin_response = self.admin_client.patch(url, data=data)
-        company_response = self.company_client.patch(url, data=data)
-        employee_response = self.employee_client.patch(url, data=data)
-        anonymous_response = self.anonymous_client.patch(url, data=data)
-        tested_account.refresh_from_db()
-        
-        assert not check_password(expected_password, tested_account.password)
-        assert admin_response.status_code == status.HTTP_400_BAD_REQUEST
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_delete(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        url = self.get_action_url('detail', uuid=tested_account.uuid)
-        admin_response = self.admin_client.delete(url)
-        company_response = self.company_client.delete(url)
-        employee_response = self.employee_client.delete(url)
-        anonymous_response = self.anonymous_client.delete(url)
-        
-        assert not get_user_model().objects.filter(uuid=tested_account.uuid).exists()
-        assert admin_response.status_code == status.HTTP_204_NO_CONTENT
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_create(self):
-        data = generate_to_dict(CompanyUserAccountModelFactory)
-        expected_username = data['username']
-        url = self.get_action_url('list')
-        admin_response = self.admin_client.post(url, data=data)
-        company_response = self.company_client.post(url, data=data)
-        employee_response = self.employee_client.post(url, data=data)
-        anonymous_response = self.anonymous_client.post(url, data=data)
-        
-        assert get_user_model().company_objects.filter(username=expected_username).exists()
         assert admin_response.status_code == status.HTTP_201_CREATED
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert admin_response.json() == expected_data
 
-    def test_activate(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory, is_active=False)[0]
-        url = self.get_action_url('activate', uuid=tested_account.uuid)
-        admin_response = self.admin_client.patch(url)
-        company_response = self.company_client.patch(url)
-        employee_response = self.employee_client.patch(url)
-        anonymous_response = self.anonymous_client.patch(url)
-        tested_account.refresh_from_db()
-        
-        assert tested_account.is_active
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+    def test_create_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.post(self.url, data=self.create_data)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
 
-    def test_deativate(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        url = self.get_action_url('deactivate', uuid=tested_account.uuid)
-        admin_response = self.admin_client.patch(url)
-        company_response = self.company_client.patch(url)
-        employee_response = self.employee_client.patch(url)
-        anonymous_response = self.anonymous_client.patch(url)
-        tested_account.refresh_from_db()
-        
-        assert not tested_account.is_active
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
+    def test_create_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.post(self.url, data=self.create_data)
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
 
-    def test_change_password(self):
-        tested_account = generate_to_db(CompanyUserAccountModelFactory)[0]
-        url = self.get_action_url('change-password', uuid=tested_account.uuid)
-        expected_password = fake.password()
-        data = {
-            'password1': expected_password,
-            'password2': expected_password
+
+@pytest.mark.django_db
+class TestPatchAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.patch_data = {
+            'email': fake.company_email()
         }
-        admin_response = self.admin_client.patch(url, data=data)
-        company_response = self.company_client.patch(url, data=data)
-        employee_response = self.employee_client.patch(url, data=data)
-        anonymous_response = self.anonymous_client.patch(url, data=data)
-        tested_account.refresh_from_db()
-        
-        assert check_password(expected_password, tested_account.password)
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
+        self.tested_account = CompanyUserAccountModelFactory.create()
+        self.url = self.get_action_url('detail', uuid=self.tested_account.uuid)
+
+    def test_patch_permisiion(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url, data=self.patch_data)
+        assert mock_has_perm.call_count == 1
+
+    def test_patch_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = True
+        company_response = self.company_client.patch(self.url, data=self.patch_data)
+        self.tested_account.refresh_from_db()
+        expected_data = CompanyUserAccountSerializer(
+            self.tested_account, 
+            context={'request': company_response.wsgi_request}
+        ).data
+        assert company_response.status_code == status.HTTP_200_OK
+        assert company_response.json() == expected_data
+        assert self.tested_account.email == self.patch_data['email']
+
+    def test_patch_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.patch(self.url, data=self.patch_data)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+    
+    def test_patch_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.patch(self.url, data=self.patch_data)
         assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestDestroyAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.tested_account = CompanyUserAccountModelFactory.create()
+        self.url = self.get_action_url('detail', uuid=self.tested_account.uuid)
+
+    def test_destroy_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.delete(self.url)
+        mock_has_perm.call_count == 1
+    
+    def test_destroy_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.delete(self.url)
+        assert admin_response.status_code == status.HTTP_204_NO_CONTENT
+        assert not get_user_model().company_objects.filter(uuid=self.tested_account.uuid).exists()
+
+    def test_destroy_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.delete(self.url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert get_user_model().company_objects.filter(uuid=self.tested_account.uuid).exists()
+
+    def test_destroy_for_anonymous_user(self, mocker):
+        anonymous_response = self.anonymous_client.delete(self.url)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestDeativateAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.tested_account = CompanyUserAccountModelFactory.create()
+        self.url = self.get_action_url('deactivate', uuid=self.tested_account.uuid)
+        self.expected_data = {'status': 'Пользователь в неактивном статусе.'}
+
+    def test_deactivate_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url)
+        mock_has_perm.call_count == 1
+
+    def test_deactivate_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url)
+        self.tested_account.refresh_from_db()
+        assert not self.tested_account.is_active
+        assert admin_response.status_code == status.HTTP_200_OK
+        assert admin_response.json() == self.expected_data
+
+    def test_deactivate_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.patch(self.url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+    
+    def test_deactivate_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.patch(self.url)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestAtivateAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.tested_account = CompanyUserAccountModelFactory.create(is_active=False)
+        self.url = self.get_action_url('activate', uuid=self.tested_account.uuid)
+        self.expected_data = {'status': 'Пользователь в активном статусе.'}
+
+    def test_activate_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url)
+        mock_has_perm.call_count == 1
+
+    def test_activate_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url)
+        self.tested_account.refresh_from_db()
+        assert self.tested_account.is_active
+        assert admin_response.status_code == status.HTTP_200_OK
+        assert admin_response.json() == self.expected_data
+
+    def test_deactivate_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.patch(self.url)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+    
+    def test_deactivate_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.patch(self.url)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+@pytest.mark.django_db
+class TestChangePasswordAction(BaseViewSetTest):
+    app_name = 'api_v1'
+    url_basename = 'account-companies'
+
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.tested_account = CompanyUserAccountModelFactory.create(is_active=False)
+        self.url = self.get_action_url('change-password', uuid=self.tested_account.uuid)
+        self.expected_password = fake.password()
+        self.patch_data = {
+            'password1': self.expected_password,
+            'password2': self.expected_password,
+        }
+        self.expected_data = {'status': 'Пароль изменен.'}
+
+    def test_change_password_permission(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        admin_response = self.admin_client.patch(self.url, data= self.patch_data)
+        mock_has_perm.call_count == 1
+
+    def test_change_password_for_permitted(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = True
+        mock_change = mocker.patch('api.v1.accounts.mixins.change_password')
+        admin_response = self.admin_client.patch(self.url, data= self.patch_data)
+        
+        mock_change.assert_called_with(self.tested_account.pk, self.expected_password)
+        assert admin_response.status_code == status.HTTP_200_OK
+        assert admin_response.json() == self.expected_data
+
+    def test_change_password_for_forbidden(self, mocker):
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminUser.has_permission')
+        mock_has_perm.return_value = False
+        admin_response = self.admin_client.patch(self.url, data= self.patch_data)
+        assert admin_response.status_code == status.HTTP_403_FORBIDDEN
+        assert admin_response.json() == self.forbidden_data
+    
+    def test_change_password_for_anonymous_user(self):
+        anonymous_response = self.anonymous_client.patch(self.url, data= self.patch_data)
+        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert anonymous_response.json() == self.unauth_data
+
+
+
+
+

@@ -6,7 +6,6 @@ import pytest
 
 pytest_plugins = [
     "accounts.tests.fixtures",
-    # "company.tests.fixtures"
 ]
 
 @pytest.fixture

@@ -22,30 +22,33 @@ class TestCompanyCreateSerializer():
         self.user = CompanyUserAccountModelFactory.create()
         self.create_data = generate_to_dict(CompanyProfileFactory)
         self.create_data.pop('user')
+        self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
+        self.create_data['password'] = fake.password()
+        self.create_data['email'] = fake.email()
         self.serializer_class = serializers.CompanyCreateSerializer
 
-    def test_validate_user(self, mocker):
+    def test_validate_user_data(self, mocker):
         mock_validate_user = mocker.patch(
-            'api.v1.companies.serializers.validators.validate_company_user'
+            'api.v1.companies.serializers.CompanyUserAccountSerializer.is_valid'
         )
         serializer = self.serializer_class()
-        serializer.validate_user(self.user.uuid)
-        mock_validate_user.assert_called_with(self.user)
-
-    def test_validate_user_with_user_not_exist(self):
-        user_uuid = fake.uuid4()
-        serializer = self.serializer_class()
-        with pytest.raises(APIValidationError):
-            serializer.validate_user(user_uuid)
+        serializer.validate(self.create_data)
+        mock_validate_user.assert_called_with(raise_exception=True)
     
     def test_create_company(self, mocker):
         mock_create = mocker.patch('api.v1.companies.serializers.utils.create_company')
         expected_company = mocker.Mock()
         mock_create.return_value = expected_company
         expected_data = self.create_data.copy()
-        self.create_data['user'] = self.user.uuid
+        expected_username = expected_data.pop('username')
+        expected_email = expected_data.pop('email')
+        expected_password = expected_data.pop('password')
         serializer = self.serializer_class()
         tested_company = serializer.create(self.create_data)
-
-        mock_create.assert_called_with(user_uuid=self.user.uuid, **expected_data)
+        mock_create.assert_called_with(
+            expected_username,
+            expected_email,
+            expected_password,
+            **expected_data
+        )
         assert tested_company == expected_company

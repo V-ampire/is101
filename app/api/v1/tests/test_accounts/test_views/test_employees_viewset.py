@@ -30,29 +30,5 @@ class TestViewSet(BaseViewSetTest):
         super().setup_method(method)
         self.tested_user = EmployeeUserAccountModelFactory.create()
 
-    def test_list(self, mocker):
-        url = self.get_action_url('list')
-        EmployeeUserAccountModelFactory.create_batch(10)
-        
-        admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
-        anonymous_response = self.anonymous_client.get(url)
-
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_retrieve(self):
-        url = self.get_action_url('detail', uuid=self.tested_user.uuid)
-        admin_response = self.admin_client.get(url)
-        company_response = self.company_client.get(url)
-        employee_response = self.employee_client.get(url)
-        anonymous_response = self.anonymous_client.get(url)
-
-        assert admin_response.status_code == status.HTTP_200_OK
-        assert company_response.status_code == status.HTTP_403_FORBIDDEN
-        assert employee_response.status_code == status.HTTP_403_FORBIDDEN
-        assert anonymous_response.status_code == status.HTTP_401_UNAUTHORIZED
+    
 

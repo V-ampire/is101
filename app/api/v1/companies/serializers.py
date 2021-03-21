@@ -16,12 +16,14 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    email = serializers.CharField()
 
     class Meta:
         model = models.CompanyProfile
         fields = (
             'username',
             'password',
+            'email',
             'title',
             'logo',
             'tagline',
@@ -29,14 +31,14 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             'ogrn',
             'city',
             'address',
-            'email',
             'phone',
         )
 
     def validate(self, data):
         user_serializer = CompanyUserAccountSerializer(data={
             'username': data['username'],
-            'password': data['password']
+            'password': data['password'],
+            'email': data['email']
         })
         user_serializer.is_valid(raise_exception=True)
         return data
@@ -44,7 +46,8 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         username = validated_data.pop('username')
         password = validated_data.pop('password')
-        return utils.create_company(username, password, **validated_data)
+        email = validated_data.pop('email')
+        return utils.create_company(username, email, password, **validated_data)
 
 
 class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
@@ -67,7 +70,6 @@ class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
             'ogrn',
             'city',
             'address',
-            'email',
             'phone',
             'url',
             'branches',
@@ -96,7 +98,6 @@ class CompanySerializerForPermitted(serializers.ModelSerializer):
             'ogrn',
             'city',
             'address',
-            'email',
             'phone',
             'branches'
         )

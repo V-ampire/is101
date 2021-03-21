@@ -18,6 +18,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     Сериалайзер для валидации данных для создания работника.
     """
     username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField(write_only=True)
     branch = serializers.UUIDField(format='hex_verbose')
     position = serializers.UUIDField(format='hex_verbose', required=False)
@@ -27,6 +28,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         fields = (
             'username',
             'password',
+            'email',
             'branch',
             'fio',
             'position',
@@ -38,7 +40,8 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user_serializer = EmployeeUserAccountSerializer(data={
             'username': data['username'],
-            'password': data['password']
+            'password': data['password'],
+            'email': data['email']
         })
         user_serializer.is_valid(raise_exception=True)
         return data
@@ -47,8 +50,9 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         branch_uuid = validated_data.pop('branch')
         position_uuid = validated_data.pop('position', None)
         username = validated_data.pop('username')
+        email = validated_data.pop('email')
         password = validated_data.pop('password')
-        return utils.create_employee(username, password, branch_uuid, position_uuid=position_uuid, **validated_data)
+        return utils.create_employee(username, email, password, branch_uuid, position_uuid=position_uuid, **validated_data)
 
 
 class EmployeeSerializer(serializers.ModelSerializer):

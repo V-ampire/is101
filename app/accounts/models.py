@@ -29,22 +29,22 @@ class UserAccountManager(BaseUserManager):
     """
     Менеджер для модели учетной записи пользователя.
     """
-    def create_user(self, username, role, password, **extra_fields):
+    def create_user(self, username, email, role, password, **extra_fields):
         """
         Создать и сохранить новую учетную запись.
         """
         extra_fields.setdefault('is_superuser', False)
-        user = self.model(username=username, role=role, **extra_fields)
+        user = self.model(username=username, email=email, role=role, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password):
+    def create_superuser(self, username, email, password):
         """
         Создать и сохранить учетку суперпользоватля.
         """
         role = Roles.ADMIN
-        user = self.create_user(username, role, password)
+        user = self.create_user(username, email, role, password)
         user.is_superuser = True
         user.save(using=self._db)
         return user
@@ -57,12 +57,12 @@ class CompanyManager(UserAccountManager):
     def get_queryset(self):
         return super().get_queryset().filter(role=Roles.COMPANY)
 
-    def create_user(self, username, password, **extra_fields):
+    def create_user(self, username, email, password, **extra_fields):
         """
         Создать учетную запись для компании.
         """
         role = Roles.COMPANY
-        return super().create_user(username, role, password, **extra_fields)
+        return super().create_user(username, email, role, password, **extra_fields)
 
 
 class EmployeeManager(UserAccountManager):
@@ -72,12 +72,12 @@ class EmployeeManager(UserAccountManager):
     def get_queryset(self):
         return super().get_queryset().filter(role=Roles.EMPLOYEE)
 
-    def create_user(self, username, password, **extra_fields):
+    def create_user(self, username, email, password, **extra_fields):
         """
         Создать учетную запись для работника.
         """
         role = Roles.EMPLOYEE
-        return super().create_user(username, role, password, **extra_fields)
+        return super().create_user(username, email, role, password, **extra_fields)
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
@@ -98,6 +98,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
+    email = models.EmailField("Имеил", unique=True)
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -110,7 +111,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email']
 
     objects = UserAccountManager()
     company_objects = CompanyManager()

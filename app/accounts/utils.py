@@ -120,5 +120,4 @@ def get_users_uuid_without_profile():
             result.append(user.uuid)
     return result
 
-
     

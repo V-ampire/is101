@@ -9,7 +9,7 @@ from accounts.forms import UserAccountChangeForm
 class UserAccountAdmin(BaseUserAdmin):
     form = UserAccountChangeForm
     fieldsets = (
-        (None, {'fields': ('username', 'role', 'password')}),
+        (None, {'fields': ('username', 'email', 'role', 'password')}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_superuser', 'groups', 'user_permissions'),
         }),
@@ -17,7 +17,7 @@ class UserAccountAdmin(BaseUserAdmin):
     )
     list_display = ('username', 'role')
     list_filter = ('role', 'is_superuser', 'is_active', 'groups')
-    search_fields = ('username',)
+    search_fields = ('username', 'email')
     ordering = ('username',)
     filter_horizontal = ('groups', 'user_permissions',)
 

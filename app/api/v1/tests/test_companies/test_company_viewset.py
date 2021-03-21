@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import status
 
 from accounts.factories import CompanyUserAccountModelFactory
@@ -118,7 +120,10 @@ class TestCreateAction(BaseViewSetTest):
     def setup_method(self, method):
         super().setup_method(method)
         self.create_data = generate_to_dict(CompanyProfileFactory)
-        self.create_data['user'] = self.company_user.uuid
+        self.create_data.pop('user')
+        self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
+        self.create_data['password'] = fake.password()
+        self.create_data['email'] = fake.email()
         self.url = self.get_action_url('list')
 
     def test_create_permission(self, mocker):
@@ -131,9 +136,8 @@ class TestCreateAction(BaseViewSetTest):
         mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.post(self.url, data=self.create_data)
-        self.company_user.refresh_from_db()
-        expected_company = self.company_user.company_profile
-        expected_data = serializers.CompanyCreateSerializer(
+        expected_company = CompanyProfile.objects.get(title=self.create_data['title'])
+        expected_data = serializers.CompanySerializerForAdmin(
             expected_company, 
             context={'request': admin_response.wsgi_request}
         ).data

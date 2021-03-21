@@ -94,12 +94,17 @@ class TestHasPermToEmployee():
 class TestCreateCompany():
 
     def test_create(self):
-        user = CompanyUserAccountModelFactory.create()
+        user = generate_to_dict(CompanyUserAccountModelFactory)
         create_data = generate_to_dict(factories.CompanyProfileFactory)
         create_data.pop('user')
-        tested_company = utils.create_company(user.uuid, **create_data)
+        tested_company = utils.create_company(
+            user['username'], 
+            user['email'], 
+            user['password'], 
+            **create_data
+        )
         assert CompanyProfile.objects.filter(uuid=tested_company.uuid).exists()
-        assert tested_company.user == user
+        assert tested_company.user.username == user['username']
 
 
 @pytest.mark.django_db
@@ -108,6 +113,7 @@ class TestCreateEmployee():
     def setup_method(self, method):
         self.expected_username = fake.user_name()
         self.expected_password = fake.password()
+        self.expected_email = fake.email()
         self.expected_branch = factories.BranchFactory.create()
         self.expected_position = factories.PositionFactory.create()
         self.create_data = generate_to_dict(factories.EmployeeProfileFactory)
@@ -118,6 +124,7 @@ class TestCreateEmployee():
     def test_create(self):
         employee = utils.create_employee(
             self.expected_username,
+            self.expected_email,
             self.expected_password,
             branch_uuid=self.expected_branch.uuid,
             position_uuid=self.expected_position.uuid,

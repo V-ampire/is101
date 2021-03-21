@@ -10,13 +10,13 @@ from accounts.utils import get_users_uuid_without_profile
 
 from api.v1.accounts import serializers
 from api.v1.accounts import mixins
-from api.v1.permissions import IsPermittedToEmployeeUser
+from api.v1.permissions import IsPermittedToEmployeeUser, IsAdminOrOwnerCompanyUser
 
 from api.v1.mixins import ViewSetActionPermissionMixin
 
 
 class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,
-                        viewsets.ModelViewSet):
+                        ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей юрлиц.
     Метод PUT отключен, т.к. изменение пароля происходит через отдельное действие.
@@ -26,6 +26,12 @@ class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswor
     queryset = get_user_model().company_objects.all()
     serializer_class = serializers.CompanyUserAccountSerializer
     lookup_field = 'uuid'
+
+    permission_action_classes = {
+        "retrieve": [IsAdminOrOwnerCompanyUser],
+        "partial_update": [IsAdminOrOwnerCompanyUser],
+        "change-password": [IsAdminOrOwnerCompanyUser],
+    }
 
 
 class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,

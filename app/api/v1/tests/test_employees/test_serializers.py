@@ -18,18 +18,15 @@ class TestCreateEmployeeSerializer():
 
     def setup_method(self, method):
         self.create_data = generate_to_dict(EmployeeProfileFactory)
-
-
-    def test_validate_calls_validate_user(self, mocker):
-        mock_is_valid_user = mocker.patch('api.v1.employees.serializers.EmployeeUserAccountSerializer.is_valid')
         self.expected_branch = BranchFactory.create()
         self.expected_position = PositionFactory.create()
         self.create_data.pop('user')
+        self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
+        self.create_data['password'] = fake.password()
+        self.create_data['email'] = fake.email()
         self.create_data.pop('employee_position')
         self.create_data['branch'] = self.expected_branch.uuid
-        self.create_data['position'] = self.expected_position.uuid
-        self.create_data['username'] = fake.user_name()
-        self.create_data['password'] = fake.password()
+        self.create_data['position'] = self.expected_position.uuid      
 
     def test_call_validate_user(self, mocker):
         mock_validate_user = mocker.patch(
@@ -46,9 +43,11 @@ class TestCreateEmployeeSerializer():
         )
         serializer = serializers.EmployeeCreateSerializer()
         serializer.validate(self.create_data)
-        mock_run_validation_user.assert_called_with(
-            {'username': self.create_data['username'], 'password': self.create_data['password']}
-        )
+        mock_run_validation_user.assert_called_with({
+            'username': self.create_data['username'],
+            'email': self.create_data['email'],  
+            'password': self.create_data['password']
+        })
 
     def test_create(self, mocker):
         expected_employee = mocker.Mock()
@@ -57,11 +56,13 @@ class TestCreateEmployeeSerializer():
         serializer = serializers.EmployeeCreateSerializer()
         expected_username = self.create_data['username']
         expected_password = self.create_data['password']
+        expected_email = self.create_data['email']
         expected_branch_uuid = self.create_data['branch']
         expected_position = self.create_data['position']
         result = serializer.create(self.create_data)
         mock_create.assert_called_with(
             expected_username,
+            expected_email,
             expected_password,
             expected_branch_uuid,
             position_uuid=expected_position,
