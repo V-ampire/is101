@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 def username_length_validator(username):
-    if len(username) < 8:
-        raise ValidationError('Минимальная длина 8 символов.')
+    if len(username) < 6:
+        raise ValidationError('Минимальная длина 6 символов.')
 
 
 class Roles(models.TextChoices):

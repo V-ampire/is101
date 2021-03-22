@@ -10,6 +10,7 @@
 import {companiesApi} from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import StatusForm from '@/core/components/commons/StatusForm';
+import { ON_RELOAD } from '@/core/services/events/types';
 
 export default {
   components: {
@@ -46,7 +47,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо переведено в архив. Доступ ограничен.');
-          this.$emit('onReload');
+          this.$emit(ON_RELOAD);
         }
       });
     },
@@ -63,7 +64,7 @@ export default {
             throw err
           }
           eventUtils.showSuccessEvent('Юрлицо в работе. Доступ разрешен.');
-          this.$emit('onReload');
+          this.$emit(ON_RELOAD);
         }
       });
     },

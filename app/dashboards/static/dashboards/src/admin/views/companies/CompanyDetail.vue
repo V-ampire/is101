@@ -13,10 +13,51 @@
               Редактировать учетную запись
             </v-card-title>
             <v-card-text>
-              <EditAccountForm
+              <IsActiveWidget
+                v-if="!!companyInfo.user"
+                :isActive="companyInfo.user.is_active"
+                :accountUuid="companyInfo.user.uuid"
+                :accountRole="accountRole"
+                ref="isActiveWidget"
+                @onReload="reloadData"
+              ></IsActiveWidget>
+              <AccountEditForm
                 v-if="!!companyInfo.user" 
-                :accountUuid="companyInfo.user.uuid" 
-                ref="editAccountForm"></EditAccountForm>
+                :accountUuid="companyInfo.user.uuid"
+                :accountRole="accountRole"
+                ref="accountEditForm"
+                @onReload="reloadData"
+              ></AccountEditForm>
+              <div class="password-field">
+                <v-dialog
+                  v-model="passwordDialog"
+                  max-width="360"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <div class="password-field-btn">
+                      <v-btn
+                        color="primary"
+                        small
+                        block
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        Изменить пароль
+                      </v-btn>
+                    </div>
+                  </template>
+                  <v-card>
+                    <v-card-title>Изменить пароль</v-card-title>
+                    <v-card-text>
+                      <ChangePasswordForm
+                        :accountUuid="accountUuid"
+                        :accountRole="accountRole"
+                        @onReload="reloadData"
+                      ></ChangePasswordForm>
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
+              </div>
             </v-card-text>
           </v-card>
           <v-card class="mb-3">
@@ -28,8 +69,9 @@
                 v-if="!!companyInfo.status" 
                 :companyUuid="companyUuid"
                 :companyStatus="companyInfo.status"
-                @onReload="reloadData()"
-                ref="editCompanyStatusForm"></EditCompanyStatusForm>
+                ref="editCompanyStatusForm"
+                @onReload="reloadData"
+              ></EditCompanyStatusForm>
             </v-card-text>
           </v-card>
           <v-card class="mb-3">
@@ -39,7 +81,7 @@
                 v-if="!!companyInfo.branches"
                 :branchList="companyInfo.branches"
                 ref="branchListTable"
-                @onReload="reloadData()"
+                @onReload="reloadData"
               ></BranchListTable>
             </v-card-text>
             <v-card-actions>
@@ -65,7 +107,7 @@
                     <BranchCreateForm
                       :companyUuid="companyUuid"
                       ref="branchCreateForm"
-                      @onReload="reloadData()"
+                      @onReload="reloadData"
                     ></BranchCreateForm>
                   </v-card-text>
                 </v-card>
@@ -101,6 +143,7 @@
               v-if="!!companyInfo"
               :companyUuid="companyUuid"
               ref="editCompanyForm"
+              @onReload="reloadData"
             ></EditCompanyForm>
           </v-card-text>
         </v-card>
@@ -113,20 +156,26 @@
 import {companiesApi} from '@/core/services/http/clients';
 import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
 import EditCompanyStatusForm from '@/core/components/companies/EditCompanyStatusForm';
-import EditAccountForm from '@/core/components/accounts/EditAccountForm';
+import AccountEditForm from '@/core/components/accounts/AccountEditForm';
+import IsActiveWidget from '@/core/components/accounts/IsActiveWidget';
+import ChangePasswordForm from '@/core/components/accounts/ChangePasswordForm';
 import BranchListTable from '@/core/components/branches/BranchListTable';
 import BranchCreateForm from '@/core/components/branches/BranchCreateForm';
 import eventUtils from '@/core/services/events/utils';
+import roles from '@/core/services/roles';
 
 export default {
   data () {
     return {
       companyInfo: null,
+      accountRole: roles.company[0]
     }
   },
   components: {
     EditCompanyForm: EditCompanyForm,
-    EditAccountForm: EditAccountForm,
+    AccountEditForm: AccountEditForm,
+    IsActiveWidget: IsActiveWidget,
+    ChangePasswordForm: ChangePasswordForm,
     EditCompanyStatusForm: EditCompanyStatusForm,
     BranchListTable: BranchListTable,
     BranchCreateForm: BranchCreateForm
@@ -142,14 +191,14 @@ export default {
   async mounted() {
     this.companyInfo = await this.getCompanyInfo();
     await this.$nextTick(() => {
-      this.$refs.editAccountForm.setInitial(this.companyInfo.user);
+      this.$refs.accountEditForm.setInitial(this.companyInfo.user);
       this.$refs.editCompanyForm.setInitial(this.companyInfo);
     });
   },
   methods: {
     async reloadData() {
       this.companyInfo = await this.getCompanyInfo();
-      this.$refs.editAccountForm.setInitial(this.companyInfo.user);
+      this.$refs.accountEditForm.setInitial(this.companyInfo.user);
       this.$refs.editCompanyForm.setInitial(this.companyInfo);
     },
     async getCompanyInfo() {

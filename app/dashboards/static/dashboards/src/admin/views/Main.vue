@@ -25,29 +25,7 @@
 </template>
 
 <script>
-import eventUtils from '@/core/services/events/utils';
-
 export default {
-  data: () => ({
-    noProfileCount: 0,
-  }),
   
-  methods: {
-    async getNoProfilesCount() {
-      let response;
-      try {
-        response = await accounts.noProfiles.count();
-      } catch (err) {
-        eventUtils.showErrorAlert(err.message);
-        throw err
-      }
-      const count = response.data.count;
-      if (Number.isInteger(count)) {
-        this.noProfileCount = count;
-      } else {
-        console.log(`Не удалось загрузить число аккаунтов без профилей. Получен ответ ${response}`);
-      }
-    }
-  },
 }
 </script>

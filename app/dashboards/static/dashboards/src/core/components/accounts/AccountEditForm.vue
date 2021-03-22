@@ -30,7 +30,7 @@
     </div>
     <div class="form-btn mb-3">
       <FormButton
-        label="Создать юрлицо"
+        label="Обновить информацию"
         :inProgress="inProgress"
         @onAction="update()"
       ></FormButton>
@@ -40,20 +40,20 @@
 </template>
 
 <script>
-import { companyAccountsApi, employeeAccountsApi } from '@/core/services/http/clients';
-import roles from '@/core/services/roles';
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
+import accountsApiMixin from '@/core/mixins/accountsApiMixin';
 import validators from '@/core/validators';
 import FormButton from '@/core/components/commons/FormButton';
+import { ON_RELOAD } from '@/core/services/events/types';
+import eventUtils from '@/core/services/events/utils';
 
 export default {
-  mixins: [formFieldsMixin],
+  mixins: [formFieldsMixin, accountsApiMixin],
   components: {
     FormButton: FormButton,
   },
   props: {
     accountUuid: String,
-    accountRole: String
   },
   data() {
     return {
@@ -68,17 +68,8 @@ export default {
       inProgress: false
     }
   },
-  computed: {
-    api() {
-      if (this.accountRole === roles.company[0]) {
-        return companyAccountsApi()
-      } else if (this.accountRole === roles.employee[0]) {
-        return employeeAccountsApi()
-      }
-    }
-  },
   methods: {
-    update() {
+    async update() {
       if (this.validate()) {
         this.inProgress = true;
         const formData = this.getAsFormData();
@@ -97,6 +88,7 @@ export default {
           this.inProgress = false;
         }
         eventUtils.showSuccessEvent('Данные обновлены.');
+        this.$emit(ON_RELOAD);
       }
     }
   },

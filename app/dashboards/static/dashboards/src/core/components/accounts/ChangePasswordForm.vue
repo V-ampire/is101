@@ -56,14 +56,13 @@
 import validators from '@/core/validators';
 import { generatePassword } from '@/core/services/accounts/utils';
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
+import accountsApiMixin from '@/core/mixins/accountsApiMixin';
 import FormButton from '@/core/components/commons/FormButton';
-import { companyAccountsApi, employeeAccountsApi } from '@/core/services/http/clients';
-import roles from '@/core/services/roles';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 
 export default {
-  mixins: [formFieldsMixin],
+  mixins: [formFieldsMixin, accountsApiMixin],
   components: {
     FormButton: FormButton
   },
@@ -91,15 +90,6 @@ export default {
             /(?=.*[0-9])(?=.*[a-zA-Z])/,
             'Пароль должен содержать цифры и буквы.'
         ),
-      }
-    }
-  },
-  computed: {
-    api() {
-      if (this.accountRole === roles.company[0]) {
-        return companyAccountsApi()
-      } else if (this.accountRole === roles.employee[0]) {
-        return employeeAccountsApi()
       }
     }
   },

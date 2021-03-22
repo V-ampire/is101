@@ -27,17 +27,38 @@
 </template>
 
 <script>
+import accountsApiMixin from '@/core/mixins/accountsApiMixin';
+import { ON_RELOAD } from '@/core/services/events/types';
+import eventUtils from '@/core/services/events/utils';
+
 export default {
+  mixins: [accountsApiMixin],
   props: {
     isActive: Boolean,
+    accountUuid: String,
     inProgress: {
       type: Boolean,
       default: false
     },
   },
   methods: {
-    changeSwitch() {
-      this.$emit('change');
+    async changeSwitch() {
+      this.inProgress = true;
+      try {
+        if (this.isActive) {
+        // Разблокировать
+          await this.api.activate(this.accountUuid);
+        } else {
+          // Заблокировать
+          await this.api.deactivate(this.accountUuid);
+        }
+      } catch (err) {
+        eventUtils.showErrorAlert(err.message);
+        throw err
+      } finally {
+        this.inProgress = false;
+        this.$emit(ON_RELOAD); // Для того чтобы отменить изменение свитча
+      }
     }
   },
 }

@@ -206,7 +206,7 @@ export class AccountsClient extends ApiClient {
     return response
   }
 
-  async desactivate(accountUuid) {
+  async deactivate(accountUuid) {
     let response;
     try {
       response = await http.patch(`${this.endpoint}/${accountUuid}/deactivate/`)

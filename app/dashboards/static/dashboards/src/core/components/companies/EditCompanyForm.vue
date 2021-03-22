@@ -95,6 +95,7 @@
     <div class="form-btn">
       <FormButton 
         @onAction="updateCompanyInfo()"
+        :inProgress="inProgress"
         label="Обновить информацию"
       ></FormButton>
     </div>
@@ -129,6 +130,7 @@ export default {
       rules: {
         required: validators.required('Обязательное поле.'),
       },
+      inProgress: false,
     }
   },
   props: {
@@ -142,6 +144,7 @@ export default {
   methods: {
     async updateCompanyInfo() {
       if (this.validate()) {
+        this.inProgress = true;
         const formData = this.getAsFormData();
         try {
           await this.api.update(this.companyUuid, formData)
@@ -154,6 +157,8 @@ export default {
             eventUtils.showErrorAlert(err.message);
           }
           throw err
+        } finally {
+          this.inProgress = false;
         }
         eventUtils.showSuccessEvent('Данные изменены!');
       }
