@@ -163,7 +163,6 @@ export class EmployeeApiClient extends ApiClient {
       throw errorUtils.checkHttpError(err)
     }
     return response
-
   }
 }
 
@@ -181,6 +180,57 @@ export class PositionsClient extends ApiClient {
     try {
       response = await http.get(`${this.endpoint}/?status=${status}`)
     } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
+    return response
+  }
+}
+
+
+export class AccountsClient extends ApiClient {
+  /**
+   * Клиент для API учетных записей.
+   * Определяет дополнительные методы: [
+   *  activate() - разрешает доступ учетной записи
+   *  deactivate() - запрещает доступ учетной записи
+   *  change_password() - меняет пароль учетной записи
+   * ]
+   */
+  async activate(accountUuid) {
+    let response;
+    try {
+      response = await http.patch(`${this.endpoint}/${accountUuid}/activate/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
+    return response
+  }
+
+  async desactivate(accountUuid) {
+    let response;
+    try {
+      response = await http.patch(`${this.endpoint}/${accountUuid}/deactivate/`)
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
+    return response
+  }
+
+  async changePassword(accountUuid, formData) {
+    /**
+     * Изменить пароль.
+     * @param formData - должен содержать пароль и подтверждение пароля.
+     */
+    let response;
+    const headers = {
+      'Content-Type': 'multipart/form-data'
+    };
+    try {
+      response = await http.patch(
+        `${this.endpoint}/${accountUuid}/change_password/`, 
+        formData, 
+        {'headers': headers})
+      } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
     return response

@@ -8,30 +8,6 @@
           <div class="accounts-title mr-1 align-self-center">
             Учетные записи
           </div>
-          <div class="accounts-alert">
-            <router-link 
-              to="/no_profiles"
-              style="text-decoration: none;"
-            >
-              <v-btn
-                class="accounts-alert-btn white--text"
-                color="red"
-                fab
-                small
-                v-show="noProfileCount > 0"
-              >
-                {{ noProfileCount }}
-              </v-btn>
-            </router-link>
-            <v-tooltip
-              right
-              activator=".accounts-alert-btn"
-            >
-              <span class="accounts-alert-note">
-                Найдено {{ noProfileCount }} учетных записей с незаполненым профилем!
-              </span>
-            </v-tooltip>
-          </div>
         </div>
       </v-list-item>
       <v-divider></v-divider>
@@ -49,7 +25,6 @@
 </template>
 
 <script>
-import accounts from '@/core/services/http/accounts';
 import eventUtils from '@/core/services/events/utils';
 
 export default {
@@ -57,10 +32,6 @@ export default {
     noProfileCount: 0,
   }),
   
-  mounted() {
-    this.getNoProfilesCount()
-  },
-
   methods: {
     async getNoProfilesCount() {
       let response;

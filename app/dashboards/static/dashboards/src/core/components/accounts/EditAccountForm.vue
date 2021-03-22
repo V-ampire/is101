@@ -1,32 +1,6 @@
 <template>
   <v-form ref="form">
     <div class="fields d-flex flex-column">
-      <div v-if="!!fields.is_active" class="isActive-field mb-4">
-        <div class="isActive-field-label subtitle-2">Доступ в систему:</div>
-        <div class="isActive-field-switch">
-          <v-switch
-            v-model="fields.is_active.value"
-            :label="fields.is_active.value ? 'Доступ разрешен' : 'Доступ ограничен'"
-            @change="switchIsActive"
-          >
-            <template v-slot:label>
-              <span v-if="isActiveInProgress">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </span>
-              <span class="green--text ml-2" v-else-if="fields.is_active.value">
-                <v-icon color="green">fa-check-circle</v-icon> Доступ разрешен
-              </span>
-              <span class="red--text ml-2" v-else>
-                <v-icon color="red">fa-times-circle</v-icon> Доступ ограничен
-              </span>
-            </template>
-          </v-switch>
-        </div>
-      </div>
-      <v-divider></v-divider>
       <div class="enter-fields d-flex flex-column">
         <div v-if="!!fields.username" class="username-field mb-3">
           <div class="username-field-label subtitle-2 mb-2">Данные для входа:</div>
@@ -47,6 +21,18 @@
             ></FormButton>
           </div>
         </div>
+            <div class="email-field d-flex flex-column mb-3">
+      <div class="email-field-label subtitle-2 mb-2">E-mail</div>
+      <div class="email-field-input">
+        <v-text-field
+          v-model="fields.email.value"
+          :rules="[rules.emailMatch]"
+          :error-messages="fields.email.errors"
+          label="E-mail"
+        ></v-text-field>
+      </div>
+    </div>
+
         <div class="password-field">
           <v-dialog
             v-model="passwordDialog"
@@ -102,20 +88,16 @@ export default {
     data () {
       return {
         fields: {
-          username: {
-            value: '',
-            errors: []
-          },
-          is_active: {
-            value: false,
-            errors: []
-          }
+          username: { value: '', errors: [] },
+          is_active: { value: false, errors: [] },
+          email: { value: '', errors: [] },
         },
         isActiveInProgress: false,
         passwordDialog: false,
         rules: {
           required: validators.required('Обязательное поле.'),
           min: validators.minLength(8, 'Минимальная длина 8 символов.'),
+          emailMatch: validators.emailMatch('Не валидный имеил.')
         },
       }   
     },

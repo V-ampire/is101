@@ -82,17 +82,6 @@
         ></v-text-field>
       </div>
     </div>
-    <div class="email-field d-flex flex-column mb-3">
-      <div class="email-field-label subtitle-2 mb-2">E-mail</div>
-      <div class="email-field-input">
-        <v-text-field
-          v-model="fields.email.value"
-          :rules="[rules.emailMatch]"
-          :error-messages="fields.email.errors"
-          label="E-mail"
-        ></v-text-field>
-      </div>
-    </div>
     <div class="phone-field d-flex flex-column mb-3">
       <div class="phone-field-label subtitle-2 mb-2">Телефон</div>
       <div class="phone-field-input">
@@ -135,12 +124,10 @@ export default {
         ogrn: { value: '', errors: [] },
         city: { value: '', errors: [] },
         address: { value: '', errors: [] },
-        email: { value: '', errors: [] },
         phone: { value: '', errors: [] },
       },
       rules: {
         required: validators.required('Обязательное поле.'),
-        emailMatch: validators.emailMatch('Не валидный имеил.')
       },
     }
   },

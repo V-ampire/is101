@@ -33,6 +33,7 @@
         <div class="form-btn-change mb-3">
           <FormButton
             label="Изменить пароль"
+            :inProgress="inProgress"
             @onAction="changePassword()"
           ></FormButton>
         </div>
@@ -56,7 +57,8 @@ import validators from '@/core/validators';
 import { generatePassword } from '@/core/services/accounts/utils';
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import FormButton from '@/core/components/commons/FormButton';
-import accountsApi from '@/core/services/http/accounts';
+import { companyAccountsApi, employeeAccountsApi } from '@/core/services/http/clients';
+import roles from '@/core/services/roles';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
 
@@ -81,6 +83,7 @@ export default {
         },
       },
       showPassword: false,
+      inProgress: false,
       rules: {
         required: validators.required('Обязательное поле.'),
         min: validators.minLength(6, 'Минимальная длина 8 символов.'),
@@ -88,23 +91,36 @@ export default {
             /(?=.*[0-9])(?=.*[a-zA-Z])/,
             'Пароль должен содержать цифры и буквы.'
         ),
-        
+      }
+    }
+  },
+  computed: {
+    api() {
+      if (this.accountRole === roles.company[0]) {
+        return companyAccountsApi()
+      } else if (this.accountRole === roles.employee[0]) {
+        return employeeAccountsApi()
       }
     }
   },
   methods: {
     async changePassword () {
       if(this.validate()) {
+        this.inProgress = true;
         const formData = this.getAsFormData();
         try {
-          await accountsApi.companies.changePassword(this.accountUuid, formData);
+          await this.api.changePassword(this.accountUuid, formData);
         } catch (err) {
-          if (err instanceof ServerError && !!err.data.password1) {
-            this.setErrorMessages('password1', err.data.password1)
+          if (err instanceof ServerError) {
+            for (let field of Object.keys(err.data)) {
+              this.setErrorMessages(field, err.data[field])
+            }
           } else {
             eventUtils.showErrorAlert(err.message);
           }
           throw err
+        } finally {
+          this.inProgress = false;
         }
         this.showPassword = false;
         eventUtils.showSuccessEvent('Пароль изменен!');

@@ -19,21 +19,16 @@
 <script>
 export default {
   props: {
-    label: String
-  },
-  data () {
-    return {
-      inProgress: false,
+    label: String,
+    inProgress: {
+      type: Boolean,
+      default: false
     }
   },
+
   methods: {
     performAction() {
-      try {
-        this.inProgress = true;
-        this.$emit('onAction');
-      } finally {
-        this.inProgress = false;
-      }
+      this.$emit('onAction');
     }
   },
 }
