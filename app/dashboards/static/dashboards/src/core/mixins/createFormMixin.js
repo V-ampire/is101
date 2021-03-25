@@ -16,11 +16,13 @@ export default {
   mixins: [formFieldsMixin],
   data() {
     return {
-      successHtml: null
+      successHtml: null,
+      inProgress: false
     }
   },
   methods: {
     async create () {
+      this.inProgress = true;
       let response;
       if (this.validate()) {
         const formData = this.getAsFormData();
@@ -35,6 +37,8 @@ export default {
             eventUtils.showErrorAlert(err.message);
           }
           throw err
+        } finally {
+          this.inProgress = false;
         }
         this.afterCreate(response.data);
         this.$emit('onReload');

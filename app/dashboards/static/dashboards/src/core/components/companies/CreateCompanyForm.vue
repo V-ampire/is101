@@ -30,6 +30,28 @@
             @click:append="showPassword = !showPassword"
           ></v-text-field>
         </div>
+        <div class="password-field-btn-generate">
+          <v-btn
+            x-small
+            block
+            color="primary"
+            @click="genSafePassword()"
+          >Создать надежный пароль
+          </v-btn>
+        </div>
+      </div>
+      <div class="email-field">
+        <div class="email-field-label subtitle-2 mb-2">E-mail</div>
+        <div class="email-field-input">
+          <v-text-field
+						v-model="fields.email.value"
+						:error-messages="fields.email.errors"
+						:rules="[rules.required, rules.emailMatch]"
+						label="Имеил"
+            name="email"
+						counter
+					></v-text-field>
+        </div>
       </div>
       <div class="title-field">
         <div class="title-field-label subtitle-2 mb-2">Название компании</div>
@@ -122,19 +144,6 @@
 					></v-text-field>
         </div>
       </div>
-      <div class="email-field">
-        <div class="email-field-label subtitle-2 mb-2">E-mail</div>
-        <div class="email-field-input">
-          <v-text-field
-						v-model="fields.email.value"
-						:error-messages="fields.email.errors"
-						:rules="[rules.required, rules.emailMatch]"
-						label="Имеил"
-            name="email"
-						counter
-					></v-text-field>
-        </div>
-      </div>
       <div class="phone-field">
         <div class="phone-field-label subtitle-2 mb-2">Телефон</div>
         <div class="phone-field-input">
@@ -172,6 +181,7 @@ import createFormMixin from '@/core/mixins/createFormMixin';
 import validators from '@/core/validators';
 import { companiesApi } from '@/core/services/http/clients';
 import FormButton from '@/core/components/commons/FormButton';
+import { generatePassword } from '@/core/services/accounts/utils';
 
 export default {
   mixins: [createFormMixin],
@@ -183,6 +193,7 @@ export default {
       fields: {
         username: { value: '', errors: [] },
         password: { value: '', errors: [] },
+        email: { value: '', errors: [] },
         title: { value: '', errors: [] },
         logo: { value: null, errors: [] },
         tagline: { value: '', errors: [] },
@@ -190,7 +201,6 @@ export default {
         ogrn: { value: '', errors: [] },
         city: { value: '', errors: [] },
         address: { value: '', errors: [] },
-        email: { value: '', errors: [] },
         phone: { value: '', errors: [] },
       },
       rules: {
@@ -222,6 +232,11 @@ export default {
       });
       this.successHtml = `
         Юрлицо <a href="${route.href}">${companyData.title}</a> успешно создано.`;
+    },
+    genSafePassword() {
+      const password = generatePassword();
+      this.fields.password.value = password;
+      this.showPassword = true;
     },
   }
 }

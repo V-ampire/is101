@@ -37,8 +37,8 @@ class BranchSerializer(serializers.ModelSerializer):
     """
     Сериалайзер филиала.
     """
-    company = serializers.StringRelatedField(read_only=True)
-    employees = EmployeeListSerizlizer(many=True, read_only=True)
+    company = serializers.StringRelatedField()
+    employees = EmployeeListSerizlizer(many=True)
 
     class Meta:
         model = Branch
@@ -51,7 +51,7 @@ class BranchSerializer(serializers.ModelSerializer):
             'employees',
             'status'
         )
-        read_only_fields = ('status',)
+        read_only_fields = ('status', 'company', 'employees')
 
 
 class BranchListSerializer(NestedHyperlinkedModelSerializer):

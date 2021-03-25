@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError
 
 from api.v1 import mixins
+from api.v1.validators import validate_status_param
 from api.v1.permissions import IsPermittedToBranch
 from api.v1.branches import serializers
 
@@ -27,7 +28,13 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     }
 
     def get_queryset(self):
-        return Branch.objects.filter(company__uuid=self.kwargs['company_uuid'])
+        queryset = Branch.objects.filter(company__uuid=self.kwargs['company_uuid'])
+        filter_status = self.request.query_params.get('status', None)
+        if filter_status:
+            validate_status_param(filter_status)
+            return queryset.filter(status=filter_status)
+        return queryset
+
 
     def get_serializer_class(self):
         if self.action == 'list':

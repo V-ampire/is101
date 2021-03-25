@@ -18,16 +18,16 @@
               </v-col>
               <v-col cols="12">
                   <v-text-field
-                      v-model="fields.password.value"
-                      :error-messages="fields.password.errors"
-                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      :rules="[rules.required, rules.min, rules.passwordMatch]"
-                      :type="showPassword ? 'text' : 'password'"
-                      name="input-10-1"
-                      hint="At least 8 characters"
-                      label="Пароль"
-                      counter
-                      @click:append="showPassword = !showPassword"
+                    v-model="fields.password.value"
+                    :error-messages="fields.password.errors"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    :rules="[rules.required, rules.min, rules.passwordMatch]"
+                    :type="showPassword ? 'text' : 'password'"
+                    name="input-10-1"
+                    hint="At least 8 characters"
+                    label="Пароль"
+                    counter
+                    @click:append="showPassword = !showPassword"
                   >
                   </v-text-field>
               </v-col>

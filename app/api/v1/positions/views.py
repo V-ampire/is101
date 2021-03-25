@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.v1.positions.serializers import PositionSerializer
-from api.v1.positions.validators import validate_status_param
+from api.v1.validators import validate_status_param
 from api.v1 import mixins
 from api.v1.permissions import IsCompanyUser
 

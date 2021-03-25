@@ -142,7 +142,7 @@ export class EmployeeApiClient extends ApiClient {
       'Content-Type': 'multipart/form-data'
     };
     try {
-      response = await http.patch(`${this.endpoint}/${employeeUuid}/`, formData, {headers: headers})
+      response = await http.patch(`${this.endpoint}/${employeeUuid}/change_position/`, formData, {headers: headers})
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
@@ -158,7 +158,27 @@ export class EmployeeApiClient extends ApiClient {
       'Content-Type': 'multipart/form-data'
     };
     try {
-      response = await http.patch(`${this.endpoint}/${employeeUuid}/`, formData, {headers: headers})
+      response = await http.patch(`${this.endpoint}/${employeeUuid}/change_branch/`, formData, {headers: headers})
+    } catch (err) {
+      throw errorUtils.checkHttpError(err)
+    }
+    return response
+  }
+}
+
+
+export class BranchesClient extends ApiClient {
+  /**
+   * Клиент для API филиалов.
+   * Предоставляет метод list() с возмоностью фильтрации по статусу.
+   */
+  async list(status=null) {
+    if (!status) {
+      return super.list()
+    }
+    let response;
+    try {
+      response = await http.get(`${this.endpoint}/?status=${status}`)
     } catch (err) {
       throw errorUtils.checkHttpError(err)
     }
@@ -170,7 +190,7 @@ export class EmployeeApiClient extends ApiClient {
 export class PositionsClient extends ApiClient {
   /**
    * Клиент для API должностей.
-   * Добавляет в метод list() возможность фильтрации по статусу.
+   * Предоставляет метод list() с возмоностью фильтрации по статусу.
    */
   async list(status=null) {
     if (!status) {

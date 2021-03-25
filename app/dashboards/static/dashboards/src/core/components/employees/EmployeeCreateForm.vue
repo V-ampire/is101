@@ -14,9 +14,22 @@
           ></v-text-field>
         </div>
       </div>
+      <div class="email-field">
+        <div class="email-field-label subtitle-2 mb-2">E-mail</div>
+        <div class="email-field-input">
+          <v-text-field
+						v-model="fields.email.value"
+						:error-messages="fields.email.errors"
+						:rules="[rules.required, rules.emailMatch]"
+						label="Имеил"
+            name="email"
+						counter
+					></v-text-field>
+        </div>
+      </div>
       <div class="password-field">
         <div class="password-field-label subtitle-2 mb-2">Пароль</div>
-        <div class="password-field-input"></div>
+        <div class="password-field-input">
           <v-text-field
             v-model="fields.password.value"
             :error-messages="fields.password.errors"
@@ -29,6 +42,16 @@
             counter
             @click:append="showPassword = !showPassword"
           ></v-text-field>
+        </div>
+        <div class="password-field-btn-generate">
+          <v-btn
+            x-small
+            block
+            color="primary"
+            @click="genSafePassword()"
+          >Создать надежный пароль
+          </v-btn>
+        </div>
       </div>
       <div class="fio-field">
         <div class="fio-field-label subtitle-2 mb-2">ФИО работника</div>
@@ -48,6 +71,7 @@
         <div class="position-field-input">
           <v-select
             v-model="fields.position.value"
+            :error-messages="fields.position.errors"
             :items="positionItems"
             item-text="title"
             item-value="uuid"
@@ -131,6 +155,7 @@
     <div class="form-btn mb-3">
       <FormButton
         label="Создать работника"
+        :inProgress="inProgress"
         @onAction="create()"
       ></FormButton>
     </div>
@@ -152,13 +177,14 @@ import createFormMixin from '@/core/mixins/createFormMixin';
 import eventUtils from '@/core/services/events/utils';
 import validators from '@/core/validators';
 import { employeesApi, positionsApi } from '@/core/services/http/clients';
-//import FormButton from '@/core/components/commons/FormButton';
+import FormButton from '@/core/components/commons/FormButton';
+import { generatePassword } from '@/core/services/accounts/utils';
 
 export default {
   mixins: [createFormMixin],
-  // components: {
-  //   FormButton: FormButton
-  // },
+  components: {
+    FormButton: FormButton
+  },
   props: {
     companyUuid: String,
     branchUuid: String
@@ -168,6 +194,7 @@ export default {
       fields: {
         username: { value: '', errors: [] },
         password: { value: '', errors: [] },
+        email: { value: '', errors: [] },
         fio: { value: '', errors: [] },
         position: { value: '', errors: [] },
         date_of_birth: { value: '', errors: [] },
@@ -176,6 +203,7 @@ export default {
       },
       rules: {
         required: validators.required('Обязательное поле.'),
+        emailMatch: validators.emailMatch('Не валидный имеил.'),
         passwordMatch: validators.regexpMatch(
           /(?=.*[0-9])(?=.*[a-zA-Z])/,
           'Пароль должен содержать цифры и буквы.'
@@ -184,7 +212,7 @@ export default {
       },
       showPassword: false,
       positionList: [],
-      dateOfBirthMenu: false
+      dateOfBirthMenu: false,
     }
   },
   computed: {
@@ -233,6 +261,11 @@ export default {
       });
       this.successHtml = `
         Работник <a href="${route.href}">${employeeData.fio}</a> успешно создан.`;
+    },
+    genSafePassword() {
+      const password = generatePassword();
+      this.fields.password.value = password;
+      this.showPassword = true;
     },
   },
 }

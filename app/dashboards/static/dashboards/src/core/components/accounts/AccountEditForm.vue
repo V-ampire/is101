@@ -46,6 +46,7 @@ import validators from '@/core/validators';
 import FormButton from '@/core/components/commons/FormButton';
 import { ON_RELOAD } from '@/core/services/events/types';
 import eventUtils from '@/core/services/events/utils';
+import { ServerError } from '@/core/services/errors/types';
 
 export default {
   mixins: [formFieldsMixin, accountsApiMixin],

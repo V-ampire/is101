@@ -55,14 +55,27 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         return utils.create_employee(username, email, password, branch_uuid, position_uuid=position_uuid, **validated_data)
 
 
+class EmployeeBranchSerializer(serializers.ModelSerializer):
+    """
+    Сериалайзер для филиала работника.
+    """
+    class Meta:
+        model = Branch
+        fields = (
+            'uuid',
+            'city',
+            'address',
+            'phone',
+        )
+
 class EmployeeSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для модели работника.
     """
     user = ReadOnlyUserAccountSerializer()
     company = serializers.ReadOnlyField()
-    branch = serializers.StringRelatedField()
-    position = serializers.StringRelatedField()
+    branch = EmployeeBranchSerializer()
+    position = PositionSerializer()
 
     class Meta:
         model = EmployeeProfile
@@ -85,7 +98,7 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
     """
     Сериалайзер для списка сотрудников.
     """
-    position = serializers.StringRelatedField(read_only=True)
+    position = PositionSerializer()
 
     parent_lookup_kwargs = {
         'company_uuid': 'branch__company__uuid',
@@ -101,6 +114,7 @@ class EmployeeListSerizlizer(NestedHyperlinkedModelSerializer):
             'position',
             'status',
         )
+        read_only_fields = ('position', 'status')
         extra_kwargs = {
             'url': {'view_name': 'api_v1:company-branch-employees-detail', 'lookup_field': 'uuid'},
         }

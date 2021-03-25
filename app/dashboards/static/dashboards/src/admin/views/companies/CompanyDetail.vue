@@ -50,7 +50,7 @@
                     <v-card-title>Изменить пароль</v-card-title>
                     <v-card-text>
                       <ChangePasswordForm
-                        :accountUuid="accountUuid"
+                        :accountUuid="companyInfo.user.uuid"
                         :accountRole="accountRole"
                         @onReload="reloadData"
                       ></ChangePasswordForm>

@@ -26,7 +26,7 @@
           <v-card>
             <v-card-title class="subtitle-1">Удалить филиал</v-card-title>
             <v-card-subtitle class="body-2 text-wrap-normal">
-              При удалении фмлиала одновременно будет удалена вся информация о работниках этого филиала.
+              При удалении филиала одновременно будет удалена вся информация о работниках этого филиала.
             </v-card-subtitle>
             <v-card-text>
               <v-btn 
