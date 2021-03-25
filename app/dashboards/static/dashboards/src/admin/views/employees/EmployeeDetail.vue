@@ -182,10 +182,8 @@ export default {
       this.$refs.employeeEditForm.setInitial(this.employeeInfo);
     });
   },
-  async beforeRouteUpdate (to, from, next) {
-    this.employeeInfo = await this.getEmployeeInfo();
-    this.changeBranchKey += 1;
-    next();
+  watch: {
+    $route: 'reloadData'
   },
   methods: {
     async getEmployeeInfo() {

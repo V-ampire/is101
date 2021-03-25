@@ -57,6 +57,11 @@ export default {
   async mounted() {
     this.branchList = await this.getBranches();
   },
+  watch: {
+    async currentBranch() {
+      this.branchList = await this.getBranches();
+    } 
+  },
   computed: {
     api() {
       return employeesApi(this.companyUuid, this.currentBranch.uuid)
@@ -91,11 +96,8 @@ export default {
         console.log(`Не удалось загрузить список филиалов. Получен ответ ${response}`);
       }
     },
-    async reloadBranches() {
-      this.branchList = await this.getBranches();
-    },
     async changeBranch() {
-        if (this.validate()) {
+      if (this.validate()) {
         this.inProgress = true;
         const formData = this.getAsFormData();
         try {
