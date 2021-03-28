@@ -84,14 +84,12 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     DEFAULT_POSTITION - значение, которое будет использовано 
     если работнику не назначана должность.
     """
-    DEFAULT_POSTITION = 'Должность не задана'
-
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="employee_profile")
     fio = models.CharField("ФИО", max_length=264)
     branch = models.ForeignKey("companies.Branch", on_delete=models.CASCADE, null=True, 
                                     related_name='employees')
-    employee_position = models.ForeignKey("companies.Position", on_delete=models.SET_NULL, null=True)
+    position = models.ForeignKey("companies.Position", on_delete=models.SET_NULL, null=True)
     date_of_birth = models.DateField("Дата рождения")
     pasport = models.CharField("Паспортные данные", max_length=264, unique=True)
     pasport_scan = models.FileField(
@@ -103,13 +101,6 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     @property
     def company(self):
         return self.branch.company.title
-
-    @property
-    def position(self):
-        p = self.employee_position
-        if not p or p.status == Statuses.ARCHIVED:
-            return self.DEFAULT_POSTITION
-        return self.employee_position
 
     def clean(self):
         validators.validate_employee_user(self.user)

@@ -71,13 +71,13 @@ class TestRetrieveAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_company.uuid)
 
     def test_retrieve_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
-        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
+        mock_has_perm.assert_called_once()
 
     def test_retrieve_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.get(self.url)
         expected_data = serializers.CompanySerializerForPermitted(
@@ -88,7 +88,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert company_response.json() == expected_data
 
     def test_retrieve_for_admin(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
         expected_data = serializers.CompanySerializerForAdmin(
@@ -99,7 +99,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_retrive_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -172,13 +172,13 @@ class TestPatchAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_company.uuid)
 
     def test_patch_permisiion(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
-        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
+        mock_has_perm.assert_called_once()
 
     def test_patch_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.patch(self.url, data=self.patch_data)
         self.tested_company.refresh_from_db()
@@ -191,7 +191,7 @@ class TestPatchAction(BaseViewSetTest):
         assert self.tested_company.title == self.patch_data['title']
     
     def test_patch_for_admin(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         self.tested_company.refresh_from_db()
@@ -204,7 +204,7 @@ class TestPatchAction(BaseViewSetTest):
         assert self.tested_company.title == self.patch_data['title']
 
     def test_patch_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN

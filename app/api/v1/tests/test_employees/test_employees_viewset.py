@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.test import APIRequestFactory
 
 from api.v1.employees import serializers
 from api.v1.employees.views import EmployeeViewSet
@@ -21,7 +22,11 @@ def test_get_queryset():
     expected_branch = factories.BranchFactory.create()
     generate_to_db(factories.EmployeeProfileFactory, quantity=5, branch=expected_branch)
     generate_to_db(factories.EmployeeProfileFactory, quantity=5)
+    rf = APIRequestFactory()
+    request = rf.get('/employees/')
+    request.query_params = {}
     viewset = EmployeeViewSet()
+    viewset.request = request
     viewset.kwargs = {'branch_uuid': expected_branch.uuid}
     expected = list(EmployeeProfile.objects.filter(branch__uuid=expected_branch.uuid))
     tested = list(viewset.get_queryset())
@@ -43,14 +48,14 @@ class TestListAction(BaseViewSetTest):
         )
 
     def test_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
-        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
+        mock_has_perm.assert_called_once()
 
     def test_list_response_for_permitted(self, mocker):
         generate_to_db(factories.EmployeeProfileFactory, quantity=10, branch=self.tested_branch)
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
         expected_data = serializers.EmployeeListSerizlizer(
@@ -62,7 +67,7 @@ class TestListAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_list_response_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -93,18 +98,18 @@ class TestRetrieveAction(BaseViewSetTest):
         )
 
     def test_retrieve_permission(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_retrieve_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
         expected_data = serializers.EmployeeSerializer(
@@ -115,7 +120,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_retrive_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -137,13 +142,15 @@ class TestCreateAction(BaseViewSetTest):
         super().setup_method(method)
         self.tested_company = factories.CompanyProfileFactory.create()
         self.tested_branch = factories.BranchFactory.create(company=self.tested_company)
+        self.tested_position = factories.PositionFactory.create()
         self.create_data = generate_to_dict(factories.EmployeeProfileFactory)
         self.create_data.pop('user')
-        self.create_data.pop('employee_position')
+        self.create_data.pop('position')
         self.create_data.pop('branch')
         self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
         self.create_data['password'] = fake.password()
         self.create_data['email'] = fake.email()
+        self.create_data['position'] = self.tested_position.uuid
         self.url = self.get_action_url(
             'list', 
             company_uuid=self.tested_company.uuid, 
@@ -151,28 +158,13 @@ class TestCreateAction(BaseViewSetTest):
         )
     
     def test_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.post(self.url, data=self.create_data)
-        mock_has_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-
-    def test_create_without_position_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
-        mock_has_company_perm.return_value = True
-        admin_response = self.admin_client.post(self.url, data=self.create_data)
-        expected_employee = EmployeeProfile.objects.get(pasport=self.create_data['pasport'])
-        expected_data = serializers.EmployeeSerializer(
-            expected_employee, 
-            context={'request': admin_response.wsgi_request}
-        ).data
-        assert admin_response.status_code == status.HTTP_201_CREATED
-        assert admin_response.json() == expected_data
-        assert expected_employee.position == EmployeeProfile.DEFAULT_POSTITION
+        mock_has_perm.assert_called_once()
 
     def test_create_with_position_for_permitted(self, mocker):
-        expected_position = factories.PositionFactory.create()
-        self.create_data['position'] = expected_position.uuid
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
         admin_response = self.admin_client.post(self.url, data=self.create_data)
         expected_employee = EmployeeProfile.objects.get(pasport=self.create_data['pasport'])
@@ -182,10 +174,10 @@ class TestCreateAction(BaseViewSetTest):
         ).data
         assert admin_response.status_code == status.HTTP_201_CREATED
         assert admin_response.json() == expected_data
-        assert expected_employee.position == expected_position
+        assert expected_employee.position == self.tested_position
 
     def test_create_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.post(self.url, data=self.create_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -220,18 +212,18 @@ class TestPatchAction(BaseViewSetTest):
         }
 
     def test_patch_permission(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_patch_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         self.tested_employee.refresh_from_db()
@@ -244,7 +236,7 @@ class TestPatchAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_patch_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -275,27 +267,27 @@ class TestDestroyAction(BaseViewSetTest):
         )
     
     def test_destroy_permission(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_destroy_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         mock_delete = mocker.patch('api.v1.employees.views.utils.delete_employee')
         admin_response = self.admin_client.delete(self.url)
 
-        mock_delete.assert_called_with(self.tested_employee.uuid)
+        mock_delete.assert_called_once()
         assert admin_response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_destroy_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -327,27 +319,27 @@ class TestToArchiveAction(BaseViewSetTest):
         self.expected_data = {'status': 'Работник переведен в архив. Учетная запись отключена.'}
 
     def test_to_archive_permission(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.patch(self.url)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_to_archive_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         mock_to_archive = mocker.patch('api.v1.employees.views.utils.employee_to_archive')
         admin_response = self.admin_client.patch(self.url)
-        mock_to_archive.assert_called_with(self.tested_employee.uuid)
+        mock_to_archive.assert_called_once()
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == self.expected_data
 
     def test_to_archive_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -379,27 +371,27 @@ class TestToWorkAction(BaseViewSetTest):
         self.expected_data = {'status': 'Работник в рабочем статусе. Учетная запись активирована.'}
 
     def test_to_work_permission(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.patch(self.url)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_to_work_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         mock_to_work = mocker.patch('api.v1.employees.views.utils.employee_to_work')
         admin_response = self.admin_client.patch(self.url)
-        mock_to_work.assert_called_with(self.tested_employee.uuid)
+        mock_to_work.assert_called_once()
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == self.expected_data
 
     def test_to_work_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -432,18 +424,18 @@ class TestChangePositionAction(BaseViewSetTest):
         self.patch_data = {'position': self.expected_position.uuid}
 
     def test_change_position_permissions(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_change_position_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         mock_change = mocker.patch('api.v1.employees.views.utils.change_employee_position')
         mock_change.return_value = self.tested_employee
@@ -457,7 +449,7 @@ class TestChangePositionAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_change_position_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -490,18 +482,18 @@ class TestChangeBranchAction(BaseViewSetTest):
         self.patch_data = {'branch': self.expected_branch.uuid}
     
     def test_change_branch_permissions(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
-        mock_has_company_perm.assert_called_with(self.tested_company.uuid, self.admin_user.uuid)
-        mock_has_employee_perm.assert_called_with(self.tested_employee.uuid, self.admin_user.uuid)
+        mock_has_company_perm.assert_called_once()
+        mock_has_employee_perm.assert_called_once()
 
     def test_change_branch_for_permitted(self, mocker):
-        mock_has_company_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
-        mock_has_employee_perm = mocker.patch('api.v1.permissions.has_user_perm_to_employee')
+        mock_has_employee_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_employee_perm.return_value = True
         mock_change = mocker.patch('api.v1.employees.views.utils.transfer_employee_to_branch')
         mock_change.return_value = self.tested_employee
@@ -510,12 +502,12 @@ class TestChangeBranchAction(BaseViewSetTest):
             self.tested_employee, 
             context={'request': admin_response.wsgi_request}
         ).data
-        mock_change.assert_called_with(self.tested_employee.uuid, self.expected_branch.uuid)
+        mock_change.assert_called_once()
         assert admin_response.status_code == status.HTTP_200_OK
         assert admin_response.json() == expected_data
 
     def test_change_branch_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.permissions.has_user_perm_to_company')
+        mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN

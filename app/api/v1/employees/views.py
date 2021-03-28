@@ -5,7 +5,7 @@ from rest_framework import status
 
 from api.v1 import mixins
 from api.v1.employees import serializers
-from api.v1.permissions import IsPermittedToEmployeeProfile
+from api.v1.permissions import IsCompanyOwnerOrAdmin
 
 from companies.models import EmployeeProfile
 from companies import utils
@@ -17,7 +17,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     """
     model_class = EmployeeProfile
     lookup_field = 'uuid'
-    permission_classes = [IsPermittedToEmployeeProfile]
+    permission_classes = [IsCompanyOwnerOrAdmin]
 
     http_method_names = ['get', 'post', 'patch', 'delete']
 

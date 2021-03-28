@@ -24,7 +24,6 @@ class TestCreateEmployeeSerializer():
         self.create_data['username'] = f'{fake.user_name()}@{fake.user_name()}'
         self.create_data['password'] = fake.password()
         self.create_data['email'] = fake.email()
-        self.create_data.pop('employee_position')
         self.create_data['branch'] = self.expected_branch.uuid
         self.create_data['position'] = self.expected_position.uuid      
 

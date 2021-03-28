@@ -46,3 +46,10 @@ export function employeeAccountsApi() {
 
   return new AccountsClient(endpoint)
 }
+
+
+export function adminAccountsApi() {
+  const endpoint = '/accounts/admins';
+
+  return new AccountsClient(endpoint)
+}

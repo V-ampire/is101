@@ -11,59 +11,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def has_user_perm_to_company(company_uuid, user_uuid):
+def get_employee_user_profile(employee_user):
     """
-    Проверяет имеет ли учетная запись доступ к информации о юрлице.
-    Доступ имеют админы и владелец.
+    Возвращает профиль работника, если профиль не заполнен 
+    то выбрасывает предупреждение и возвращает None.
     """
-    user = get_user_model().objects.get(uuid=user_uuid)
     try:
-        company = CompanyProfile.objects.get(uuid=company_uuid)
-    except CompanyProfile.DoesNotExist:
-        logger.warning(f"Проверка доступа для несуществующей компании company_uuid={company_uuid}")
-        return False
-    return company.user.uuid == user_uuid or user.is_staff
-
-
-def has_user_perm_to_branch(branch_uuid, user_uuid):
-    """
-    Проверяет имеет ли учетная запись доступ к информации о филиале.
-    Доступ имеют админы и юрлицо владелец.
-    """
-    user = get_user_model().objects.get(uuid=user_uuid)
-    try:
-        branch = Branch.objects.get(uuid=branch_uuid)
-    except Branch.DoesNotExist:
-        logger.warning(f"Проверка доступа для несуществующего филиала branch_uuid={branch_uuid}")
-        return False
-    return branch.company.user.uuid == user_uuid or user.is_staff
-
-
-def has_user_perm_to_employee(employee_uuid, user_uuid):
-    """
-    Проверяет имеет ли учетная запись доступ к информации о работнике.
-    Доступ имеют админы и юрлицо владелец.
-    """
-    user = get_user_model().objects.get(uuid=user_uuid)
-    try:
-        employee = EmployeeProfile.objects.get(uuid=employee_uuid)
-    except EmployeeProfile.DoesNotExist:
-        logger.warning(f"Проверка доступа для несуществующего работника employee_uuid={employee_uuid}")
-        return False
-    return employee.branch.company.user.uuid == user_uuid or user.is_staff
-
-
-def has_user_perm_to_employee_user(employee_user_uuid, user_uuid):
-    """
-    Проверяет имеет ли пользователь доступ к учетной записи работника.
-    """
-    employee_user = get_user_model().employee_objects.get(uuid=employee_user_uuid)
-    try:
-        profile = employee_user.employee_profile
+        return employee_user.employee_profile
     except ObjectDoesNotExist:
         logger.warning(f"Учетная запись {employee_user.username} работника создана без заполненого профиля")
-        return False
-    return has_user_perm_to_employee(profile.uuid, user_uuid)
+        return None
 
 
 def create_company(username, email, password, **company_data):
@@ -78,18 +35,18 @@ def create_company(username, email, password, **company_data):
 
 
 def create_employee(username, email, password, branch_uuid, 
-                    position_uuid=None, **employee_data):
+                    position_uuid, **employee_data):
     """
     Создать учетку работника.
     Создать профиль работника.
     """
     branch = Branch.objects.get(uuid=branch_uuid)
-    position = Position.objects.get(uuid=position_uuid) if position_uuid else None
+    position = Position.objects.get(uuid=position_uuid)
     with transaction.atomic():
         user = get_user_model().employee_objects.create_user(
             username=username, email=email, password=password)
         return EmployeeProfile.objects.create(user=user, branch=branch, 
-                                                employee_position=position, **employee_data)
+                                                position=position, **employee_data)
 
 
 def employee_to_archive(employee_uuid):
@@ -246,7 +203,7 @@ def change_employee_position(employee_uuid, new_position_uuid):
     """
     employee = EmployeeProfile.objects.get(uuid=employee_uuid)
     new_position = Position.objects.get(uuid=new_position_uuid)
-    employee.employee_position = new_position
+    employee.position = new_position
     employee.save()
     return employee
 

@@ -77,21 +77,22 @@
             </v-card-text>
           </v-card>
           <v-card>
-            <v-card-title class="subtitle-1">
-              Филиал
-            </v-card-title>
+            <v-card-title class="subtitle-1">Удалить работника</v-card-title>
+            <v-card-subtitle class="body-2 text-wrap-normal">
+              Информация о работнике будет удалена без возможности восстановления.
+            </v-card-subtitle>
             <v-card-text>
-              <EmployeeChangeBranchForm
-                v-if="!!employeeInfo" 
-                :companyUuid="companyUuid"
-                :employeeUuid="employeeUuid"
-                :currentBranch="employeeInfo.branch"
-                ref="employeeChangeBranch"
-                @onReload="reloadData"
-                :key="componentKey"
-              ></EmployeeChangeBranchForm>
+              <v-btn 
+                color="error"
+                small
+                block
+                @click="deleteEmployee()"
+              >
+                Удалить работника
+              </v-btn>
             </v-card-text>
           </v-card>
+
         </div>
       </v-col>
       <v-col cols="7">
@@ -110,7 +111,7 @@
             ></EmployeeEditForm>
           </v-card-text>
         </v-card>
-        <v-card>
+        <v-card class="mb-3">
           <v-card-title class="subtitle-1">
             Изменить должность работника.
           </v-card-title>
@@ -124,6 +125,22 @@
               ref="employeeChangePosition"
               @onReload="reloadData"
             ></EmployeeChangePositionForm>
+          </v-card-text>
+        </v-card>
+        <v-card>
+          <v-card-title class="subtitle-1">
+            Филиал
+          </v-card-title>
+          <v-card-text>
+            <EmployeeChangeBranchForm
+              v-if="!!employeeInfo" 
+              :companyUuid="companyUuid"
+              :employeeUuid="employeeUuid"
+              :currentBranch="employeeInfo.branch"
+              ref="employeeChangeBranch"
+              @onReload="reloadData"
+              :key="componentKey"
+            ></EmployeeChangeBranchForm>
           </v-card-text>
         </v-card>
       </v-col>
@@ -200,6 +217,26 @@ export default {
         eventUtils.showErrorAlert('Не удалось загрузить данные с сервера.');
         console.log(`Не удалось информацию о работнике. Получен ответ ${response}`);
       }
+    },
+    async deleteEmployee() {
+      const confirmParams = {
+        message: `Вы действительно хотите удалить работника ${this.employeeInfo.fio}?`
+      }
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
+        if (result) {
+          try {
+            await this.api.delete(this.employeeInfo.uuid);
+          } catch (err) {
+            eventUtils.showErrorAlert(err.message);
+            throw err
+          }
+          eventUtils.showSuccessEvent('Рвботник удален!');
+          this.$router.push({
+            name: 'BranchDetail', 
+            params: {companyUuid: this.companyUuid, branchUuid: this.branchUuid}
+          });
+        }
+      });
     },
     async reloadData() {
       this.employeeInfo = await this.getEmployeeInfo();

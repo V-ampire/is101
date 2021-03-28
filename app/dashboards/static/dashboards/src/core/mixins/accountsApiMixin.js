@@ -1,4 +1,4 @@
-import { companyAccountsApi, employeeAccountsApi } from '@/core/services/http/clients';
+import { companyAccountsApi, employeeAccountsApi, adminAccountsApi } from '@/core/services/http/clients';
 import roles from '@/core/services/roles';
 
 
@@ -12,6 +12,10 @@ export default {
         return companyAccountsApi()
       } else if (this.accountRole === roles.employee[0]) {
         return employeeAccountsApi()
+      } else if (this.accountRole === roles.admin[0]) {
+        return adminAccountsApi()
+      } else {
+        throw Error('Не определена роль учетной записи.')
       }
     }
   },

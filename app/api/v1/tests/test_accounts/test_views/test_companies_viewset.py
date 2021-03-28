@@ -70,13 +70,13 @@ class TestRetrieveAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_account.uuid)
 
     def test_permisson(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
         assert mock_has_perm.call_count == 1
 
     def test_retrieve_response_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.get(self.url)
         expected_data = CompanyUserAccountSerializer(
@@ -87,7 +87,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert company_response.json() == expected_data
 
     def test_retrive_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -99,6 +99,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert anonymous_response.json() == self.unauth_data
 
 
+@pytest.mark.skip(reason="Method POST is disabled")
 @pytest.mark.django_db
 class TestCreateAction(BaseViewSetTest):
     app_name = 'api_v1'
@@ -153,13 +154,13 @@ class TestPatchAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_account.uuid)
 
     def test_patch_permisiion(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert mock_has_perm.call_count == 1
 
     def test_patch_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.patch(self.url, data=self.patch_data)
         self.tested_account.refresh_from_db()
@@ -172,7 +173,7 @@ class TestPatchAction(BaseViewSetTest):
         assert self.tested_account.email == self.patch_data['email']
 
     def test_patch_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.accounts.views.IsAdminOrOwnerCompanyUser.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.accounts.views.IsOwnerOrAdmin.has_object_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -184,6 +185,7 @@ class TestPatchAction(BaseViewSetTest):
         assert anonymous_response.json() == self.unauth_data
 
 
+@pytest.mark.skip(reason="Method DELETE is disabled")
 @pytest.mark.django_db
 class TestDestroyAction(BaseViewSetTest):
     app_name = 'api_v1'

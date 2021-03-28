@@ -7,7 +7,7 @@ from rest_framework import status
 
 from api.v1 import mixins
 from api.v1.companies import serializers
-from api.v1 import permissions
+from api.v1.permissions import IsOwnerOrAdmin
 
 from companies.models import CompanyProfile
 from companies import utils
@@ -23,9 +23,9 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
 
     permission_action_classes = {
         "list": [IsAdminUser],
-        "retrieve": [permissions.IsPermittedToCompanyProfile],
+        "retrieve": [IsOwnerOrAdmin],
         "create": [IsAdminUser],
-        "partial_update": [permissions.IsPermittedToCompanyProfile],
+        "partial_update": [IsOwnerOrAdmin],
         "destroy": [IsAdminUser],
         "to_archive": [IsAdminUser],
         "to_work": [IsAdminUser],

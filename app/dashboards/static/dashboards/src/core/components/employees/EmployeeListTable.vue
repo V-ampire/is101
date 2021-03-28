@@ -54,7 +54,7 @@ export default {
       for (let employee of this.employeeList) {
         result.push({
           linkText: employee.fio,
-          position: employee.position,
+          position: employee.position.title,
           status: statuses[employee.status],
           uuid: employee.uuid
         });

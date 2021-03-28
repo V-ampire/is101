@@ -7,6 +7,7 @@ from django.utils import timezone
 from accounts.models import IPAddress, Roles, UserAccount
 
 import logging
+from typing import Optional
 
 
 logger = logging.getLogger(__name__)
@@ -104,6 +105,16 @@ def is_employee_user(user):
     return False
 
 
+def get_user_uuid(user) -> Optional[str]:
+    """
+    Возвращает UUID пользователя либо None если UUID нет.
+    """
+    try:
+        return user.uuid
+    except AttributeError:
+        return None
+
+
 def get_users_uuid_without_profile():
     """
     Возвращает список UUID учетных записей юрлиц или работников, 
@@ -119,5 +130,4 @@ def get_users_uuid_without_profile():
         if not hasattr(user, 'employee_profile'):
             result.append(user.uuid)
     return result
-
     

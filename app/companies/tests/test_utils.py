@@ -19,78 +19,6 @@ fake = Faker()
 
 
 @pytest.mark.django_db
-class TestHasPermToCompany():
-    def test_company_doesnt_exist(self, caplog):
-        user = CompanyUserAccountModelFactory()
-        tested_company_uuid = fake.uuid4()
-        result = utils.has_user_perm_to_company(tested_company_uuid, user.uuid)
-        expected_log_message = f'Проверка доступа для несуществующей компании company_uuid={tested_company_uuid}'
-        assert not result
-        assert expected_log_message in caplog.text
-
-    def test_with_admin_user(sel, admin_user):
-        tested_company = factories.CompanyProfileFactory.create()
-        assert utils.has_user_perm_to_company(tested_company.uuid, admin_user.uuid)
-
-    def test_with_related_user(self):
-        tested_company = factories.CompanyProfileFactory.create()
-        user = tested_company.user
-        assert utils.has_user_perm_to_company(tested_company.uuid, user.uuid)
-    
-    def test_with_not_permitted_user(self, company_user):
-        tested_company = factories.CompanyProfileFactory.create()
-        assert not utils.has_user_perm_to_company(tested_company.uuid, company_user.uuid)
-
-
-@pytest.mark.django_db
-class TestHasPermToBranch():
-    def test_branch_doesnt_exist(self, caplog):
-        user = CompanyUserAccountModelFactory()
-        tested_branch_uuid = fake.uuid4()
-        result = utils.has_user_perm_to_branch(tested_branch_uuid, user.uuid)
-        expected_log_message = f'Проверка доступа для несуществующего филиала branch_uuid={tested_branch_uuid}'
-        assert not result
-        assert expected_log_message in caplog.text
-
-    def test_with_admin_user(sel, admin_user):
-        tested_branch = factories.BranchFactory.create()
-        assert utils.has_user_perm_to_branch(tested_branch.uuid, admin_user.uuid)
-
-    def test_with_permitted_user(self):
-        tested_branch = factories.BranchFactory.create()
-        user = tested_branch.company.user
-        assert utils.has_user_perm_to_branch(tested_branch.uuid, user.uuid)
-    
-    def test_with_not_permitted_user(self, company_user):
-        tested_branch = factories.BranchFactory.create()
-        assert not utils.has_user_perm_to_branch(tested_branch.uuid, company_user.uuid)
-
-
-@pytest.mark.django_db
-class TestHasPermToEmployee():
-    def test_employee_doesnt_exist(self, caplog):
-        user = CompanyUserAccountModelFactory()
-        tested_employee_uuid = fake.uuid4()
-        result = utils.has_user_perm_to_employee(tested_employee_uuid, user.uuid)
-        expected_log_message = f'Проверка доступа для несуществующего работника employee_uuid={tested_employee_uuid}'
-        assert not result
-        assert expected_log_message in caplog.text
-
-    def test_with_admin_user(sel, admin_user):
-        tested_employee = factories.EmployeeProfileFactory.create()
-        assert utils.has_user_perm_to_employee(tested_employee.uuid, admin_user.uuid)
-
-    def test_with_permitted_user(self):
-        tested_employee = factories.EmployeeProfileFactory.create()
-        user = tested_employee.branch.company.user
-        assert utils.has_user_perm_to_employee(tested_employee.uuid, user.uuid)
-    
-    def test_with_not_permitted_user(self, company_user):
-        tested_employee = factories.EmployeeProfileFactory.create()
-        assert not utils.has_user_perm_to_employee(tested_employee.uuid, company_user.uuid)
-
-
-@pytest.mark.django_db
 class TestCreateCompany():
 
     def test_create(self):
@@ -119,7 +47,7 @@ class TestCreateEmployee():
         self.create_data = generate_to_dict(factories.EmployeeProfileFactory)
         self.create_data.pop('user')
         self.create_data.pop('branch')
-        self.create_data.pop('employee_position')
+        self.create_data.pop('position')
 
     def test_create(self):
         employee = utils.create_employee(
@@ -390,10 +318,10 @@ class TestChangeEmployeePosition():
     def test_change_position(self):
         old_position = factories.PositionFactory.create()
         new_position = factories.PositionFactory.create()
-        employee = factories.EmployeeProfileFactory.create(employee_position=old_position)
+        employee = factories.EmployeeProfileFactory.create(position=old_position)
         utils.change_employee_position(employee.uuid, new_position.uuid)
         employee.refresh_from_db()
-        assert employee.employee_position == new_position
+        assert employee.position == new_position
         assert employee.position == new_position
 
 

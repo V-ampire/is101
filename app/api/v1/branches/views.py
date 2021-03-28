@@ -7,7 +7,7 @@ from rest_framework.exceptions import ParseError
 
 from api.v1 import mixins
 from api.v1.validators import validate_status_param
-from api.v1.permissions import IsPermittedToBranch
+from api.v1.permissions import IsCompanyOwnerOrAdmin
 from api.v1.branches import serializers
 
 from companies.models import Branch
@@ -20,7 +20,7 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     """
     model_class = Branch
     lookup_field = 'uuid'
-    permission_classes = [IsPermittedToBranch]
+    permission_classes = [IsCompanyOwnerOrAdmin]
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     permission_action_classes = {

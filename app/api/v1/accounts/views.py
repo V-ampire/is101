@@ -5,12 +5,14 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed
 
 from accounts.utils import get_users_uuid_without_profile
+from accounts.models import Roles
 
 from api.v1.accounts import serializers
 from api.v1.accounts import mixins
-from api.v1.permissions import IsPermittedToEmployeeUser, IsAdminOrOwnerCompanyUser
+from api.v1.permissions import IsOwnerOrAdmin, IsOwnerOrSuperuser, IsPermittedToEmployeeUser
 
 from api.v1.mixins import ViewSetActionPermissionMixin
 
@@ -19,18 +21,19 @@ class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswor
                         ViewSetActionPermissionMixin, viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей юрлиц.
+    Метод POST отключен, т.к. учетная запись создается одновременно с профилем.
     Метод PUT отключен, т.к. изменение пароля происходит через отдельное действие.
     """
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'patch']
     permission_classes = [IsAdminUser]
     queryset = get_user_model().company_objects.all()
     serializer_class = serializers.CompanyUserAccountSerializer
     lookup_field = 'uuid'
 
     permission_action_classes = {
-        "retrieve": [IsAdminOrOwnerCompanyUser],
-        "partial_update": [IsAdminOrOwnerCompanyUser],
-        "change-password": [IsAdminOrOwnerCompanyUser],
+        "retrieve": [IsOwnerOrAdmin],
+        "partial_update": [IsOwnerOrAdmin],
+        "change-password": [IsOwnerOrAdmin],
     }
 
 
@@ -51,6 +54,21 @@ class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswo
     permission_action_classes = {
         "list": [IsAdminUser],
     }
+
+
+class AdminAccountViewSet(mixins.ChangePasswordViewMixin, viewsets.ModelViewSet):
+    """
+    Вьюсет для учетных записей администраторов.
+    Доступны только действия для чтения, изменения и изменения пароля.
+    """
+    http_method_names = ['get', 'patch']
+    permission_classes = [IsOwnerOrSuperuser]
+    queryset = get_user_model().objects.filter(role=Roles.ADMIN)
+    serializer_class = serializers.UserAccountSerializer
+    lookup_field = 'uuid'
+
+    def list(self, request):
+        raise MethodNotAllowed('GET', detail='Список учетных записей недоступен.')
 
 
 class UsersWithNoProfileView(generics.ListAPIView):

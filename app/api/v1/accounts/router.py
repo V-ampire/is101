@@ -11,13 +11,10 @@ root_router.register(
 root_router.register(
     r'employees', views.EmployeeAccountsViewSet, basename='account-employees'
 )
+root_router.register(
+    r'admins', views.AdminAccountViewSet, basename='account-admins'
+)
 
 urls = [
     path('', include(root_router.urls)),
-    path('no_profiles', views.UsersWithNoProfileView.as_view(), name='accounts-no_profiles'),
-    path(
-        'no_profiles/count/', 
-        views.UsersWithNoProfileCountView.as_view(), 
-        name='accounts-no_profiles-count'
-    ),
 ]
