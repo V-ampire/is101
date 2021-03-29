@@ -6,14 +6,6 @@
     :search="search"
     :item-class="getStatusClasses"
   >
-    <template v-slot:item.title="{ item }">
-      <div v-if="editState" class="title-edit">
-        <v-text-field dense></v-text-field>
-      </div>
-      <div v-else class="title-value dotted" @click="!editState">
-        {{ item.title }}
-      </div>
-    </template>
     <template v-slot:item.actions="{ item }">
       <div class="action-icons d-flex">
         <div class="status-btn mr-1">
@@ -48,7 +40,7 @@
             В работу
           </v-tooltip>
         </div>
-        <div class="delete-btn">
+        <div class="delete-btn mr-1">
           <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -65,6 +57,42 @@
             Удалить
           </v-tooltip>
         </div>
+        <div class="edit-btn">
+          <v-dialog
+            v-model="dialog"
+            max-width="600px"
+            @click:outside="resetCreatePositionForm()"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <div class="edit-btn-tooltip" v-bind="attrs" v-on="on">
+                <v-tooltip left>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      color="primary"
+                      x-small
+                      fab
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon small>fa-edit</v-icon>
+                    </v-btn>
+                  </template>
+                  Редактировать
+                </v-tooltip>
+              </div>
+            </template>
+            <v-card>
+              <v-card-title class="subtitle-1">Изменить должность</v-card-title>
+              <v-card-text>
+                <PositionEditForm
+                  ref="positionEditForm"
+                  :position="item"
+                  @onReload="reloadPositionList()"
+                ></PositionEditForm>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+        </div>
       </div>
     </template>
 
@@ -75,9 +103,15 @@
 <script>
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 import statuses from "@/core/services/statuses";
+import { positionsApi } from '@/core/services/http/clients';
+import eventUtils from '@/core/services/events/utils';
+import PositionEditForm from '@/core/components/positions/PositionEditForm';
 
 export default {
   mixins: [statusClassesMixin],
+  components: {
+    PositionEditForm: PositionEditForm
+  },
   props: {
     search: String
   },
@@ -90,7 +124,6 @@ export default {
         {text: 'Действия', value: 'actions', sortable: false}
       ],
       statuses: statuses,
-      editState: false
     }
   },
   computed: {
@@ -104,35 +137,46 @@ export default {
         });
       }
       return result
-
+    },
+    api() {
+      return positionsApi()
     }
   },
   async mounted() {
     this.positionList = await this.getPositions()
   },
   methods: {
-    reloadPositions() {
+    async reloadPositions() {
       this.positionList = await this.getPositions()
     },
     async getPositions() {
-      
+      let response;
+      try {
+        response = await this.api.list();
+      } catch (err) {
+        eventUtils.showErrorAlert(err.message);
+        throw err
+      }
+      if (Array.isArray(response.data)) {
+        return response.data
+      } else {
+        const errorMessage = 'Не удалось загрузить данные с сервера.';
+        eventUtils.showErrorAlert(errorMessage);
+        console.log(`Не удалось загрузить список должностей. Получен ответ ${response}`);
+      }
     },
     toArchiveItem(item) {
-
+      console.log(item)
     },
     toWorkItem(item) {
-
+      console.log(item)
     },
     deleteItem(item) {
-
+      console.log(item)
+    },
+    updateItem(item) {
+      console.log(item)
     }
   },
 }
 </script>
-
-<style>
-  .dotted {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-  }
-</style>

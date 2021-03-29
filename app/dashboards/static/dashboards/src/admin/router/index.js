@@ -37,7 +37,7 @@ const routes = [
     component: EmployeeDetail,    
   },
   {
-    path: 'positions',
+    path: '/positions',
     name: 'PositionList',
     component: PositionList
   }
