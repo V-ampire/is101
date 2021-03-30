@@ -19,6 +19,13 @@ module.exports = {
       // все фрагменты, добавляемые на этой странице, по умолчанию
       // это извлечённые общий фрагмент и вендорный фрагмент.
       chunks: ['chunk-vendors', 'chunk-common', 'admin'],
+    },
+    company: {
+      entry: 'src/company/main.js',
+      template: 'public/company.html',
+      filename: 'company.html',
+      title: 'Company',
+      chunks: ['chunk-vendors', 'chunk-common', 'company'],
     }
   }
 }

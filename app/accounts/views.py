@@ -52,9 +52,19 @@ class LoginView(BruteForceLoginView):
         """
         return reverse_lazy('dashboards:admin')
 
+    def get_redirect_url_for_company(self):
+        return reverse_lazy('dashboards:company')
+
+    def get_redirect_url_for_employee(self):
+        return reverse_lazy('dashboards:employee')
+
     def get_redirect_url(self):
-        if self.request.user.is_staff:
-            return self.get_redirect_url_for_admin()    
+        if utils.is_admin_user(self.request.user):
+            return self.get_redirect_url_for_admin()
+        elif utils.is_company_user(self.request.user):
+            return self.get_redirect_url_for_company()
+        else:
+            return self.get_redirect_url_for_employee()
 
 
 class BlockView(TemplateView):

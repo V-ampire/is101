@@ -7,6 +7,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "build:admin": "vue-cli-service build admin --dest dist/admin",
+    "build:company": "vue-cli-service build company --dest dist/company",
     "test:jest": "jest"
   },
   "dependencies": {
