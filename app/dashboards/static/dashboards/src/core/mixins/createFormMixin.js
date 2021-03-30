@@ -11,6 +11,7 @@
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import eventUtils from '@/core/services/events/utils';
 import { ServerError } from '@/core/services/errors/types';
+import { ON_RELOAD } from '@/core/services/events/types';
 
 export default {
   mixins: [formFieldsMixin],
@@ -41,7 +42,7 @@ export default {
           this.inProgress = false;
         }
         this.afterCreate(response.data);
-        this.$emit('onReload');
+        this.$emit(ON_RELOAD);
       }
     },
     afterCreate(data) {

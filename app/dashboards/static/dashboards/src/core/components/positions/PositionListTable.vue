@@ -8,38 +8,6 @@
   >
     <template v-slot:item.actions="{ item }">
       <div class="action-icons d-flex">
-        <div class="status-btn mr-1">
-          <v-tooltip left v-if="item.status==statuses.works">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn  
-                color="primary"
-                x-small
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="toArchiveItem(item)"
-              >
-                <v-icon small>fa-archive</v-icon>
-              </v-btn>
-            </template>
-            В архив
-          </v-tooltip>
-          <v-tooltip left v-else>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn  
-                color="primary"
-                x-small
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="toWorkItem(item)"
-              >
-                <v-icon small>fa-briefcase</v-icon>
-              </v-btn>
-            </template>
-            В работу
-          </v-tooltip>
-        </div>
         <div class="delete-btn mr-1">
           <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
@@ -59,9 +27,9 @@
         </div>
         <div class="edit-btn">
           <v-dialog
-            v-model="dialog"
+            v-model="item.editDialog"
             max-width="600px"
-            @click:outside="resetCreatePositionForm()"
+            @click:outside="resetEditPositionForm()"
           >
             <template v-slot:activator="{ on, attrs }">
               <div class="edit-btn-tooltip" v-bind="attrs" v-on="on">
@@ -95,7 +63,6 @@
         </div>
       </div>
     </template>
-
   </v-data-table>
 </template>
 
@@ -120,7 +87,7 @@ export default {
       positionList: [],
       headers: [
         {text: 'Должность', value: 'title'},
-        {text: 'Статус', value: 'status'},
+        //{text: 'Статус', value: 'status'},
         {text: 'Действия', value: 'actions', sortable: false}
       ],
       statuses: statuses,
@@ -133,26 +100,24 @@ export default {
         result.push({
           title: position.title,
           status: statuses[position.status],
-          uuid: position.uuid
+          uuid: position.uuid,
+          editDialog: false
         });
       }
       return result
     },
-    api() {
-      return positionsApi()
-    }
   },
   async mounted() {
     this.positionList = await this.getPositions()
   },
   methods: {
-    async reloadPositions() {
+    async reloadPositionList() {
       this.positionList = await this.getPositions()
     },
     async getPositions() {
       let response;
       try {
-        response = await this.api.list();
+        response = await positionsApi().list();
       } catch (err) {
         eventUtils.showErrorAlert(err.message);
         throw err
@@ -165,17 +130,26 @@ export default {
         console.log(`Не удалось загрузить список должностей. Получен ответ ${response}`);
       }
     },
-    toArchiveItem(item) {
-      console.log(item)
+    deleteItem(position) {
+      const confirmParams = {
+        message: `Вы действительно хотите удалить должность ${position.title}`
+      }
+      eventUtils.onConfirmAction(confirmParams, async (result) => {
+        if (result) {
+          try {
+            await positionsApi().delete(position.uuid);
+          } catch (err) {
+            eventUtils.showErrorAlert(err.message);
+            throw err
+          }
+          eventUtils.showSuccessEvent('Должность удалена!');
+          this.reloadPositionList();
+        }
+      });
+
     },
-    toWorkItem(item) {
-      console.log(item)
-    },
-    deleteItem(item) {
-      console.log(item)
-    },
-    updateItem(item) {
-      console.log(item)
+    resetEditPositionForm() {
+      this.$refs.positionEditForm.reset();
     }
   },
 }

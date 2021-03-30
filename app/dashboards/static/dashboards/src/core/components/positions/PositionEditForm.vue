@@ -29,6 +29,10 @@
 import formFieldsMixin from '@/core/mixins/formFieldsMixin';
 import FormButton from '@/core/components/commons/FormButton';
 import validators from '@/core/validators';
+import { positionsApi } from '@/core/services/http/clients';
+import { ON_RELOAD } from '@/core/services/events/types';
+import eventUtils from '@/core/services/events/utils';
+import { ServerError } from '@/core/services/errors/types';
 
 export default {
   mixins: [formFieldsMixin],
@@ -52,7 +56,27 @@ export default {
   },
   methods: {
     async update() {
-      console.log(this.getAsObject())
+      if (this.validate()) {
+        this.inProgress = true;
+        const formData = this.getAsFormData();
+        try {
+          await positionsApi().update(this.position.uuid, formData)
+        } catch (err) {
+          if (err instanceof ServerError) {
+            for (let field of Object.keys(err.data)) {
+              this.setErrorMessages(field, err.data[field])
+            }
+          } else {
+            eventUtils.showErrorAlert(err.message);
+          }
+          throw err
+        } finally {
+          this.inProgress = false;
+        }
+        eventUtils.showSuccessEvent('Данные изменены!');
+        this.$emit(ON_RELOAD);
+      }
+
     }
   },
 }

@@ -14,7 +14,7 @@
         <v-col cols="4">
           <v-card-actions>
             <v-dialog
-              v-model="dialog"
+              v-model="createDialog"
               max-width="600px"
               @click:outside="resetCreatePositionForm()"
             >
@@ -31,7 +31,7 @@
                 <v-card-title class="subtitle-1">Добавить должность</v-card-title>
                 <v-card-text>
                   <PositionCreateForm
-                    ref="createPositionform"
+                    ref="createPositionForm"
                     @onReload="reloadPositionList()"
                   ></PositionCreateForm>
                 </v-card-text>
@@ -61,6 +61,7 @@ export default {
   data () {
     return {
       search: '',
+      createDialog: false
     }
   },
   components: {
@@ -68,11 +69,12 @@ export default {
     PositionCreateForm: PositionCreateForm
   },
   methods: {
-    resetCreateCompanyForm() {
-      this.$refs.PositionCreateForm.reset();
+    resetCreatePositionForm() {
+      this.$refs.createPositionForm.reset();
     },
     reloadPositionList() {
-      this.$refs.positionListTable.reloadPositions();
+      this.$refs.positionListTable.reloadPositionList();
+      this.createDialog = false;
     }
   },
 
