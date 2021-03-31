@@ -55,14 +55,11 @@
 import ErrorAlert from '@/core/components/commons/ErrorAlert';
 import SuccessAlert from '@/core/components/commons/SuccessAlert';
 import ConfirmDialog from '@/core/components/commons/ConfirmDialog';
-
 export default {
   name: 'App',
-
   data: () => ({
     //
   }),
-
   components: {
     'ErrorAlert': ErrorAlert,
     'SuccessAlert': SuccessAlert,

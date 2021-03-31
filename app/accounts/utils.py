@@ -115,6 +115,31 @@ def get_user_uuid(user) -> Optional[str]:
         return None
 
 
+def get_employee_user_profile(employee_user) -> Optional[UserAccount]:
+    """
+    Возвращает профиль работника, если профиль не заполнен 
+    то выбрасывает предупреждение и возвращает None.
+    """
+    try:
+        return employee_user.employee_profile
+    except ObjectDoesNotExist:
+        logger.warning(f"Учетная запись {employee_user} работника создана без заполненого профиля")
+        return None
+
+
+def get_company_user_profile(company_user) -> Optional[UserAccount]:
+    """
+    Возвращает профиль юрлица, если профиль не заполнен 
+    то выбрасывает предупреждение и возвращает None.
+    """
+    try:
+        return company_user.company_profile
+    except ObjectDoesNotExist:
+        logger.warning(f"Учетная запись {company_user} юрлица создана без заполненого профиля")
+        return None
+
+
+
 def get_users_uuid_without_profile():
     """
     Возвращает список UUID учетных записей юрлиц или работников, 

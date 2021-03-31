@@ -11,18 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_employee_user_profile(employee_user):
-    """
-    Возвращает профиль работника, если профиль не заполнен 
-    то выбрасывает предупреждение и возвращает None.
-    """
-    try:
-        return employee_user.employee_profile
-    except ObjectDoesNotExist:
-        logger.warning(f"Учетная запись {employee_user.username} работника создана без заполненого профиля")
-        return None
-
-
 def create_company(username, email, password, **company_data):
     """
     Создать учетку юрлица.

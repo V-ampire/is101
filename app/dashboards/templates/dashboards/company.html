@@ -1,0 +1,27 @@
+{% extends 'dashboards/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    101CRM - панель юрлица
+{% endblock title %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'dashboards/dist/company/css/chunk-vendors.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboards/dist/company/css/company.css' %}">
+{% endblock css %}
+
+
+{% block content %}
+    <div id="app"></div>
+{% endblock content %}
+
+
+{% block scripts %}
+  
+  <script src="{% static 'dashboards/dist/company/js/chunk-vendors.js' %}"></script>
+  <script src="{% static 'dashboards/dist/company/js/company.js' %}"></script>
+    
+{% endblock scripts %}
+    

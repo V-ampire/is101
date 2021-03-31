@@ -15,3 +15,8 @@ class AdminAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
 class AdminDashboardView(AdminAccessMixin, TemplateView):
     template_name = 'dashboards/admin.html'
 
+class CompanyDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboards/company.html'
+
+class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboards/employee.html'

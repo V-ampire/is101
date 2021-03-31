@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.user_uuid_cookie_middleware',
+    'accounts.middleware.user_profile_uuid_cookie_middleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -122,3 +123,4 @@ REST_FRAMEWORK = {
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
 USER_UUID_COOKIE_NAME = 'USER_UUID'
+PROFILE_UUID_COOKIE_NAME = 'PROFILE_UUID'

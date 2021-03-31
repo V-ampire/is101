@@ -3,10 +3,9 @@ from django.urls import NoReverseMatch
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 
-from accounts.utils import is_company_user
+from accounts.utils import is_company_user, get_employee_user_profile
 
 from companies.models import CompanyProfile
-from companies.utils import get_employee_user_profile
 
 
 class IsCompanyUser(permissions.BasePermission):

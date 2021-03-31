@@ -26,9 +26,6 @@ class CompanyProfile(TimeStamptedModel, StatusModel):
     address = models.CharField("Адрес, без города", max_length=264)
     phone = models.CharField("Номер телефона", max_length=32)
 
-    def clean(self):
-        validate_company_user(self.user)
-
     def __str__(self):
         return self.title
 
@@ -101,9 +98,6 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     @property
     def company(self):
         return self.branch.company.title
-
-    def clean(self):
-        validators.validate_employee_user(self.user)
 
     # def __str__(self):
     #     return f"{self.position.title}: {self.fio}"

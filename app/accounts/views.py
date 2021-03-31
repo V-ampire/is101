@@ -40,31 +40,50 @@ class BruteForceLoginView(LoginView):
 
 
 class LoginView(BruteForceLoginView):
+
+    form = forms.LoginForm
+    redirect_authenticated_user = True
+
+    def get_redirect_url(self):
+        if utils.is_admin_user(self.request.user):
+            return reverse_lazy('dashboards:admin')
+        elif utils.is_company_user(self.request.user):
+            return reverse_lazy('dashboards:company')
+        else:
+            return reverse_lazy('dashboards:employee')
+
+
+class AdminLoginView(BruteForceLoginView):
     """
     LoginView для пользователей CRM.
     """
     form = forms.LoginForm
     redirect_authenticated_user = True
 
-    def get_redirect_url_for_admin(self):
-        """
-        Возвращает URL для админов.
-        """
-        return reverse_lazy('dashboards:admin')
+    def get_redirect_url(self):
+         return reverse_lazy('dashboards:admin')
 
-    def get_redirect_url_for_company(self):
-        return reverse_lazy('dashboards:company')
 
-    def get_redirect_url_for_employee(self):
-        return reverse_lazy('dashboards:employee')
+class CompanyLoginView(BruteForceLoginView):
+    """
+    LoginView для пользователей CRM.
+    """
+    form = forms.LoginForm
+    redirect_authenticated_user = True
 
     def get_redirect_url(self):
-        if utils.is_admin_user(self.request.user):
-            return self.get_redirect_url_for_admin()
-        elif utils.is_company_user(self.request.user):
-            return self.get_redirect_url_for_company()
-        else:
-            return self.get_redirect_url_for_employee()
+         return reverse_lazy('dashboards:company')
+
+
+class EmployeeLoginView(BruteForceLoginView):
+    """
+    LoginView для пользователей CRM.
+    """
+    form = forms.LoginForm
+    redirect_authenticated_user = True
+
+    def get_redirect_url(self):
+         return reverse_lazy('dashboards:employee')
 
 
 class BlockView(TemplateView):
