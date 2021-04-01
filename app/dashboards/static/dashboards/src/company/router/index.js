@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import config from '@/config'
 
 import Profile from '@/company/views/Profile';
+//import TestComp from '@/company/views/TestComp';
 
 Vue.use(VueRouter)
 
