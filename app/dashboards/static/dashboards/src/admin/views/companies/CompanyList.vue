@@ -39,7 +39,6 @@
             </v-dialog>
           </v-card-actions>
         </v-col>
-      </v-row>
       <v-row>
         <v-col cols="12">
           <CompanyListTable

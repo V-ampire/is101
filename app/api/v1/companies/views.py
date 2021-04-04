@@ -7,7 +7,7 @@ from rest_framework import status
 
 from api.v1 import mixins
 from api.v1.companies import serializers
-from api.v1.permissions import IsOwnerOrAdmin
+from api.v1.permissions import IsCompanyOwnerOrAdmin
 
 from companies.models import CompanyProfile
 from companies import utils
@@ -20,12 +20,13 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
     """
     model_class = CompanyProfile
     lookup_field = 'uuid'
+    company_uuid_kwarg = 'uuid'
 
     permission_action_classes = {
         "list": [IsAdminUser],
-        "retrieve": [IsOwnerOrAdmin],
+        "retrieve": [IsCompanyOwnerOrAdmin],
         "create": [IsAdminUser],
-        "partial_update": [IsOwnerOrAdmin],
+        "partial_update": [IsCompanyOwnerOrAdmin],
         "destroy": [IsAdminUser],
         "to_archive": [IsAdminUser],
         "to_work": [IsAdminUser],
@@ -37,22 +38,16 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
         return CompanyProfile.objects.all().order_by('-status')
 
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            if self.request.user.is_staff:
-                return serializers.CompanySerializerForAdmin
-            return serializers.CompanySerializerForPermitted
 
         if self.action == "list":
             return serializers.CompanyListSerializer
 
-        if self.action == "create":
+        elif self.action == "create":
             return serializers.CompanyCreateSerializer
-        
-        if self.action == "partial_update":
-            if self.request.user.is_staff:
-                return serializers.CompanySerializerForAdmin
-            return serializers.CompanySerializerForPermitted
 
+        else:
+            return serializers.CompanyDetailSerializer
+        
     def create(self, request, *args, **kwargs):
         """
         Создать учетную запись.

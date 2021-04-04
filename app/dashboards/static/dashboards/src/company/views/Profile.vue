@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 class="title">Юрлицо {{ companyInfo }}</h1>
+        <h1 class="title">Юрлицо</h1>
       </v-col>
     </v-row>
     <v-row>
@@ -13,18 +13,62 @@
               Редактировать учетную запись
             </v-card-title>
             <v-card-text>
-              <!-- <AccountEditForm
+              <AccountEditForm
                 v-if="!!companyInfo.user" 
                 :accountUuid="companyInfo.user.uuid"
                 :accountRole="accountRole"
                 ref="accountEditForm"
                 @onReload="reloadData"
-              ></AccountEditForm> -->
+              ></AccountEditForm>
+              <div class="password-field">
+                <v-dialog
+                  v-model="passwordDialog"
+                  max-width="360"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <div class="password-field-btn">
+                      <v-btn
+                        color="primary"
+                        small
+                        block
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        Изменить пароль
+                      </v-btn>
+                    </div>
+                  </template>
+                  <v-card>
+                    <v-card-title>Изменить пароль</v-card-title>
+                    <v-card-text>
+                      <ChangePasswordForm
+                        :accountUuid="companyInfo.user.uuid"
+                        :accountRole="accountRole"
+                        @onReload="reloadData"
+                      ></ChangePasswordForm>
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
+              </div>
             </v-card-text>
           </v-card>
         </div>
       </v-col>
-
+      <v-col cols="7">
+        <v-card>
+          <v-card-title class="subtitle-1">
+            Редактировать профиль.
+          </v-card-title>
+          <v-card-text>
+            <EditCompanyForm
+              v-if="!!companyInfo"
+              :companyUuid="companyUuid"
+              ref="editCompanyForm"
+              @onReload="reloadData"
+            ></EditCompanyForm>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -35,12 +79,16 @@ import config from '@/config';
 import roles from '@/core/services/roles';
 import eventUtils from '@/core/services/events/utils';
 
-//import AccountEditForm from '@/core/components/accounts/AccountEditForm';
+import AccountEditForm from '@/core/components/accounts/AccountEditForm';
+import ChangePasswordForm from '@/core/components/accounts/ChangePasswordForm';
+import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
 
 export default {
-  // components: {
-  //   AccountEditForm: AccountEditForm
-  // },
+  components: {
+    AccountEditForm: AccountEditForm,
+    ChangePasswordForm: ChangePasswordForm,
+    EditCompanyForm: EditCompanyForm
+  },
   data() {
     return {
       companyInfo: null,
@@ -55,12 +103,19 @@ export default {
       return companiesApi()
     }
   },
-  // async mounted() {
-  //   console.log('mounted')
-  //   // let response;
-  //   // response = await this.api.detail(this.companyUuid);
-  // },
+  async mounted() {
+    this.companyInfo = await this.getCompanyInfo();
+    await this.$nextTick(() => {
+      this.$refs.accountEditForm.setInitial(this.companyInfo.user);
+      this.$refs.editCompanyForm.setInitial(this.companyInfo);
+    });
+  },
   methods: {
+    async reloadData() {
+      this.companyInfo = await this.getCompanyInfo();
+      this.$refs.accountEditForm.setInitial(this.companyInfo.user);
+      this.$refs.editCompanyForm.setInitial(this.companyInfo);
+    },
     async getCompanyInfo() {
       let response;
       try {
@@ -76,7 +131,7 @@ export default {
         console.log(`Не удалось информацию о юрлице. Получен ответ ${response}`);
       }
     },
-  }
+  },
 }
 </script>
 

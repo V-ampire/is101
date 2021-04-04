@@ -17,6 +17,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     """
     model_class = EmployeeProfile
     lookup_field = 'uuid'
+    company_uuid_kwarg = 'company_uuid'
     permission_classes = [IsCompanyOwnerOrAdmin]
 
     http_method_names = ['get', 'post', 'patch', 'delete']

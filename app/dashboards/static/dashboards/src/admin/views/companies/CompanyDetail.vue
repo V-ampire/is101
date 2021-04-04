@@ -153,7 +153,7 @@
 </template>
 
 <script>
-import {companiesApi} from '@/core/services/http/clients';
+import { companiesApi } from '@/core/services/http/clients';
 import EditCompanyForm from '@/core/components/companies/EditCompanyForm';
 import EditCompanyStatusForm from '@/core/components/companies/EditCompanyStatusForm';
 import AccountEditForm from '@/core/components/accounts/AccountEditForm';

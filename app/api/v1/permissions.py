@@ -1,4 +1,5 @@
 from django.urls import NoReverseMatch
+from django.core.exceptions import ImproperlyConfigured
 
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
@@ -13,35 +14,43 @@ class IsCompanyUser(permissions.BasePermission):
         return is_company_user(request.user)
 
 
-class CompanyNestedMixin():
+class IsCompanyOwnerOrAdmin():
     """
-    Миксин для вложенных ресурсов юрлица.
+    Доступ для юрлица-владельца и админов.
     Реализует метод get_related_company(self, view) - возвращающий юрлицо.
     URL юрлица должен содержать UUID юрлица, например:
-    /companies/<company_uuid>/branches/
+    /companies/<company_uuid_kwarg>/branches/
+
+    View должна содержать атрибут company_uuid_kwarg - имя аргумента содержащего uuid юрлица.
     """
     def get_related_company(self, view):
         """
         Возвращает относящийся к ресурсу CompanyProfile.
         """
         try:
-            company_uuid = view.kwargs['company_uuid']
+            company_uuid_kwarg = view.company_uuid_kwarg
+        except AttributeError:
+            raise ImproperlyConfigured('View должна содержать атрибут company_uuid_kwarg - имя аргумента содержащего uuid юрлица.')
+        
+        try:
+            company_uuid = view.kwargs[company_uuid_kwarg]
         except KeyError:
             raise NoReverseMatch('Вложенный URL юрлица должен содержать UUID юрлица')
 
         try:
             return CompanyProfile.objects.get(uuid=company_uuid)
-        except CompanyProfile.DoesNotExists:
+        except CompanyProfile.DoesNotExist:
             raise NotFound('Юрлицо, к которому относится запрашиваемый ресурс не найдено')
-
-
-class IsCompanyOwnerOrAdmin(CompanyNestedMixin, permissions.BasePermission):
-    """
-    Разрешает доступ юрлицу-владельцу и админам.
-    """
+    
     def has_permission(self, request, view):
+        """
+        Разрешает доступ юрлицу-владельцу и админам.
+        """
         company = self.get_related_company(view)
         return company.user == request.user or request.user.is_staff
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
 
 
 class IsOwnerOrSuperuser(permissions.IsAuthenticated):

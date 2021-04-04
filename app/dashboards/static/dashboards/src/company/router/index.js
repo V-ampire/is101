@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import config from '@/config'
 
 import Profile from '@/company/views/Profile';
-//import TestComp from '@/company/views/TestComp';
+import BranchList from '@/company/views/BranchList';
 
 Vue.use(VueRouter)
 
@@ -13,6 +13,11 @@ const routes = [
     name: 'Profile',
     component: Profile
   },
+  {
+    path: '/branches',
+    name: 'BranchList',
+    component: BranchList
+  }
 ]
 
 const router = new VueRouter({

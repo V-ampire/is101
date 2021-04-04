@@ -20,6 +20,7 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     """
     model_class = Branch
     lookup_field = 'uuid'
+    company_uuid_kwarg = 'company_uuid'
     permission_classes = [IsCompanyOwnerOrAdmin]
     http_method_names = ['get', 'post', 'patch', 'delete']
 
@@ -28,7 +29,7 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     }
 
     def get_queryset(self):
-        queryset = Branch.objects.filter(company__uuid=self.kwargs['company_uuid'])
+        queryset = Branch.objects.filter(company__uuid=self.kwargs[self.company_uuid_kwarg])
         filter_status = self.request.query_params.get('status', None)
         if filter_status:
             validate_status_param(filter_status)
@@ -48,7 +49,7 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
 
     def create(self, request, *args, **kwargs):
         create_data = request.data.dict()
-        create_data['company_uuid'] = self.kwargs['company_uuid']
+        create_data['company_uuid'] = self.kwargs[self.company_uuid_kwarg]
         create_serializer = self.get_serializer(data=create_data)
         create_serializer.is_valid(raise_exception=True)
         branch = create_serializer.save()

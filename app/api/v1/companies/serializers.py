@@ -50,7 +50,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         return utils.create_company(username, email, password, **validated_data)
 
 
-class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
+class CompanyDetailSerializer(serializers.HyperlinkedModelSerializer):
     """
     Сериалайзер для чтения юр. лица для админов.
     Содержит учетную запись.
@@ -79,28 +79,6 @@ class CompanySerializerForAdmin(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'view_name': 'api_v1:companies-detail', 'lookup_field': 'uuid'},
         }
-
-
-class CompanySerializerForPermitted(serializers.ModelSerializer):
-    """
-    Сериалайзер для юр. лица для тех кому разрешен доступ.
-    """
-    branches = BranchListSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = models.CompanyProfile
-        fields = (
-            'uuid',
-            'title',
-            'logo',
-            'tagline',
-            'inn',
-            'ogrn',
-            'city',
-            'address',
-            'phone',
-            'branches'
-        )
 
 
 class CompanyListSerializer(serializers.HyperlinkedModelSerializer):

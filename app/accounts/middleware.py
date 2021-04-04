@@ -11,7 +11,7 @@ def user_uuid_cookie_middleware(get_response):
         response = get_response(request)
         user_uuid = utils.get_user_uuid(request.user)
         if user_uuid:
-            response.set_cookie(settings.USER_UUID_COOKIE_NAME, user_uuid)
+            response.set_cookie(settings.USER_UUID_COOKIE_NAME, user_uuid, samesite='Strict')
         return response
     return middleware
 
@@ -29,6 +29,6 @@ def user_profile_uuid_cookie_middleware(get_response):
             profile = utils.get_employee_user_profile(request.user)
         
         if profile:
-            response.set_cookie(settings.PROFILE_UUID_COOKIE_NAME, profile.uuid)
+            response.set_cookie(settings.PROFILE_UUID_COOKIE_NAME, profile.uuid, samesite='Strict')
         return response
     return middleware

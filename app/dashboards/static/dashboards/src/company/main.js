@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import App from './App.vue'
+import App from '@/company/App.vue'
 import router from '@/company/router'
 import vuetify from '@/plugins/vuetify';
 import VueCookies from 'vue-cookies'

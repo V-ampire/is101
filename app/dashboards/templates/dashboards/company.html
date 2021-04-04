@@ -8,8 +8,7 @@
 
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'dashboards/dist/company/css/chunk-vendors.css' %}">
-    <link rel="stylesheet" href="{% static 'dashboards/dist/company/css/company.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboards/dist/css/chunk-vendors.css' %}">
 {% endblock css %}
 
 
@@ -20,8 +19,9 @@
 
 {% block scripts %}
   
-  <script src="{% static 'dashboards/dist/company/js/chunk-vendors.js' %}"></script>
-  <script src="{% static 'dashboards/dist/company/js/company.js' %}"></script>
+  <script src="{% static 'dashboards/dist/js/chunk-vendors.js' %}"></script>
+  <script src="{% static 'dashboards/dist/js/chunk-common.js' %}"></script>
+  <script src="{% static 'dashboards/dist/js/company.js' %}"></script>
     
 {% endblock scripts %}
     
