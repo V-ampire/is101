@@ -30,6 +30,7 @@ export default {
   },
   props: {
     branchList: Array,
+    companyUuid: String
   },
   data () {
     return {
@@ -50,9 +51,6 @@ export default {
         })
       }
       return branches
-    },
-    companyUuid() {
-      return this.$route.params.companyUuid;
     },
     api() {
       return branchesApi(this.companyUuid)

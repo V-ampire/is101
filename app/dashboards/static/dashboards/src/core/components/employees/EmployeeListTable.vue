@@ -34,6 +34,8 @@ export default {
   props: {
     search: String,
     employeeList: Array,
+    companyUuid: String,
+    branchUuid: String
   },
   data() {
     return {
@@ -60,12 +62,6 @@ export default {
         });
       }
       return result
-    },
-    companyUuid() {
-      return this.$route.params.companyUuid;
-    },
-    branchUuid() {
-      return this.$route.params.branchUuid;
     },
   },
   methods: {
