@@ -54,3 +54,15 @@ def test_employee_manager():
     expected = UserAccount.objects.filter(role=Roles.EMPLOYEE)
     assert set(tested) == set(expected)
 
+
+@pytest.mark.django_db
+def test_creator():
+    creator = factories.AdminUserAccountModelFactory()
+    user = UserAccount.objects.create(
+        username=fake.user_name(),
+        password=fake.password(),
+        email=fake.company_email(),
+        role=Roles.ADMIN,
+        creator=creator
+    )
+    assert user.creator == creator

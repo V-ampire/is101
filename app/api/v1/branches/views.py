@@ -14,7 +14,7 @@ from companies.models import Branch
 from companies import utils
 
 
-class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet):
+class BranchesViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для филиалов.
     """
@@ -23,10 +23,6 @@ class BranchesViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet
     company_uuid_kwarg = 'company_uuid'
     permission_classes = [IsCompanyOwnerOrAdmin]
     http_method_names = ['get', 'post', 'patch', 'delete']
-
-    permission_action_classes = {
-        'destroy': [IsAdminUser]
-    }
 
     def get_queryset(self):
         queryset = Branch.objects.filter(company__uuid=self.kwargs[self.company_uuid_kwarg])

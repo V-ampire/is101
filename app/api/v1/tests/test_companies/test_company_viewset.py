@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 
 from accounts.factories import CompanyUserAccountModelFactory
+from accounts.emails import MessageField
 
 from companies.factories import CompanyProfileFactory
 from companies.models import CompanyProfile
@@ -71,16 +72,16 @@ class TestRetrieveAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_company.uuid)
 
     def test_retrieve_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         mock_has_perm.assert_called_once()
 
     def test_retrieve_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.get(self.url)
-        expected_data = serializers.CompanySerializerForPermitted(
+        expected_data = serializers.CompanyDetailSerializer(
             self.tested_company, 
             context={'request': company_response.wsgi_request}
         ).data
@@ -88,10 +89,10 @@ class TestRetrieveAction(BaseViewSetTest):
         assert company_response.json() == expected_data
 
     def test_retrieve_for_admin(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.get(self.url)
-        expected_data = serializers.CompanySerializerForAdmin(
+        expected_data = serializers.CompanyDetailSerializer(
             self.tested_company, 
             context={'request': admin_response.wsgi_request}
         ).data
@@ -99,7 +100,7 @@ class TestRetrieveAction(BaseViewSetTest):
         assert admin_response.json() == expected_data
 
     def test_retrive_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.get(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN
@@ -135,14 +136,19 @@ class TestCreateAction(BaseViewSetTest):
     def test_create_for_permitted(self, mocker):
         mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
         mock_has_perm.return_value = True
+        mock_send_task = mocker.patch('api.v1.companies.views.send_account_created_message.delay')
+        mock_get_fields = mocker.patch('api.v1.companies.views.get_email_fields')
+        expected_email_fields = fake.pylist()
+        mock_get_fields.return_value = expected_email_fields
         admin_response = self.admin_client.post(self.url, data=self.create_data)
         expected_company = CompanyProfile.objects.get(title=self.create_data['title'])
-        expected_data = serializers.CompanySerializerForAdmin(
+        expected_data = serializers.CompanyDetailSerializer(
             expected_company, 
             context={'request': admin_response.wsgi_request}
         ).data
         assert admin_response.status_code == status.HTTP_201_CREATED
         assert admin_response.json() == expected_data
+        mock_send_task.assert_called_with(self.admin_user.uuid, expected_email_fields)
 
     def test_create_for_forbidden(self, mocker):
         mock_has_perm = mocker.patch('api.v1.companies.views.IsAdminUser.has_permission')
@@ -172,17 +178,17 @@ class TestPatchAction(BaseViewSetTest):
         self.url = self.get_action_url('detail', uuid=self.tested_company.uuid)
 
     def test_patch_permisiion(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
-        mock_has_perm.assert_called_once()
+        assert mock_has_perm.call_count == 2
 
     def test_patch_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         company_response = self.company_client.patch(self.url, data=self.patch_data)
         self.tested_company.refresh_from_db()
-        expected_data = serializers.CompanySerializerForPermitted(
+        expected_data = serializers.CompanyDetailSerializer(
             self.tested_company, 
             context={'request': company_response.wsgi_request}
         ).data
@@ -191,11 +197,11 @@ class TestPatchAction(BaseViewSetTest):
         assert self.tested_company.title == self.patch_data['title']
     
     def test_patch_for_admin(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         self.tested_company.refresh_from_db()
-        expected_data = serializers.CompanySerializerForAdmin(
+        expected_data = serializers.CompanyDetailSerializer(
             self.tested_company, 
             context={'request': admin_response.wsgi_request}
         ).data
@@ -204,7 +210,7 @@ class TestPatchAction(BaseViewSetTest):
         assert self.tested_company.title == self.patch_data['title']
 
     def test_patch_for_forbidden(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.companies.views.IsOwnerOrAdmin.has_object_permission')
+        mock_has_perm = mocker.patch('api.v1.companies.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.patch(self.url, data=self.patch_data)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN

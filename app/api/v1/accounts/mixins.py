@@ -39,6 +39,3 @@ class ActiveControlViewMixin():
         user.activate()
         return Response({'status': 'Пользователь в активном статусе.'})
 
-
-
-

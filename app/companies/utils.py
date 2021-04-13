@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 
 from companies.models import CompanyProfile, EmployeeProfile, Position, Branch
 from companies import validators
@@ -11,18 +12,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_company(username, email, password, **company_data):
+def create_company(creator, username, email, password, **company_data):
     """
     Создать учетку юрлица.
     Создать профиль юрлица.
     """
     with transaction.atomic():
         user = get_user_model().company_objects.create_user(
-            username=username, email=email, password=password)
+            username=username, email=email, password=password, creator=creator)
         return CompanyProfile.objects.create(user=user, **company_data)
 
 
-def create_employee(username, email, password, branch_uuid, 
+def create_employee(creator, username, email, password, branch_uuid, 
                     position_uuid, **employee_data):
     """
     Создать учетку работника.
@@ -32,7 +33,7 @@ def create_employee(username, email, password, branch_uuid,
     position = Position.objects.get(uuid=position_uuid)
     with transaction.atomic():
         user = get_user_model().employee_objects.create_user(
-            username=username, email=email, password=password)
+            username=username, email=email, password=password, creator=creator)
         return EmployeeProfile.objects.create(user=user, branch=branch, 
                                                 position=position, **employee_data)
 
@@ -223,3 +224,4 @@ def position_to_work(position_uuid):
     position = Position.objects.get(uuid=position_uuid)
     position.to_work()
     return position
+    

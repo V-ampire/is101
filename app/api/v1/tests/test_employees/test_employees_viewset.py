@@ -166,6 +166,11 @@ class TestCreateAction(BaseViewSetTest):
     def test_create_with_position_for_permitted(self, mocker):
         mock_has_company_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_company_perm.return_value = True
+        mock_send_task = mocker.patch('api.v1.employees.views.send_account_created_message.delay')
+        mock_get_fields = mocker.patch('api.v1.employees.views.get_email_fields')
+        expected_email_fields = fake.pylist()
+        mock_get_fields.return_value = expected_email_fields
+
         admin_response = self.admin_client.post(self.url, data=self.create_data)
         expected_employee = EmployeeProfile.objects.get(pasport=self.create_data['pasport'])
         expected_data = serializers.EmployeeSerializer(
@@ -175,6 +180,7 @@ class TestCreateAction(BaseViewSetTest):
         assert admin_response.status_code == status.HTTP_201_CREATED
         assert admin_response.json() == expected_data
         assert expected_employee.position == self.tested_position
+        mock_send_task.assert_called_with(self.admin_user.uuid, expected_email_fields)
 
     def test_create_for_forbidden(self, mocker):
         mock_has_perm = mocker.patch('api.v1.employees.views.IsCompanyOwnerOrAdmin.has_permission')

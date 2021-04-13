@@ -14,8 +14,8 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     Сериалайзер для создания юр. лица для админов.
     Содержит uuid учетной записи юрлица.
     """
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+    username = serializers.CharField(label='Логин')
+    password = serializers.CharField(write_only=True, label='Пароль')
     email = serializers.CharField()
 
     class Meta:
@@ -44,10 +44,11 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
+        creator = self.context['request'].user
         username = validated_data.pop('username')
         password = validated_data.pop('password')
         email = validated_data.pop('email')
-        return utils.create_company(username, email, password, **validated_data)
+        return utils.create_company(creator, username, email, password, **validated_data)
 
 
 class CompanyDetailSerializer(serializers.HyperlinkedModelSerializer):

@@ -25,7 +25,7 @@ class TestCreateEmployeeSerializer():
         self.create_data['password'] = fake.password()
         self.create_data['email'] = fake.email()
         self.create_data['branch'] = self.expected_branch.uuid
-        self.create_data['position'] = self.expected_position.uuid      
+        self.create_data['position'] = self.expected_position.uuid
 
     def test_call_validate_user(self, mocker):
         mock_validate_user = mocker.patch(
@@ -48,11 +48,12 @@ class TestCreateEmployeeSerializer():
             'password': self.create_data['password']
         })
 
-    def test_create(self, mocker):
+    def test_create(self, mocker, admin_user):
         expected_employee = mocker.Mock()
+        expected_creator = admin_user
         mock_create = mocker.patch('api.v1.employees.serializers.utils.create_employee')
         mock_create.return_value = expected_employee
-        serializer = serializers.EmployeeCreateSerializer()
+        serializer = serializers.EmployeeCreateSerializer(context={'request': mocker.Mock(user=expected_creator)})
         expected_username = self.create_data['username']
         expected_password = self.create_data['password']
         expected_email = self.create_data['email']
@@ -60,6 +61,7 @@ class TestCreateEmployeeSerializer():
         expected_position = self.create_data['position']
         result = serializer.create(self.create_data)
         mock_create.assert_called_with(
+            expected_creator,
             expected_username,
             expected_email,
             expected_password,

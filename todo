@@ -1,9 +1,27 @@
-- Разобраться и настроить авторизацию для всех ролей
-- Админка юрлиц
-- Навигация
+-Celery для мейлов
+    +- Тест creator
+    +- Тест имейлов
+    - Тест для вьюх
+- Деплой
+- Переделать авторизацию, разделить фронт и бек
+- Деплой с докер
+- Мониторинг и логгеры
+- CI/CD
 
 
 
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestRetrieveAction::test_retrieve_permission - ModuleNotFoundError: N...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestRetrieveAction::test_retrieve_for_permitted - ModuleNotFoundError...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestRetrieveAction::test_retrieve_for_admin - ModuleNotFoundError: No...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestRetrieveAction::test_retrive_for_forbidden - ModuleNotFoundError:...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestPatchAction::test_patch_permisiion - ModuleNotFoundError: No modu...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestPatchAction::test_patch_for_permitted - ModuleNotFoundError: No m...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestPatchAction::test_patch_for_admin - ModuleNotFoundError: No modul...
+FAILED api/v1/tests/test_companies/test_company_viewset.py::TestPatchAction::test_patch_for_forbidden - ModuleNotFoundError: No m...
+FAILED api/v1/tests/test_companies/test_serializers.py::TestCompanyCreateSerializer::test_create_company - KeyError: 'request'
+FAILED api/v1/tests/test_employees/test_serializers.py::TestCreateEmployeeSerializer::test_create - KeyError: 'request'
+FAILED companies/tests/test_utils.py::TestCreateCompany::test_create - TypeError: create_company() missing 1 required positional ...
+FAILED companies/tests/test_utils.py::TestCreateEmployee::test_create - TypeError: create_employee() missing 1 required positiona.
 
 
 

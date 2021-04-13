@@ -52,7 +52,16 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         username = validated_data.pop('username')
         email = validated_data.pop('email')
         password = validated_data.pop('password')
-        return utils.create_employee(username, email, password, branch_uuid, position_uuid=position_uuid, **validated_data)
+        creator = self.context['request'].user
+        return utils.create_employee(
+            creator,
+            username, 
+            email, 
+            password, 
+            branch_uuid, 
+            position_uuid=position_uuid, 
+            **validated_data
+        )
 
 
 class EmployeeBranchSerializer(serializers.ModelSerializer):

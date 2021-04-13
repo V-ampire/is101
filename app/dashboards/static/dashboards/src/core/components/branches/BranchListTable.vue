@@ -20,7 +20,7 @@
 import statuses from "@/core/services/statuses";
 import statusClassesMixin from '@/core/mixins/statusClassesMixin';
 import ListTable from '@/core/components/commons/ListTable';
-import {branchesApi} from '@/core/services/http/clients';
+import { branchesApi } from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 
 export default {

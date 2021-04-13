@@ -246,13 +246,13 @@ class TestDestroyAction(BaseViewSetTest):
         )
 
     def test_destroy_permission(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
         mock_has_perm.call_count == 1
 
     def test_destroy_for_permitted(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = True
         mock_delete = mocker.patch('api.v1.branches.views.utils.delete_branch')
         admin_response = self.admin_client.delete(self.url)
@@ -261,7 +261,7 @@ class TestDestroyAction(BaseViewSetTest):
         assert admin_response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_patch_for_forbidden_to_branch(self, mocker):
-        mock_has_perm = mocker.patch('api.v1.branches.views.IsAdminUser.has_permission')
+        mock_has_perm = mocker.patch('api.v1.branches.views.IsCompanyOwnerOrAdmin.has_permission')
         mock_has_perm.return_value = False
         admin_response = self.admin_client.delete(self.url)
         assert admin_response.status_code == status.HTTP_403_FORBIDDEN

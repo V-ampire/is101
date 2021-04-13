@@ -80,6 +80,7 @@
               <BranchListTable
                 v-if="!!companyInfo.branches"
                 :branchList="companyInfo.branches"
+                :companyUuid="companyUuid"
                 ref="branchListTable"
                 @onReload="reloadData"
               ></BranchListTable>

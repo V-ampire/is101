@@ -28,7 +28,7 @@ class NotBlockedIPAddressFactory(factory.django.DjangoModelFactory):
     ip = factory.Faker('ipv4')
     unblock_time = None
     is_blocked = False
-
+    
 
 class AdminUserAccountModelFactory(factory.django.DjangoModelFactory):
     """
@@ -54,6 +54,7 @@ class CompanyUserAccountModelFactory(factory.django.DjangoModelFactory):
     password = factory.Faker('password')
     email = factory.Faker('company_email')
     role = Roles.COMPANY
+    creator = factory.SubFactory(AdminUserAccountModelFactory)
 
 
 class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
@@ -68,3 +69,4 @@ class EmployeeUserAccountModelFactory(factory.django.DjangoModelFactory):
     password = factory.Faker('password')
     email = factory.Faker('company_email')
     role = Roles.EMPLOYEE
+    creator = factory.SubFactory(AdminUserAccountModelFactory)

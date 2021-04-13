@@ -44,9 +44,11 @@
       <v-row>
         <v-col cols="12">
           <BranchListTable
-          :branchList="branchList"
+            :branchList="branchList"
+            :companyUuid="companyUuid"
             ref="branchListTable"
             v-bind:search="search"
+            @onReload="reloadData"
           ></BranchListTable>
         </v-col>
       </v-row>

@@ -9,6 +9,9 @@ from api.v1 import mixins
 from api.v1.companies import serializers
 from api.v1.permissions import IsCompanyOwnerOrAdmin
 
+from accounts.emails import get_email_fields
+from accounts.tasks import send_account_created_message
+
 from companies.models import CompanyProfile
 from companies import utils
 
@@ -56,11 +59,23 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
         create_serializer = self.get_serializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
         company = create_serializer.save()
+        fields = get_email_fields(create_serializer, include=[
+            'username',
+            'password',
+            'email',
+            'title',
+            'tagline',
+            'inn',
+            'ogrn',
+            'city',
+            'address',
+            'phone',
+        ])
+        send_account_created_message.delay(request.user.uuid, fields)
         context = self.get_serializer_context()
-        company_serializer = serializers.CompanySerializerForAdmin(company, context=context)
+        company_serializer = serializers.CompanyDetailSerializer(company, context=context)
         headers = self.get_success_headers(company_serializer.data)
         return Response(company_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
     def perform_destroy(self, instance):
         utils.delete_company(instance.uuid)

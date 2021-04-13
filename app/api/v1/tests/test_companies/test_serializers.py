@@ -10,6 +10,7 @@ from companies.models import CompanyProfile
 from factory_generator import generate_to_dict
 from faker import Faker
 import pytest
+from unittest.mock import Mock
 
 
 fake = Faker()
@@ -26,6 +27,7 @@ class TestCompanyCreateSerializer():
         self.create_data['password'] = fake.password()
         self.create_data['email'] = fake.email()
         self.serializer_class = serializers.CompanyCreateSerializer
+        self.request = Mock(user=self.user)
 
     def test_validate_user_data(self, mocker):
         mock_validate_user = mocker.patch(
@@ -43,9 +45,11 @@ class TestCompanyCreateSerializer():
         expected_username = expected_data.pop('username')
         expected_email = expected_data.pop('email')
         expected_password = expected_data.pop('password')
-        serializer = self.serializer_class()
+        expected_creator = self.user
+        serializer = self.serializer_class(context={'request': self.request})
         tested_company = serializer.create(self.create_data)
         mock_create.assert_called_with(
+            expected_creator,
             expected_username,
             expected_email,
             expected_password,

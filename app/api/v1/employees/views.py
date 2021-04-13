@@ -7,6 +7,9 @@ from api.v1 import mixins
 from api.v1.employees import serializers
 from api.v1.permissions import IsCompanyOwnerOrAdmin
 
+from accounts.emails import get_email_fields
+from accounts.tasks import send_account_created_message
+
 from companies.models import EmployeeProfile
 from companies import utils
 
@@ -44,6 +47,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         create_serializer = self.get_serializer(data=create_data)
         create_serializer.is_valid(raise_exception=True)
         employee = create_serializer.save()
+        fields = get_email_fields(create_serializer, include=[
+            'username',
+            'password',
+            'email',
+            'fio',
+            'date_of_birth',
+            'pasport',
+        ])
+        send_account_created_message.delay(request.user.uuid, fields)
         context = self.get_serializer_context()
         employee_serializer = serializers.EmployeeSerializer(employee, context=context)
         headers = self.get_success_headers(employee_serializer.data)

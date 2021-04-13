@@ -125,7 +125,8 @@
 </template>
 
 <script>
-import {branchesApi} from '@/core/services/http/clients';
+import config from '@/config';
+import { branchesApi } from '@/core/services/http/clients';
 import eventUtils from '@/core/services/events/utils';
 import BranchStatusForm from '@/core/components/branches/BranchStatusForm';
 import EditBranchForm from '@/core/components/branches/EditBranchForm';
@@ -156,7 +157,7 @@ export default {
       return this.$route.params.branchUuid;
     },
     companyUuid() {
-      return this.$route.params.companyUuid;
+      return this.$cookies.get(config.profileUuidCookie)
     },
     api() {
       return branchesApi(this.companyUuid)

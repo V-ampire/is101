@@ -110,6 +110,10 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     role = models.CharField("Тип учетки", max_length=16, choices=Roles.choices, default=Roles.EMPLOYEE)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
+    creator = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True, related_name='created_accounts'
+    )
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 

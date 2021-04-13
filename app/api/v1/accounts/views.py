@@ -37,8 +37,11 @@ class CompanyAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswor
     }
 
 
-class EmployeeAccountsViewSet(mixins.ActiveControlViewMixin, mixins.ChangePasswordViewMixin,
-                        ViewSetActionPermissionMixin, viewsets.ModelViewSet):
+class EmployeeAccountsViewSet(
+    mixins.ActiveControlViewMixin, 
+    mixins.ChangePasswordViewMixin,
+    ViewSetActionPermissionMixin, 
+    viewsets.ModelViewSet):
     """
     Вьюсет для учетных записей работников.
     Метод PUT отключен, т.к. изменение пароля происходит через отдельное действие.

@@ -155,4 +155,5 @@ def get_users_uuid_without_profile():
         if not hasattr(user, 'employee_profile'):
             result.append(user.uuid)
     return result
-    
+
+

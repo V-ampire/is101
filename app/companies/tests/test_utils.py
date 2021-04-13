@@ -21,11 +21,12 @@ fake = Faker()
 @pytest.mark.django_db
 class TestCreateCompany():
 
-    def test_create(self):
+    def test_create(self, admin_user):
         user = generate_to_dict(CompanyUserAccountModelFactory)
         create_data = generate_to_dict(factories.CompanyProfileFactory)
         create_data.pop('user')
         tested_company = utils.create_company(
+            admin_user,
             user['username'], 
             user['email'], 
             user['password'], 
@@ -33,6 +34,7 @@ class TestCreateCompany():
         )
         assert CompanyProfile.objects.filter(uuid=tested_company.uuid).exists()
         assert tested_company.user.username == user['username']
+        assert tested_company.user.creator == admin_user
 
 
 @pytest.mark.django_db
@@ -49,8 +51,9 @@ class TestCreateEmployee():
         self.create_data.pop('branch')
         self.create_data.pop('position')
 
-    def test_create(self):
+    def test_create(self, admin_user):
         employee = utils.create_employee(
+            admin_user,
             self.expected_username,
             self.expected_email,
             self.expected_password,
@@ -61,12 +64,14 @@ class TestCreateEmployee():
         employee_user = get_user_model().employee_objects.get(username=self.expected_username)
         assert check_password(self.expected_password, employee_user.password)
         assert EmployeeProfile.objects.filter(uuid=employee.uuid).exists()
+        assert employee.user.creator == admin_user
 
-    def test_create_atomic(self, mocker):
+    def test_create_atomic(self, mocker, admin_user):
         mock_create = mocker.patch('companies.utils.EmployeeProfile.objects.create')
         mock_create.side_effect = Exception
         with pytest.raises(Exception):
             employee = utils.create_employee(
+                admin_user,
                 self.expected_username,
                 self.expected_password,
                 branch_uuid=self.expected_branch.uuid,
