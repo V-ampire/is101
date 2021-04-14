@@ -45,8 +45,12 @@ __pycache__/
 # Distribution / packaging
 build/
 develop-eggs/
+
+#####
 # dist/
 src/
+#####
+
 downloads/
 eggs/
 .eggs/
