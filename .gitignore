@@ -1,3 +1,5 @@
+# Production
+
 functional_tests/
 # Конфиг-файл config.json
 config.json
@@ -43,7 +45,8 @@ __pycache__/
 # Distribution / packaging
 build/
 develop-eggs/
-dist/
+# dist/
+src/
 downloads/
 eggs/
 .eggs/
