@@ -1,6 +1,10 @@
+# Production
+
 .DS_Store
 node_modules
-/dist
+# dist/
+src/
+#####
 
 
 # local env files
