@@ -32,6 +32,11 @@ a:hover {
   margin-bottom: 1vh;
 }
 
+.header a {
+  color: white;
+  text-decoration: underline;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;

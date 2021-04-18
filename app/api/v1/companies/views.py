@@ -102,3 +102,5 @@ class CompanyViewSet(mixins.ViewSetActionPermissionMixin, viewsets.ModelViewSet)
         company = self.get_object()
         utils.company_to_work(company.uuid)
         return Response({'status': 'Юрлицо в рабочем статусе. Учетная запись активирована.'})
+
+

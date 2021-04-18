@@ -1,9 +1,7 @@
-# Production
-
 .DS_Store
 node_modules
-# dist/
-src/
+dist/
+# src/
 #####
 
 

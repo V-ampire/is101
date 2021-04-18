@@ -10,6 +10,15 @@ from core.models import TimeStamptedModel, StatusModel, Statuses
 import uuid
 
 
+def get_company_media_path(instance, filename) -> str:
+    """
+    Возвращает путь к директории в которую сохраняются сканы паспортов.
+    Путь опеределяется по шаблону: 
+    /companies/<company_uuid>/company_media/<filename>
+    """
+    return f"companies/{instance.uuid}/company_media/{filename}"
+
+
 class CompanyProfile(TimeStamptedModel, StatusModel):
     """
     Информация о компании.
@@ -17,7 +26,7 @@ class CompanyProfile(TimeStamptedModel, StatusModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="company_profile")
     title = models.CharField("Название компании", max_length=128, unique=True)
-    logo = models.ImageField("Логотип компании", upload_to="logo/%Y/%m/%d/",
+    logo = models.ImageField("Логотип компании", upload_to=get_company_media_path,
                                 validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png'])])
     tagline = models.CharField("Слоган компании", max_length=264)
     inn = models.CharField("ИНН", max_length=12, unique=True)
@@ -71,8 +80,11 @@ class Position(TimeStamptedModel, StatusModel):
 def get_employee_pasport_scan_path(instance, filename) -> str:
     """
     Возвращает путь к директории в которую сохраняются сканы паспортов.
+    Путь опеределяется по шаблону: 
+    /companies/<company_uuid>/employees/<employee_uuid>/<employee.fio>
     """
-    return f"employees_pasports/{instance.fio}"
+    company_uuid = instance.branch.company.uuid
+    return f"companies/{company_uuid}/employees/{instance.uuid}/{instance.fio}"
 
 
 class EmployeeProfile(TimeStamptedModel, StatusModel):
@@ -90,7 +102,8 @@ class EmployeeProfile(TimeStamptedModel, StatusModel):
     date_of_birth = models.DateField("Дата рождения")
     pasport = models.CharField("Паспортные данные", max_length=264, unique=True)
     pasport_scan = models.FileField(
-        "Скан паспорта", 
+        "Скан паспорта",
+        max_length=264, 
         upload_to=get_employee_pasport_scan_path, 
         validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'pdf', 'zip'])]
     )

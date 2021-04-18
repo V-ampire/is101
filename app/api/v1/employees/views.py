@@ -14,6 +14,7 @@ from companies.models import EmployeeProfile
 from companies import utils
 
 
+
 class EmployeeViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для работников.
@@ -119,4 +120,5 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee = self.get_object()
         utils.employee_to_work(employee.uuid)
         return Response({'status': 'Работник в рабочем статусе. Учетная запись активирована.'})
+
 

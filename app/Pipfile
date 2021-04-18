@@ -19,3 +19,4 @@ djangorestframework = "*"
 rest-condition = "*"
 drf-nested-routers = "*"
 celery = {extras = ["redis"],version = "*"}
+django-private-storage = "*"

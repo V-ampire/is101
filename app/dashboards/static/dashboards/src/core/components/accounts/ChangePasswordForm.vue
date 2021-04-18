@@ -85,7 +85,7 @@ export default {
       inProgress: false,
       rules: {
         required: validators.required('Обязательное поле.'),
-        min: validators.minLength(6, 'Минимальная длина 8 символов.'),
+        min: validators.minLength(6, 'Минимальная длина 6 символов.'),
         passwordMatch: validators.regexpMatch(
             /(?=.*[0-9])(?=.*[a-zA-Z])/,
             'Пароль должен содержать цифры и буквы.'

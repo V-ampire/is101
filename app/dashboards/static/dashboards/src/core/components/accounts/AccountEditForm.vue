@@ -63,7 +63,7 @@ export default {
         email: { value: '', errors: [] },
       },
       rules: {
-        min: validators.minLength(8, 'Минимальная длина 8 символов.'),
+        min: validators.minLength(6, 'Минимальная длина 6 символов.'),
         emailMatch: validators.emailMatch('Не валидный имеил.')
       },
       inProgress: false

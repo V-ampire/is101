@@ -37,4 +37,6 @@ CELERY_TIMEZONE = 'UTC'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'app-messages')
+
+
+PRIVATE_STORAGE_ROOT = os.path.join(BASE_DIR, 'media')

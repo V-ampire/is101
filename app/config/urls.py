@@ -24,7 +24,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('dashboards/', include('dashboards.urls')),
     path('api/v1/', include('api.v1.urls')),
+    path('private_media/', include('api.v1.mediafiles.urls')),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
