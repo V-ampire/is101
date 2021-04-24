@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
-User=django
+User=celery
 Group=celery
 EnvironmentFile=/home/django/projects/is101/celery/celery.conf
 WorkingDirectory=/home/django/projects/is101/app
