@@ -7,10 +7,11 @@ After=network.target
 User=django
 Group=www-data
 WorkingDirectory=/home/django/projects/is101/app
-ExecStart=/home/django/projects/is101/venv/bin/gunicorn \
-          --access-logfile - \
+ExecStart=/home/django/projects/is101/.venv/bin/gunicorn \
+          --access-logfile /home/django/projects/is101/gunicorn/access.log \
+          --error-logfile /home/django/projects/is101/gunicorn/error.log \
           --workers 3 \
-          --bind unix:/run/gunicorn.sock \
+          --bind unix:/home/django/projects/is101/gunicorn/gunicorn.sock \
           config.wsgi:application
 
 [Install]
