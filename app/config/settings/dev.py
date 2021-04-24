@@ -40,3 +40,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 PRIVATE_STORAGE_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+INSTALLED_APPS.append(
+    'factory_generator',
+) 

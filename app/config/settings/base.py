@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'companies',
     'dashboards',
     'api',
-    'factory_generator'
 ]
 
 MIDDLEWARE = [
