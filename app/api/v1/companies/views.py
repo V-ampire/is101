@@ -10,7 +10,7 @@ from api.v1.companies import serializers
 from api.v1.permissions import IsCompanyOwnerOrAdmin
 
 from accounts.emails import get_email_fields
-from accounts.tasks import send_account_created_message
+from tasks.accounts import send_account_created_message
 
 from companies.models import CompanyProfile
 from companies import utils

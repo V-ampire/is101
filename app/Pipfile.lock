@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9795f11fe93511b4a9beeab655aac54c3cbc933bdf35a452c7d9f50035af3793"
+            "sha256": "b72c71dd205de51dd267116ec72b8e733776f1c21236827bf6d7b43940bd92d0"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -112,6 +112,13 @@
             ],
             "index": "pypi",
             "version": "==0.93.3"
+        },
+        "gunicorn": {
+            "hashes": [
+                "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"
+            ],
+            "index": "pypi",
+            "version": "==20.1.0"
         },
         "kombu": {
             "hashes": [
@@ -297,10 +304,10 @@
         },
         "faker": {
             "hashes": [
-                "sha256:26c7c3df8d46f1db595a34962f8967021dd90bbd38cc6e27461a3fb16cd413ae",
-                "sha256:44eb060fad3015690ff3fec6564d7171be393021e820ad1851d96cb968fbfcd4"
+                "sha256:14edeced0492f1516df2e8c73bd9cc02307ad89bf2b46c2c3b46b2f595ae6d24",
+                "sha256:1cc03528930fd26570077b05bd02da0625eb87b7ba192ea5c448284beb77149b"
             ],
-            "version": "==8.1.0"
+            "version": "==8.1.1"
         },
         "iniconfig": {
             "hashes": [
