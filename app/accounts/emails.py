@@ -42,7 +42,6 @@ class CreatedEmail():
         return loader.render_to_string(self.subject_template)
 
     def get_message(self):
-        logger.info(self.fields)
         return loader.render_to_string(self.message_template, {'fields': self.fields})
 
     def send(self, **kwargs):

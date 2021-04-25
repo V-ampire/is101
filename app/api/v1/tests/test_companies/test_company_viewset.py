@@ -141,7 +141,6 @@ class TestCreateAction(BaseViewSetTest):
         expected_email_fields = fake.pylist()
         mock_get_fields.return_value = expected_email_fields
         admin_response = self.admin_client.post(self.url, data=self.create_data)
-        import pdb; pdb.set_trace()
         expected_company = CompanyProfile.objects.get(title=self.create_data['title'])
         expected_data = serializers.CompanyDetailSerializer(
             expected_company, 
