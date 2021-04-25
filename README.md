@@ -6,6 +6,67 @@
 `python 3.6+`
 
 
+## Деплоймент
+
+### Клонируем проект
+
+`git clone git@github.com:V-ampire/is101.git`
+
+### Виртуальное окружение
+
+`virtualenv .venv`
+
+`cd app ; pip install -r requirements.txt`
+
+`source .venv/bin/activate`
+
+`python manage.py collectstatic`
+
+### Настраиваем django-приложение
+
+Создать файл .env:
+```
+SECRET_KEY=
+DEBUG=off
+ALLOWED_HOSTS=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=true
+```
+
+Модуль настроек:
+
+`export DJANGO_SETTINGS_MODULE=config.settings.prod`
+
+База данных и статика:
+
+```
+python manage.py migrate
+python manage.py collectstatic
+python manage.py createsuperuser
+```
+
+Добавляем конфиги:
+```
+sudo ln -s $project_path/nginx/is101.conf /etc/nginx/sites-enabled/
+sudo ln -s $project_path/systemd/gunicorn.socket /etc/systemd/system/
+sudo ln -s $project_path/systemd/gunicorn.service /etc/systemd/system/
+sudo ln -s $project_path/systemd/celery.service /etc/systemd/system/
+
+sudo systemctl daemon-reload ; \
+sudo systemctl start gunicorn ; \
+sudo systemctl enable gunicorn ; \
+sudo systemctl start celery ; \
+sudo systemctl enable celery ; \
+sudo service nginx restart
+```
+
+
 ## Роли пользователей
 
 - [Администратор](#role_admin)
