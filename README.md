@@ -20,7 +20,6 @@
 
 `source .venv/bin/activate`
 
-`python manage.py collectstatic`
 
 ### Настраиваем django-приложение
 
