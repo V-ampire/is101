@@ -42,6 +42,7 @@ class CreatedEmail():
         return loader.render_to_string(self.subject_template)
 
     def get_message(self):
+        import pdb; pdb.set_trace()
         return loader.render_to_string(self.message_template, {'fields': self.fields})
 
     def send(self, subject: Optional[str]=None, message: Optional[str]=None, **kwargs):
