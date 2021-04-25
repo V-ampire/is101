@@ -42,12 +42,12 @@ class CreatedEmail():
         return loader.render_to_string(self.subject_template)
 
     def get_message(self):
-        import pdb; pdb.set_trace()
+        logger.info(self.fields)
         return loader.render_to_string(self.message_template, {'fields': self.fields})
 
-    def send(self, subject: Optional[str]=None, message: Optional[str]=None, **kwargs):
-        subject = subject if subject else self.get_subject()
-        message = message if message else self.get_message()
+    def send(self, **kwargs):
+        subject = self.get_subject()
+        message = self.get_message()
         from_email = None
         return send_mail(
             subject, 

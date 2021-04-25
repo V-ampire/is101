@@ -1,5 +1,5 @@
 export default {
-  apiRoot: '127.0.0.1:8000/api/v1',
+  apiRoot: process.env.VUE_APP_API_ROOT,
   adminBaseUrl: '/dashboards/admin/',
   companyBaseUrl: '/dashboards/company/',
   userUuidCookie: 'USER_UUID',
